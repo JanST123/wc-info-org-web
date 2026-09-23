@@ -4,7 +4,8 @@ export const environment: EnvironmentConfig = {
   production: true,
   apiBaseUrl: 'https://api.wc-info.org',
   apiKey: 'wc_web_89745c8e0365016915492a7496f70659',
-  googleMapsApiKey: 'AIzaSyCKQXL0B8kaLSSyG1oA6T_kU3dx-im7uKs',
+  googleMapsApiKey: 'AIzaSyDxkqjduGkK9ijPlVILPGnQOpyxBK2Xo8M',
+  googleMapsMapId: 'DEMO_MAP_ID',
   matomo: {
     trackerUrl: "https://piwik.jan8.de",
     siteId: "1"

@@ -3,6 +3,7 @@ export interface EnvironmentConfig {
   apiBaseUrl: string;
   apiKey?: string;
   googleMapsApiKey?: string;
+  googleMapsMapId?: string;
   matomo?: {
     siteId: string;
     trackerUrl: string;

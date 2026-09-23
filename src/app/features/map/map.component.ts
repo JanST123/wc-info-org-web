@@ -17,6 +17,7 @@ import { Toilet } from '../../core/models/toilet.model';
 import { Coordinates } from '../../core/services/location.service';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-map',
@@ -103,8 +104,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   readonly isMapReady = signal<boolean>(false);
 
   private googleMap?: google.maps.Map;
-  private markersMap = new Map<number, google.maps.Marker | google.maps.marker.AdvancedMarkerElement>();
-  private userMarker?: google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
+  private markersMap = new Map<number, google.maps.marker.AdvancedMarkerElement>();
+  private userMarker?: google.maps.marker.AdvancedMarkerElement;
   private idleListener?: google.maps.MapsEventListener;
   private clickListener?: google.maps.MapsEventListener;
   private moveEndTimer?: ReturnType<typeof setTimeout>;
@@ -146,7 +147,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       const mapOptions: google.maps.MapOptions = {
         center: { lat: this.center.lat, lng: this.center.lon },
         zoom: this.zoom,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapId: environment.googleMapsMapId || 'DEMO_MAP_ID',
         disableDefaultUI: true,
         zoomControl: true,
         zoomControlOptions: {
@@ -199,18 +200,14 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private updateToiletMarkers(): void {
-    if (!this.googleMap || typeof google === 'undefined') return;
+    if (!this.googleMap || typeof google === 'undefined' || !google.maps.marker) return;
 
     const currentToiletIds = new Set(this.toilets.map((t) => t.id));
 
     // Remove markers that are no longer in the list
     for (const [id, marker] of this.markersMap.entries()) {
       if (!currentToiletIds.has(id)) {
-        if ('setMap' in marker) {
-          (marker as google.maps.Marker).setMap(null);
-        } else {
-          (marker as google.maps.marker.AdvancedMarkerElement).map = null;
-        }
+        marker.map = null;
         this.markersMap.delete(id);
       }
     }
@@ -227,35 +224,14 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         this.toiletSelect.emit(toilet);
       });
 
-      // Use AdvancedMarkerElement if available or standard Marker with overlay
-      if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
-        try {
-          const advMarker = new google.maps.marker.AdvancedMarkerElement({
-            map: this.googleMap,
-            position,
-            content: el,
-            title: toilet.name
-          });
-          this.markersMap.set(toilet.id, advMarker);
-          continue;
-        } catch {
-          // Fallback to standard marker if AdvancedMarkerElement is not enabled
-        }
-      }
-
-      // Standard Google Maps Marker fallback
-      const marker = new google.maps.Marker({
-        position,
+      const advMarker = new google.maps.marker.AdvancedMarkerElement({
         map: this.googleMap,
-        title: toilet.name,
-        icon: this.createSvgIconDataUrl(toilet)
+        position,
+        content: el,
+        title: toilet.name
       });
 
-      marker.addListener('click', () => {
-        this.toiletSelect.emit(toilet);
-      });
-
-      this.markersMap.set(toilet.id, marker);
+      this.markersMap.set(toilet.id, advMarker);
     }
 
     if (this.selectedToilet) {
@@ -289,25 +265,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     return el;
   }
 
-  private createSvgIconDataUrl(toilet: Toilet): google.maps.Icon {
-    const isClosed = toilet.status === 'temporary_closed' || toilet.temporaryClosed;
-    const isAccessible = toilet.hasWheelchairAccess;
-    const strokeColor = isClosed ? '#9ca3af' : (isAccessible ? '#2563eb' : '#9333ea');
-
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34">
-        <circle cx="17" cy="17" r="15" fill="#ffffff" stroke="${strokeColor}" stroke-width="3" />
-        <circle cx="17" cy="17" r="7" fill="${strokeColor}" />
-      </svg>
-    `;
-
-    return {
-      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-      scaledSize: new google.maps.Size(34, 34),
-      anchor: new google.maps.Point(17, 17)
-    };
-  }
-
   private highlightSelectedToilet(): void {
     if (!this.selectedToilet || !this.googleMap) return;
 
@@ -318,7 +275,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
     // Update active marker styling
     this.markersMap.forEach((marker, id) => {
-      if ('content' in marker && marker.content) {
+      if (marker.content) {
         const el = marker.content as HTMLElement;
         if (id === this.selectedToilet!.id) {
           el.classList.add('active');
@@ -330,49 +287,33 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private updateUserMarker(): void {
-    if (!this.googleMap || !this.userLocation || typeof google === 'undefined') return;
+    if (!this.googleMap || !this.userLocation || typeof google === 'undefined' || !google.maps.marker) return;
 
     const position = { lat: this.userLocation.lat, lng: this.userLocation.lon };
 
     if (!this.userMarker) {
-      const userSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" fill="#3b82f6" fill-opacity="0.3" />
-          <circle cx="12" cy="12" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="2" />
-        </svg>
-      `;
+      const el = document.createElement('div');
+      el.className = 'user-location-marker';
 
-      this.userMarker = new google.maps.Marker({
+      this.userMarker = new google.maps.marker.AdvancedMarkerElement({
         position,
         map: this.googleMap,
-        title: 'Dein Standort',
-        icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(userSvg),
-          scaledSize: new google.maps.Size(24, 24),
-          anchor: new google.maps.Point(12, 12)
-        }
+        content: el,
+        title: 'Dein Standort'
       });
     } else {
-      if ('setPosition' in this.userMarker) {
-        (this.userMarker as google.maps.Marker).setPosition(position);
-      }
+      this.userMarker.position = position;
     }
   }
 
   private clearAllMarkers(): void {
     this.markersMap.forEach((m) => {
-      if ('setMap' in m) {
-        (m as google.maps.Marker).setMap(null);
-      } else {
-        (m as google.maps.marker.AdvancedMarkerElement).map = null;
-      }
+      m.map = null;
     });
     this.markersMap.clear();
 
     if (this.userMarker) {
-      if ('setMap' in this.userMarker) {
-        (this.userMarker as google.maps.Marker).setMap(null);
-      }
+      this.userMarker.map = null;
       this.userMarker = undefined;
     }
   }
