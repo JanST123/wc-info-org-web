@@ -1,0 +1,425 @@
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-badge/opening-time-badge.component';
+import { ToiletSymbolComponent } from '../../shared/components/toilet-symbol/toilet-symbol.component';
+import { OpeningHoursService } from '../../core/services/opening-hours.service';
+import { LocationService } from '../../core/services/location.service';
+import { TranslationService } from '../../core/services/translation.service';
+
+@Component({
+  selector: 'app-detail',
+  standalone: true,
+  imports: [CommonModule, TranslatePipe, OpeningTimeBadgeComponent],
+  template: `
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+      <div
+        class="bg-white w-full h-full md:h-auto md:max-h-[90vh] md:max-w-2xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-gray-800"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Modal Header -->
+        <div class="p-4 border-b border-gray-100 flex items-start justify-between gap-3 bg-gray-50/70">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              @if (toilet.owner) {
+                <span class="text-xs font-bold text-purple-700 uppercase tracking-wider">
+                  {{ toilet.owner }}
+                </span>
+              }
+              @if (toilet.isQualified) {
+                <span class="inline-flex items-center text-purple-600" [title]="'attr.verified' | translate">
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </span>
+              }
+            </div>
+
+            <h2 class="text-xl md:text-2xl font-black text-gray-900 leading-tight">
+              {{ toilet.name || ('app.title' | translate) }}
+            </h2>
+
+            @if (toilet.address) {
+              <p class="text-xs md:text-sm text-gray-500 mt-0.5">
+                {{ toilet.address }}
+              </p>
+            }
+          </div>
+
+          <!-- Close & Share Buttons -->
+          <div class="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              (click)="shareToilet()"
+              class="p-2 rounded-full hover:bg-gray-200 text-gray-500 transition-colors"
+              [title]="'common.share' | translate"
+            >
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              (click)="onClose.emit()"
+              class="p-2 rounded-full hover:bg-gray-200 text-gray-500 transition-colors"
+              [title]="'common.close' | translate"
+            >
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Modal Body -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+          <!-- Status & Distance Row -->
+          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-purple-50/50 rounded-xl border border-purple-100">
+            <app-opening-time-badge [toilet]="toilet"></app-opening-time-badge>
+
+            @if (formattedDistance) {
+              <span class="text-sm font-bold text-purple-900">
+                {{ formattedDistance }}
+              </span>
+            }
+          </div>
+
+          <!-- Photo Carousel Gallery -->
+          @if (toilet.photos && toilet.photos.length > 0) {
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                  {{ 'detail.photos' | translate }} ({{ toilet.photos.length }})
+                </h3>
+                <button
+                  type="button"
+                  (click)="onAddPhoto.emit(toilet)"
+                  class="text-xs text-purple-600 font-semibold hover:underline"
+                >
+                  + {{ 'detail.addPhoto' | translate }}
+                </button>
+              </div>
+
+              <div class="flex gap-2.5 overflow-x-auto pb-2 no-scrollbar snap-x">
+                @for (photo of toilet.photos; track photo.id || $index) {
+                  <div
+                    (click)="activeLightboxPhoto.set(photo)"
+                    class="relative shrink-0 w-36 h-28 md:w-44 md:h-32 rounded-xl overflow-hidden shadow-xs cursor-pointer border border-gray-100 group snap-start"
+                  >
+                    <img
+                      [src]="photo.urlThumb || photo.url"
+                      [alt]="toilet.name"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="p-4 rounded-xl bg-gray-50 border border-dashed border-gray-200 text-center">
+              <p class="text-xs text-gray-500 mb-2">{{ 'detail.noPhotos' | translate }}</p>
+              <button
+                type="button"
+                (click)="onAddPhoto.emit(toilet)"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 text-xs font-semibold transition-colors"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="9" cy="9" r="2"/>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+                {{ 'detail.addPhoto' | translate }}
+              </button>
+            </div>
+          }
+
+          <!-- Feature Matrix Grid -->
+          <div class="space-y-2">
+            <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+              {{ 'detail.title' | translate }}
+            </h3>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <!-- Wheelchair -->
+              <div class="p-3 rounded-xl border bg-gray-50/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.hasWheelchairAccess ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="4" r="2"/>
+                    <path d="M18 19a6 6 0 0 1-12 0 6 6 0 0 1 12 0Z"/>
+                    <path d="m14 13 3 3"/>
+                    <path d="M9 13v-2a2 2 0 0 1 2-2h3"/>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs text-gray-500">{{ 'attr.wheelchair' | translate }}</span>
+                  <span class="text-xs font-bold truncate">
+                    {{ (toilet.hasWheelchairAccess ? 'common.yes' : 'common.no') | translate }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Changing Table -->
+              <div class="p-3 rounded-xl border bg-gray-50/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.hasChangingTable ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-400'">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs text-gray-500">{{ 'attr.changingTable' | translate }}</span>
+                  <span class="text-xs font-bold truncate">
+                    {{ (toilet.hasChangingTable ? 'common.yes' : 'common.no') | translate }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Euro Key -->
+              <div class="p-3 rounded-xl border bg-gray-50/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="isEuroKeyRequired ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-400'">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/>
+                    <path d="m21 2-9.6 9.6"/>
+                    <circle cx="7.5" cy="15.5" r="5.5"/>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs text-gray-500">{{ 'attr.euroKey' | translate }}</span>
+                  <span class="text-xs font-bold truncate">
+                    {{ (isEuroKeyRequired ? 'attr.euroKeyRequired' : 'attr.noEuroKeyRequired') | translate }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Partitioning -->
+              <div class="p-3 rounded-xl border bg-gray-50/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs text-gray-500">{{ 'create.step9.title' | translate }}</span>
+                  <span class="text-xs font-bold truncate">
+                    {{ (toilet.isUnisex ? 'attr.unisex' : (toilet.isGenderSeparated ? 'attr.genderSeparated' : 'common.unknown')) | translate }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Storage Space -->
+              <div class="p-3 rounded-xl border bg-gray-50/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs text-gray-500">{{ 'attr.storageSpace' | translate }}</span>
+                  <span class="text-xs font-bold truncate">
+                    {{ ('attr.storage.' + (toilet.storageSpace || 'none')) | translate }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Public Access -->
+              <div class="p-3 rounded-xl border bg-gray-50/50 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.publicAccessible !== false ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="m9 12 2 2 4-4"/>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs text-gray-500">{{ 'create.step5.title' | translate }}</span>
+                  <span class="text-xs font-bold truncate">
+                    {{ (toilet.publicAccessible !== false ? 'attr.public' : 'attr.nonPublic') | translate }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Opening Hours Table -->
+          <div class="space-y-2">
+            <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+              {{ 'detail.openingSchedule' | translate }}
+            </h3>
+            <div class="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100 text-xs">
+              @for (schedule of weeklySchedule; track schedule.dayIndex) {
+                <div
+                  class="p-2.5 flex items-center justify-between"
+                  [class.bg-purple-50]="schedule.isToday"
+                  [class.font-bold]="schedule.isToday"
+                  [class.text-purple-900]="schedule.isToday"
+                >
+                  <div class="flex items-center gap-2">
+                    <span>{{ schedule.dayName }}</span>
+                    @if (schedule.isToday) {
+                      <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-purple-200 text-purple-800 uppercase font-extrabold">
+                        {{ 'days.today' | translate }}
+                      </span>
+                    }
+                  </div>
+                  <span>{{ schedule.hoursText }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Website / External Links -->
+          @if (toilet.website) {
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                {{ 'detail.website' | translate }}
+              </h3>
+              <a
+                [href]="toilet.website"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 text-xs text-purple-600 hover:text-purple-800 font-semibold break-all underline"
+              >
+                {{ toilet.website }}
+                <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/>
+                  <line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+          }
+
+          <!-- Comments / Notes -->
+          @if (toilet.comment) {
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                {{ 'detail.comments' | translate }}
+              </h3>
+              <p class="text-xs text-gray-600 p-3 bg-gray-50 rounded-xl border border-gray-100 whitespace-pre-line">
+                {{ toilet.comment }}
+              </p>
+            </div>
+          }
+        </div>
+
+        <!-- Modal Footer Action Bar -->
+        <div class="p-4 border-t border-gray-200 bg-gray-50 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="onSuggestEdit.emit(toilet)"
+              class="px-3 py-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-100 text-xs font-semibold text-gray-700 transition-colors"
+            >
+              {{ 'detail.suggestEdit' | translate }}
+            </button>
+            <button
+              type="button"
+              (click)="onReportProblem.emit(toilet)"
+              class="px-3 py-2 rounded-xl bg-white border border-gray-200 hover:bg-rose-50 hover:text-rose-700 text-xs font-semibold text-gray-700 transition-colors"
+            >
+              {{ 'detail.reportProblem' | translate }}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            (click)="onStartNavigation.emit(toilet)"
+            class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-md transition-all active:scale-95 flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+            </svg>
+            <span>{{ 'detail.navigate' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    @if (activeLightboxPhoto()) {
+      <div
+        class="fixed inset-0 z-60 bg-black/95 flex items-center justify-center p-4 animate-fadeIn"
+        (click)="activeLightboxPhoto.set(null)"
+      >
+        <button
+          type="button"
+          (click)="activeLightboxPhoto.set(null)"
+          class="absolute top-4 right-4 text-white p-2 rounded-full hover:bg-white/20 transition-colors"
+        >
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <img
+          [src]="activeLightboxPhoto()!.url"
+          [alt]="toilet.name"
+          class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+          (click)="$event.stopPropagation()"
+        />
+      </div>
+    }
+  `
+})
+export class DetailComponent {
+  private readonly openingHoursService = inject(OpeningHoursService);
+  private readonly locationService = inject(LocationService);
+  private readonly translationService = inject(TranslationService);
+
+  @Input({ required: true }) toilet!: Toilet;
+
+  @Output() onClose = new EventEmitter<void>();
+  @Output() onStartNavigation = new EventEmitter<Toilet>();
+  @Output() onSuggestEdit = new EventEmitter<Toilet>();
+  @Output() onReportProblem = new EventEmitter<Toilet>();
+  @Output() onAddPhoto = new EventEmitter<Toilet>();
+
+  readonly activeLightboxPhoto = signal<ToiletPhoto | null>(null);
+
+  get formattedDistance(): string | null {
+    if (this.toilet.distanceMeters !== undefined && this.toilet.distanceMeters !== null) {
+      return this.locationService.formatDistance(this.toilet.distanceMeters);
+    }
+    if (this.toilet.distance !== undefined && this.toilet.distance !== null) {
+      return this.locationService.formatDistance(this.toilet.distance * 1000);
+    }
+    return null;
+  }
+
+  get isEuroKeyRequired(): boolean {
+    const k = this.toilet.euroKey;
+    return k === 'yes' || k === 'true' || k === '1';
+  }
+
+  get weeklySchedule() {
+    this.translationService.currentLang();
+    return this.openingHoursService.getWeeklySchedule(this.toilet);
+  }
+
+  shareToilet(): void {
+    const shareUrl = window.location.origin + '/results?toilet=' + this.toilet.id;
+    if (navigator.share) {
+      navigator.share({
+        title: this.toilet.name || 'WC-Info',
+        text: this.toilet.address || 'WC-Info Restroom',
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert(this.translationService.t('common.copied'));
+      });
+    }
+  }
+}
