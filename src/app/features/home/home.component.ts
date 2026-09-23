@@ -168,7 +168,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
       <!-- Footer -->
       <footer class="relative z-10 py-4 text-center text-xs text-purple-300/70 border-t border-white/10">
-        <p>&copy; 2026 WC-Info. Open Community Data.</p>
+        <p>{{ funnyFooter() }}</p>
       </footer>
     </div>
   `
@@ -184,10 +184,23 @@ export class HomeComponent implements OnInit {
   readonly suggestions = signal<PlaceSuggestion[]>([]);
   readonly recentSearches = signal<string[]>([]);
 
+  private funnyFooters = [
+    "Made of stardust 💫",
+    "Powered by coffee ☕",
+    "Made in Germany 🥔",
+    "Made with love ❤️",
+    "Toilets are our passion 🚽",
+  ];
+  funnyFooter = signal<string>(this.funnyFooters[Math.floor(Math.random() * this.funnyFooters.length)]);
+
   private readonly searchSubject = new Subject<string>();
 
   ngOnInit(): void {
     this.loadRecentSearches();
+
+    window.setInterval(() => {
+      this.funnyFooter.set(this.funnyFooters[Math.floor(Math.random() * this.funnyFooters.length)]);
+    }, 10000);
 
     this.searchSubject.pipe(
       debounceTime(300),
