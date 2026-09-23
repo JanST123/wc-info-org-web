@@ -281,7 +281,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     const img = document.createElement('img');
     img.src = `/assets/${iconName}.png`;
     img.alt = toilet.name || 'Toilet';
-    img.className = 'w-6 h-6 object-contain pointer-events-none';
+    img.className = 'w-12 h-12 object-contain pointer-events-none';
 
     if (isClosed) {
       img.style.filter = 'grayscale(100%) opacity(0.65)';

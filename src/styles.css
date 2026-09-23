@@ -51,10 +51,10 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 9999px;
+  /* border-radius: 9999px;
   background-color: white;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  border: 2px solid white;
+  border: 2px solid white; */
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
@@ -66,8 +66,8 @@
 
 .custom-map-pin.active {
   transform: scale(1.25) translateY(-4px);
-  border-color: #9333ea;
-  box-shadow: 0 6px 16px rgba(147, 51, 234, 0.45);
+  /* border-color: #9333ea;
+  box-shadow: 0 6px 16px rgba(147, 51, 234, 0.45); */
   z-index: 50;
 }
 
