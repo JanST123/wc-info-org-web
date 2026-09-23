@@ -254,9 +254,12 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getMarkerIconName(toilet: Toilet): string {
-    if (toilet.hasWheelchairAccess) {
+    const isWheelchair = Boolean(toilet.hasWheelchairAccess || (toilet as any).has_wheelchair_access);
+    const isGenderSep = Boolean(toilet.isGenderSeparated || (toilet as any).is_gender_separated);
+
+    if (isWheelchair) {
       return 'toiletAccessible';
-    } else if (toilet.isGenderSeparated) {
+    } else if (isGenderSep) {
       return 'toiletGenderSeparated';
     } else {
       return 'toiletUnisex';
@@ -268,7 +271,11 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     el.className = 'custom-map-pin';
     el.setAttribute('data-id', toilet.id.toString());
 
-    const isClosed = toilet.status === 'temporary_closed' || toilet.temporaryClosed;
+    const isClosed = Boolean(
+      toilet.status === 'temporary_closed' ||
+      toilet.temporaryClosed ||
+      (toilet as any).temporary_closed
+    );
     const iconName = this.getMarkerIconName(toilet);
 
     const img = document.createElement('img');

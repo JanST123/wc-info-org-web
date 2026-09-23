@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   Toilet,
+  normalizeToiletList,
   AddToiletPayload,
   AddToiletResponse,
   UpdateToiletPayload,
@@ -32,7 +33,9 @@ export class WcInfoApiService {
     if (filter) {
       params = params.set('filter', filter);
     }
-    return this.http.get<Toilet[]>(`${this.baseUrl}/toilets/nearby/${lat}/${lon}`, { params });
+    return this.http.get<any[]>(`${this.baseUrl}/toilets/nearby/${lat}/${lon}`, { params }).pipe(
+      map((items) => normalizeToiletList(items))
+    );
   }
 
   fetchToiletsInBounds(south: number, west: number, north: number, east: number, filter?: string): Observable<Toilet[]> {
@@ -40,7 +43,9 @@ export class WcInfoApiService {
     if (filter) {
       params = params.set('filter', filter);
     }
-    return this.http.get<Toilet[]>(`${this.baseUrl}/toilets/bounds/${south}/${west}/${north}/${east}`, { params });
+    return this.http.get<any[]>(`${this.baseUrl}/toilets/bounds/${south}/${west}/${north}/${east}`, { params }).pipe(
+      map((items) => normalizeToiletList(items))
+    );
   }
 
   addToilet(payload: AddToiletPayload): Observable<AddToiletResponse> {
