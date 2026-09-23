@@ -21,9 +21,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         <img
           src="/assets/lavendel.webp"
           alt="Lavender background"
-          class="w-full h-full object-cover object-center opacity-40 scale-105 transform animate-pulse-slow"
+          class="w-full h-full object-cover object-center scale-105 transform animate-pulse-slow"
         />
-        <div class="absolute inset-0 bg-gradient-to-b from-purple-950/80 via-gray-900/85 to-gray-950"></div>
+        <!--<div class="absolute inset-0 bg-gradient-to-b from-purple-950/40 via-gray-900/45 to-gray-950/60"></div>-->
       </div>
 
       <!-- App Header -->
@@ -38,16 +38,20 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             alt="WC-Info Logo"
             class="w-20 h-20 md:w-24 md:h-24 object-contain mb-4 drop-shadow-2xl animate-bounce-subtle"
           />
-          <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-purple-200 via-white to-purple-300 bg-clip-text text-transparent">
-            {{ 'app.title' | translate }}
-          </h1>
-          <p class="mt-3 text-sm md:text-lg text-purple-200/90 max-w-xl font-medium">
-            {{ 'app.subtitle' | translate }}
-          </p>
+         
         </div>
 
         <!-- Search Card -->
         <div class="w-full max-w-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 md:p-6 rounded-2xl shadow-2xl relative text-left">
+          <div class="mb-8 flex flex-col items-center">
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-purple-200 via-white to-purple-300 bg-clip-text text-transparent">
+              {{ 'app.title' | translate }}
+            </h1>
+            <p class="mt-3 text-sm md:text-lg text-purple-200/90 max-w-xl font-medium">
+              {{ 'app.subtitle' | translate }}
+            </p>
+          </div>
+
           <!-- Autocomplete Input Box -->
           <div class="relative">
             <div class="relative flex items-center">
@@ -140,9 +144,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             <button
               type="button"
               (click)="onNearbyClick()"
-              class="w-full py-3 px-4 rounded-xl bg-white/20 hover:bg-white/30 text-white border border-white/30 font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 backdrop-blur-md"
+              class="w-full py-3 px-4 rounded-xl bg-gray-200/80 hover:bg-white/30 text-purple-500 border border-white/30 font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 backdrop-blur-md"
             >
-              <svg class="w-4 h-4 text-purple-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg class="w-4 h-4 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
                 <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
               </svg>

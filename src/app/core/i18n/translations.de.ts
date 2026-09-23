@@ -1,7 +1,7 @@
 export const TRANSLATIONS_DE: Record<string, string> = {
   // General & Navigation
   'app.title': 'WC-Info',
-  'app.subtitle': 'Finde saubere und barrierefreie Toiletten in deiner Nähe',
+  'app.subtitle': 'Finde Toiletten in deiner Nähe',
   'nav.home': 'Start',
   'nav.search': 'Suchen',
   'nav.nearby': 'In der Nähe',
