@@ -87,6 +87,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
 
   // Detail View
   'detail.title': 'Restroom Details',
+  'detail.viewDetails': 'View details',
   'detail.navigate': 'Navigate',
   'detail.suggestEdit': 'Suggest edits',
   'detail.reportProblem': 'Report problem',

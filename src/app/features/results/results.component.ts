@@ -145,6 +145,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             [userLocation]="userLocation()"
             (boundsChange)="onBoundsChange($event)"
             (toiletSelect)="onSelectToilet($event)"
+            (openDetails)="onOpenDetails($event)"
             (mapCreate)="onMapCreate($event)"
           />
 
