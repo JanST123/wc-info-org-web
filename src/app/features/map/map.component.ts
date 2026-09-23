@@ -109,6 +109,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private idleListener?: google.maps.MapsEventListener;
   private clickListener?: google.maps.MapsEventListener;
   private moveEndTimer?: ReturnType<typeof setTimeout>;
+  private lastEmittedBounds?: { south: number; west: number; north: number; east: number };
 
   ngOnInit(): void {
     this.initGoogleMap();
@@ -121,8 +122,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       this.updateToiletMarkers();
     }
 
-    if (changes['selectedToilet'] && this.selectedToilet) {
-      this.highlightSelectedToilet();
+    if (changes['selectedToilet']) {
+      this.highlightSelectedMarkersOnly();
     }
 
     if (changes['userLocation'] && this.userLocation) {
@@ -159,7 +160,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       this.googleMap = new g.maps.Map(this.mapContainerElement.nativeElement, mapOptions);
       this.isMapReady.set(true);
 
-      // Listen for idle events (camera pan / zoom finished)
+      // Listen for camera idle event
       this.idleListener = this.googleMap.addListener('idle', () => {
         this.emitCurrentBounds();
       });
@@ -189,13 +190,27 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
       const sw = bounds.getSouthWest();
       const ne = bounds.getNorthEast();
-
-      this.boundsChange.emit({
+      const newBounds = {
         south: sw.lat(),
         west: sw.lng(),
         north: ne.lat(),
         east: ne.lng()
-      });
+      };
+
+      // Suppress duplicate calls if the bounds haven't shifted
+      if (this.lastEmittedBounds) {
+        const dSouth = Math.abs(this.lastEmittedBounds.south - newBounds.south);
+        const dWest = Math.abs(this.lastEmittedBounds.west - newBounds.west);
+        const dNorth = Math.abs(this.lastEmittedBounds.north - newBounds.north);
+        const dEast = Math.abs(this.lastEmittedBounds.east - newBounds.east);
+
+        if (dSouth < 0.0001 && dWest < 0.0001 && dNorth < 0.0001 && dEast < 0.0001) {
+          return;
+        }
+      }
+
+      this.lastEmittedBounds = newBounds;
+      this.boundsChange.emit(newBounds);
     }, 300);
   }
 
@@ -228,14 +243,23 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         map: this.googleMap,
         position,
         content: el,
-        title: toilet.name
+        title: toilet.name,
+        zIndex: this.selectedToilet?.id === toilet.id ? 100 : 1
       });
 
       this.markersMap.set(toilet.id, advMarker);
     }
 
-    if (this.selectedToilet) {
-      this.highlightSelectedToilet();
+    this.highlightSelectedMarkersOnly();
+  }
+
+  private getMarkerIconName(toilet: Toilet): string {
+    if (toilet.hasWheelchairAccess) {
+      return 'toiletAccessible';
+    } else if (toilet.isGenderSeparated) {
+      return 'toiletGenderSeparated';
+    } else {
+      return 'toiletUnisex';
     }
   }
 
@@ -244,43 +268,43 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     el.className = 'custom-map-pin';
     el.setAttribute('data-id', toilet.id.toString());
 
-    let iconSvg = '';
-    let colorClass = 'text-purple-600';
+    const isClosed = toilet.status === 'temporary_closed' || toilet.temporaryClosed;
+    const iconName = this.getMarkerIconName(toilet);
 
-    if (toilet.status === 'temporary_closed' || toilet.temporaryClosed) {
-      colorClass = 'text-gray-400';
-      iconSvg = `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
-    } else if (toilet.hasWheelchairAccess) {
-      colorClass = 'text-blue-600';
-      iconSvg = `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="4" r="2"/><path d="M18 19a6 6 0 0 1-12 0 6 6 0 0 1 12 0Z"/><path d="m14 13 3 3"/><path d="M9 13v-2a2 2 0 0 1 2-2h3"/></svg>`;
-    } else if (toilet.hasChangingTable) {
-      colorClass = 'text-pink-600';
-      iconSvg = `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>`;
-    } else {
-      colorClass = 'text-purple-600';
-      iconSvg = `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    const img = document.createElement('img');
+    img.src = `/assets/${iconName}.png`;
+    img.alt = toilet.name || 'Toilet';
+    img.className = 'w-6 h-6 object-contain pointer-events-none';
+
+    if (isClosed) {
+      img.style.filter = 'grayscale(100%) opacity(0.65)';
+      el.style.borderColor = '#9ca3af';
     }
 
-    el.innerHTML = iconSvg;
+    el.appendChild(img);
     return el;
   }
 
-  private highlightSelectedToilet(): void {
-    if (!this.selectedToilet || !this.googleMap) return;
+  private highlightSelectedMarkersOnly(): void {
+    if (!this.selectedToilet) {
+      this.markersMap.forEach((marker) => {
+        if (marker.content) {
+          (marker.content as HTMLElement).classList.remove('active');
+          marker.zIndex = 1;
+        }
+      });
+      return;
+    }
 
-    this.googleMap.panTo({
-      lat: this.selectedToilet.lat,
-      lng: this.selectedToilet.lon
-    });
-
-    // Update active marker styling
     this.markersMap.forEach((marker, id) => {
       if (marker.content) {
         const el = marker.content as HTMLElement;
         if (id === this.selectedToilet!.id) {
           el.classList.add('active');
+          marker.zIndex = 100;
         } else {
           el.classList.remove('active');
+          marker.zIndex = 1;
         }
       }
     });
@@ -299,7 +323,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         position,
         map: this.googleMap,
         content: el,
-        title: 'Dein Standort'
+        title: 'Dein Standort',
+        zIndex: 200
       });
     } else {
       this.userMarker.position = position;
