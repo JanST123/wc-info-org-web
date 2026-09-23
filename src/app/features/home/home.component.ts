@@ -200,7 +200,7 @@ export class HomeComponent implements OnInit {
 
     window.setInterval(() => {
       this.funnyFooter.set(this.funnyFooters[Math.floor(Math.random() * this.funnyFooters.length)]);
-    }, 10000);
+    }, 60000);
 
     this.searchSubject.pipe(
       debounceTime(300),
