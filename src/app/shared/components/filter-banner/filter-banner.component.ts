@@ -190,6 +190,13 @@ export class FilterBannerComponent {
 
   isNonDefault(): boolean {
     const f = this.filters();
-    return f.showClosed || f.showNonPublic || !f.showNonWheelchairAccessible || !f.showWithoutChangingTable || !f.showWithoutGenderSeparation || !f.showWithoutEuroKey;
+    return (
+      f.showClosed ||
+      !f.showNonPublic ||
+      !f.showNonWheelchairAccessible ||
+      !f.showWithoutChangingTable ||
+      !f.showWithoutGenderSeparation ||
+      !f.showWithoutEuroKey
+    );
   }
 }

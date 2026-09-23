@@ -48,12 +48,12 @@ export class ToiletStateService {
       .sort((a, b) => (a.distanceMeters || 0) - (b.distanceMeters || 0));
   });
 
-  // Computed: Active filter count
+  // Computed: Active filter count (deviations from defaults)
   readonly activeFilterCount = computed(() => {
     const f = this.filterSettings();
     let count = 0;
     if (f.showClosed) count++;
-    if (f.showNonPublic) count++;
+    if (!f.showNonPublic) count++;
     if (!f.showNonWheelchairAccessible) count++;
     if (!f.showWithoutChangingTable) count++;
     if (!f.showWithoutGenderSeparation) count++;

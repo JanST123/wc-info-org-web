@@ -11,7 +11,7 @@ export interface ToiletFilterSettings {
 
 export const DEFAULT_FILTER_SETTINGS: ToiletFilterSettings = {
   showClosed: false,
-  showNonPublic: false,
+  showNonPublic: true,
   showNonWheelchairAccessible: true,
   showWithoutChangingTable: true,
   showWithoutGenderSeparation: true,
