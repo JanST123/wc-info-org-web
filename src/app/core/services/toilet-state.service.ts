@@ -76,13 +76,40 @@ export class ToiletStateService {
       });
   }
 
+  private lastBounds: { south: number; west: number; north: number; east: number } | null = null;
+  private lastNearby: { lat: number; lon: number; distance: number } | null = null;
+
   setFilterSettings(settings: ToiletFilterSettings): void {
     this.filterSettings.set(settings);
-    // Trigger reload for current map bounds or location
+    this.reloadCurrentView();
   }
 
   resetFilterSettings(): void {
     this.filterSettings.set(DEFAULT_FILTER_SETTINGS);
+    this.reloadCurrentView();
+  }
+
+  reloadCurrentView(): void {
+    if (this.lastBounds) {
+      this.loadToiletsInBounds(
+        this.lastBounds.south,
+        this.lastBounds.west,
+        this.lastBounds.north,
+        this.lastBounds.east
+      );
+    } else if (this.lastNearby) {
+      this.loadToiletsNearby(
+        this.lastNearby.lat,
+        this.lastNearby.lon,
+        this.lastNearby.distance
+      );
+    } else if (this.userLocation()) {
+      const user = this.userLocation()!;
+      this.loadToiletsNearby(user.lat, user.lon);
+    } else {
+      const center = this.mapCenter();
+      this.loadToiletsNearby(center.lat, center.lon);
+    }
   }
 
   setSelectedToilet(toilet: Toilet | null): void {
@@ -93,6 +120,7 @@ export class ToiletStateService {
   }
 
   loadToiletsInBounds(south: number, west: number, north: number, east: number): void {
+    this.lastBounds = { south, west, north, east };
     const filterQuery = buildApiFilterQuery(this.filterSettings());
     this.isLoading.set(true);
     this.error.set(null);
@@ -112,6 +140,7 @@ export class ToiletStateService {
   }
 
   loadToiletsNearby(lat: number, lon: number, distance = 10): void {
+    this.lastNearby = { lat, lon, distance };
     const filterQuery = buildApiFilterQuery(this.filterSettings());
     this.isLoading.set(true);
     this.error.set(null);
