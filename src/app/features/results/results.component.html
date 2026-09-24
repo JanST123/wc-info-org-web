@@ -3,13 +3,13 @@
       <app-header class="shrink-0" />
 
       <!-- Main Responsive Shell -->
-      <div class="flex-1 flex relative overflow-hidden">
+      <div class="flex-1 flex relative overflow-hidden h-[calc(100vh-57px)]">
         <!-- ============================================== -->
         <!-- Desktop / Tablet Landscape Left Pane (>= 768px) -->
         <!-- ============================================== -->
-        <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-10 shrink-0 h-[calc(100vh-57px)]">
-          <!-- Search Header in Sidebar -->
-          <div class="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+        <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-10 shrink-0 h-full">
+          <!-- Search & Action Header in Sidebar -->
+          <div class="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2.5">
             <div class="relative">
               <input
                 type="text"
@@ -52,6 +52,20 @@
                 </div>
               }
             </div>
+
+            <!-- Missing Toilet Banner Button -->
+            <button
+              type="button"
+              (click)="openAddModal()"
+              class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-500 hover:opacity-95 active:scale-[0.99] text-white shadow-md transition-all text-center flex flex-col items-center justify-center cursor-pointer"
+            >
+              <span class="font-black text-sm tracking-wide leading-tight">
+                {{ 'nav.missingToilet' | translate }}
+              </span>
+              <span class="text-[11px] text-white/90 font-medium leading-tight mt-0.5">
+                {{ 'nav.missingToiletSub' | translate }}
+              </span>
+            </button>
           </div>
 
           <!-- Filter Banner Component -->
@@ -96,9 +110,9 @@
         </aside>
 
         <!-- ============================================== -->
-        <!-- Right Interactive Map View (Full screen / Split) -->
+        <!-- Desktop Interactive Map View (>= 768px) -->
         <!-- ============================================== -->
-        <main class="flex-1 relative h-[calc(100vh-57px)]">
+        <main class="hidden md:block flex-1 relative h-full">
           <app-map
             [toilets]="toilets()"
             [selectedToilet]="selectedToilet()"
@@ -109,72 +123,144 @@
             (openDetails)="onOpenDetails($event)"
             (mapCreate)="onMapCreate($event)"
           />
+        </main>
 
-          <!-- Mobile Floating Search Bar on Top (< 768px) -->
-          <div class="md:hidden absolute top-3 left-3 right-3 z-20">
-            <div class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-              <div class="p-2 flex items-center gap-2">
-                <svg class="w-4 h-4 text-gray-400 ml-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"/>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
+        <!-- ============================================== -->
+        <!-- Mobile Portrait Layout (< 768px) -->
+        <!-- Top: Results List (60% default), Bottom: Map (40%) -->
+        <!-- Draggable ratio between results list and map -->
+        <!-- ============================================== -->
+        <div id="results-portrait-container" class="md:hidden flex flex-col w-full h-full overflow-hidden relative">
+          <!-- Top Section: Results Area -->
+          <div
+            class="flex flex-col bg-white dark:bg-gray-900 overflow-hidden z-10 transition-none"
+            [style.height.%]="listHeightPercent()"
+          >
+            <!-- Search & Missing Toilet Controls Header -->
+            <div class="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2">
+              <div class="relative">
                 <input
                   type="text"
                   [(ngModel)]="searchQuery"
                   (ngModelChange)="onSearchInput($event)"
+                  (focus)="isSearchFocused.set(true)"
                   [placeholder]="'common.searchPlaceholder' | translate"
-                  class="w-full py-1.5 text-xs bg-transparent focus:outline-hidden text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                  class="w-full pl-9 pr-8 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-hidden shadow-2xs"
                 />
-              </div>
-              <app-filter-banner />
-            </div>
-          </div>
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
 
-          <!-- ============================================== -->
-          <!-- Mobile Bottom Sheet Drawer (< 768px) -->
-          <!-- ============================================== -->
-          <div
-            class="md:hidden absolute bottom-0 left-0 right-0 z-20 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl border-t border-gray-200 dark:border-gray-800 transition-all duration-300 flex flex-col"
-            [ngClass]="mobileDrawerClasses()"
-          >
-            <!-- Drag Handle & Drawer Header -->
-            <div
-              (click)="toggleMobileDrawer()"
-              class="p-2.5 flex flex-col items-center justify-center cursor-pointer select-none bg-gray-50 dark:bg-gray-800 rounded-t-2xl border-b border-gray-100 dark:border-gray-750"
-            >
-              <div class="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600 mb-1.5"></div>
-              <div class="flex items-center justify-between w-full px-3 text-xs font-bold text-gray-600 dark:text-gray-300">
-                <span>{{ toilets().length }} Toiletten</span>
-                <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold uppercase">
-                  {{ drawerState() === 'peek' ? 'Mehr anzeigen ↑' : 'Einklappen ↓' }}
+                @if (searchQuery) {
+                  <button
+                    type="button"
+                    (click)="searchQuery = ''; suggestions.set([])"
+                    class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                }
+
+                <!-- Suggestions Dropdown -->
+                @if (isSearchFocused() && suggestions().length > 0) {
+                  <div class="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
+                    @for (place of suggestions(); track place.placeId) {
+                      <div
+                        (click)="selectPlace(place)"
+                        class="px-3 py-2 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer text-xs flex flex-col border-b border-gray-50 dark:border-gray-700 last:border-0"
+                      >
+                        <span class="font-bold text-gray-900 dark:text-gray-100 truncate">{{ place.primaryText }}</span>
+                        <span class="text-[11px] text-gray-500 dark:text-gray-400 truncate">{{ place.secondaryText }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Missing Toilet Banner Button -->
+              <button
+                type="button"
+                (click)="openAddModal()"
+                class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-500 hover:opacity-95 active:scale-[0.99] text-white shadow-md transition-all text-center flex flex-col items-center justify-center cursor-pointer"
+              >
+                <span class="font-black text-sm tracking-wide leading-tight">
+                  {{ 'nav.missingToilet' | translate }}
                 </span>
-              </div>
+                <span class="text-[11px] text-white/90 font-medium leading-tight mt-0.5">
+                  {{ 'nav.missingToiletSub' | translate }}
+                </span>
+              </button>
             </div>
 
-            <!-- Drawer Scrollable Content -->
+            <!-- Filter Banner Component -->
+            <app-filter-banner />
+
+            <!-- Count Summary -->
+            <div class="px-4 py-1.5 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
+              <span>{{ toilets().length }} Toiletten</span>
+              @if (isLoading()) {
+                <span class="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 font-semibold">
+                  <svg class="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 2v4M12 18v4"/>
+                  </svg>
+                  {{ 'common.loading' | translate }}
+                </span>
+              }
+            </div>
+
+            <!-- Scrollable Toilet Cards List -->
             <div class="flex-1 overflow-y-auto p-3 space-y-2.5">
-              @if (selectedToilet() && drawerState() === 'peek') {
+              @for (toilet of toilets(); track toilet.id) {
                 <app-toilet-card
-                  [toilet]="selectedToilet()!"
-                  [isSelected]="true"
+                  [toilet]="toilet"
+                  [isSelected]="selectedToilet()?.id === toilet.id"
                   (onSelect)="onSelectToilet($event)"
                   (onOpenDetails)="onOpenDetails($event)"
                   (onNavigate)="onStartNavigation($event)"
                 />
-              } @else {
-                @for (toilet of toilets(); track toilet.id) {
-                  <app-toilet-card
-                    [toilet]="toilet"
-                    [isSelected]="selectedToilet()?.id === toilet.id"
-                    (onSelect)="onSelectToilet($event)"
-                    (onOpenDetails)="onOpenDetails($event)"
-                    (onNavigate)="onStartNavigation($event)"
-                  />
+              } @empty {
+                @if (!isLoading()) {
+                  <div class="p-8 text-center text-gray-400 dark:text-gray-500 space-y-2">
+                    <svg class="w-10 h-10 mx-auto text-gray-300 dark:text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <p class="text-xs">{{ 'common.noResults' | translate }}</p>
+                  </div>
                 }
               }
             </div>
           </div>
-        </main>
+
+          <!-- Draggable Splitter Handle between List and Map -->
+          <div
+            (mousedown)="startDragging($event)"
+            (touchstart)="startDragging($event)"
+            class="h-6 flex items-center justify-center cursor-row-resize touch-none select-none bg-gray-100 dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20 shrink-0 shadow-xs"
+            title="Drag to resize results / map"
+          >
+            <div class="w-12 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500"></div>
+          </div>
+
+          <!-- Bottom Section: Map Component -->
+          <div class="flex-1 relative w-full overflow-hidden">
+            <app-map
+              [toilets]="toilets()"
+              [selectedToilet]="selectedToilet()"
+              [center]="mapCenter()"
+              [userLocation]="userLocation()"
+              (boundsChange)="onBoundsChange($event)"
+              (toiletSelect)="onSelectToilet($event)"
+              (openDetails)="onOpenDetails($event)"
+              (mapCreate)="onMapCreate($event)"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- ============================================== -->

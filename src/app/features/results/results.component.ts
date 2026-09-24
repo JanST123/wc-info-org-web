@@ -54,7 +54,12 @@ export class ResultsComponent implements OnInit {
   searchQuery = '';
   readonly isSearchFocused = signal<boolean>(false);
   readonly suggestions = signal<PlaceSuggestion[]>([]);
-  readonly drawerState = signal<'peek' | 'half' | 'full'>('peek');
+  readonly listHeightPercent = signal<number>(60);
+
+  private isDragging = false;
+  private startY = 0;
+  private startHeightPercent = 60;
+  private containerHeight = 0;
 
   // Modal Signals
   readonly activeDetailToilet = signal<Toilet | null>(null);
@@ -147,6 +152,10 @@ export class ResultsComponent implements OnInit {
     this.toiletState.openCreateWizard(coords);
   }
 
+  openAddModal(): void {
+    this.toiletState.openCreateWizard();
+  }
+
   onToiletCreated(toilet: Toilet): void {
     this.toiletState.closeCreateWizard();
     this.toiletState.addToiletToState(toilet);
@@ -164,18 +173,36 @@ export class ResultsComponent implements OnInit {
     this.activePhotoToilet.set(null);
   }
 
-  toggleMobileDrawer(): void {
-    this.drawerState.update((current) => (current === 'peek' ? 'half' : 'peek'));
-  }
+  startDragging(event: MouseEvent | TouchEvent): void {
+    this.isDragging = true;
+    this.startY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+    this.startHeightPercent = this.listHeightPercent();
 
-  mobileDrawerClasses(): string {
-    switch (this.drawerState()) {
-      case 'peek':
-        return 'h-36 max-h-36';
-      case 'half':
-        return 'h-[50vh] max-h-[50vh]';
-      case 'full':
-        return 'h-[85vh] max-h-[85vh]';
-    }
+    const container = document.getElementById('results-portrait-container');
+    this.containerHeight = container ? container.getBoundingClientRect().height : window.innerHeight;
+
+    const onMove = (e: MouseEvent | TouchEvent) => {
+      if (!this.isDragging) return;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const deltaY = clientY - this.startY;
+      const deltaPercent = (deltaY / (this.containerHeight || 1)) * 100;
+      const newPercent = Math.min(85, Math.max(15, this.startHeightPercent + deltaPercent));
+      this.listHeightPercent.set(newPercent);
+      window.dispatchEvent(new Event('resize'));
+    };
+
+    const onEnd = () => {
+      this.isDragging = false;
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onEnd);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+      window.dispatchEvent(new Event('resize'));
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: false });
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onEnd);
   }
 }

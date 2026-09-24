@@ -6,6 +6,8 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'nav.search': 'Suchen',
   'nav.nearby': 'In der Nähe',
   'nav.addToilet': 'Toilette hinzufügen',
+  'nav.missingToilet': 'Fehlt eine Toilette?',
+  'nav.missingToiletSub': 'Hier klicken, um eine Toilette hinzuzufügen – wir freuen uns darüber!',
   'nav.urgent': 'Notfall-WC',
   'common.loading': 'Wird geladen...',
   'common.error': 'Ein Fehler ist aufgetreten',
