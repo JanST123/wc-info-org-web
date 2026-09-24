@@ -1,15 +1,15 @@
-<div class="relative min-h-screen flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-100 overflow-hidden">
+<div class="relative h-screen h-dvh flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-100 overflow-hidden">
       <!-- Top Navigation Header -->
       <app-header class="shrink-0" />
 
       <!-- Main Responsive Shell -->
-      <div class="flex-1 flex relative overflow-hidden h-[calc(100vh-57px)]">
+      <div class="flex-1 min-h-0 flex relative overflow-hidden">
         <!-- ============================================== -->
         <!-- Desktop / Tablet Landscape Left Pane (>= 768px) -->
         <!-- ============================================== -->
-        <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-10 shrink-0 h-full">
+        <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-10 shrink-0 h-full overflow-hidden">
           <!-- Search & Action Header in Sidebar -->
-          <div class="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2.5">
+          <div class="shrink-0 p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2.5">
             <div class="relative">
               <input
                 type="text"
@@ -69,10 +69,10 @@
           </div>
 
           <!-- Filter Banner Component -->
-          <app-filter-banner />
+          <app-filter-banner class="shrink-0" />
 
           <!-- Results Summary Header -->
-          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
+          <div class="shrink-0 px-4 py-2 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
             <span>{{ toilets().length }} Toiletten in diesem Bereich</span>
             @if (isLoading()) {
               <span class="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 font-semibold">
@@ -86,7 +86,7 @@
           </div>
 
           <!-- Scrollable Restroom Cards List -->
-          <div class="flex-1 overflow-y-auto p-3 space-y-2.5">
+          <div class="flex-1 min-h-0 overflow-y-auto p-3 space-y-2.5 overscroll-contain">
             @for (toilet of toilets(); track toilet.id) {
               <app-toilet-card
                 [toilet]="toilet"
@@ -112,7 +112,7 @@
         <!-- ============================================== -->
         <!-- Desktop Interactive Map View (>= 768px) -->
         <!-- ============================================== -->
-        <main class="hidden md:block flex-1 relative h-full">
+        <main class="hidden md:block flex-1 min-h-0 relative h-full">
           <app-map
             [toilets]="toilets()"
             [selectedToilet]="selectedToilet()"
@@ -131,13 +131,13 @@
         <!-- Draggable ratio between results list and map -->
         <!-- ============================================== -->
         <div id="results-portrait-container" class="md:hidden flex flex-col w-full h-full overflow-hidden relative">
-          <!-- Top Section: Results Area -->
+          <!-- Top Section: Results Area (Strictly takes listHeightPercent() of available height) -->
           <div
-            class="flex flex-col bg-white dark:bg-gray-900 overflow-hidden z-10 transition-none"
+            class="shrink-0 flex flex-col bg-white dark:bg-gray-900 overflow-hidden z-10 transition-none"
             [style.height.%]="listHeightPercent()"
           >
-            <!-- Search & Missing Toilet Controls Header -->
-            <div class="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2">
+            <!-- Search & Missing Toilet Controls Header (shrink-0) -->
+            <div class="shrink-0 p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2">
               <div class="relative">
                 <input
                   type="text"
@@ -197,10 +197,10 @@
             </div>
 
             <!-- Filter Banner Component -->
-            <app-filter-banner />
+            <app-filter-banner class="shrink-0" />
 
-            <!-- Count Summary -->
-            <div class="px-4 py-1.5 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
+            <!-- Count Summary (shrink-0) -->
+            <div class="shrink-0 px-4 py-1.5 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
               <span>{{ toilets().length }} Toiletten</span>
               @if (isLoading()) {
                 <span class="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 font-semibold">
@@ -213,8 +213,8 @@
               }
             </div>
 
-            <!-- Scrollable Toilet Cards List -->
-            <div class="flex-1 overflow-y-auto p-3 space-y-2.5">
+            <!-- Scrollable Toilet Cards List (flex-1 min-h-0 overflow-y-auto) -->
+            <div class="flex-1 min-h-0 overflow-y-auto p-3 space-y-2.5 overscroll-contain">
               @for (toilet of toilets(); track toilet.id) {
                 <app-toilet-card
                   [toilet]="toilet"
@@ -237,18 +237,18 @@
             </div>
           </div>
 
-          <!-- Draggable Splitter Handle between List and Map -->
+          <!-- Draggable Splitter Handle between List and Map (shrink-0) -->
           <div
             (mousedown)="startDragging($event)"
             (touchstart)="startDragging($event)"
-            class="h-6 flex items-center justify-center cursor-row-resize touch-none select-none bg-gray-100 dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20 shrink-0 shadow-xs"
+            class="shrink-0 h-6 flex items-center justify-center cursor-row-resize touch-none select-none bg-gray-100 dark:bg-gray-800 border-y border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20 shadow-xs"
             title="Drag to resize results / map"
           >
             <div class="w-12 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500"></div>
           </div>
 
-          <!-- Bottom Section: Map Component -->
-          <div class="flex-1 relative w-full overflow-hidden">
+          <!-- Bottom Section: Map Component (flex-1 min-h-0) -->
+          <div class="flex-1 min-h-0 relative w-full overflow-hidden">
             <app-map
               [toilets]="toilets()"
               [selectedToilet]="selectedToilet()"
