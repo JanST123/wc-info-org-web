@@ -1,7 +1,7 @@
 export const TRANSLATIONS_EN: Record<string, string> = {
   // General & Navigation
   'app.title': 'WC-Info',
-  'app.subtitle': 'Find restrooms near you',
+  'app.subtitle': 'Find restrooms near you.',
   'nav.home': 'Home',
   'nav.search': 'Search',
   'nav.nearby': 'Nearby',

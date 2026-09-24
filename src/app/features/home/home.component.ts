@@ -34,9 +34,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         <!-- Logo & Headline -->
         <div class="mb-8 flex flex-col items-center">
           <img
-            src="/assets/logo.svg"
+            src="/assets/logo.png"
             alt="WC-Info Logo"
-            class="w-20 h-20 md:w-24 md:h-24 object-contain mb-4 drop-shadow-2xl animate-bounce-subtle"
+            class="w-40 h-40 md:w-24 md:h-24 object-contain mb-4 drop-shadow-2xl animate-bounce-subtle"
           />
          
         </div>
@@ -44,9 +44,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         <!-- Search Card -->
         <div class="w-full max-w-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 md:p-6 rounded-2xl shadow-2xl relative text-left">
           <div class="mb-8 flex flex-col items-center">
-            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-purple-200 via-white to-purple-300 bg-clip-text text-transparent">
-              {{ 'app.title' | translate }}
-            </h1>
+            
             <p class="mt-3 text-sm md:text-lg text-purple-200/90 max-w-xl font-medium">
               {{ 'app.subtitle' | translate }}
             </p>
@@ -55,10 +53,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
           <!-- Autocomplete Input Box -->
           <div class="relative">
             <div class="relative flex items-center">
-              <svg class="w-5 h-5 text-gray-400 absolute left-4 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
+
 
               <input
                 type="text"
@@ -66,7 +61,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                 (ngModelChange)="onSearchInput($event)"
                 (focus)="isFocused.set(true)"
                 [placeholder]="'common.searchPlaceholder' | translate"
-                class="w-full pl-12 pr-10 py-3.5 bg-white text-gray-900 placeholder-gray-400 rounded-xl text-sm md:text-base font-medium shadow-inner focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                class="w-full pl-8 pr-4 py-3.5 bg-white text-gray-900 placeholder-gray-400 rounded-xl text-sm md:text-base font-medium shadow-inner focus:outline-hidden focus:ring-2 focus:ring-purple-500"
               />
 
               @if (searchQuery) {
@@ -126,17 +121,13 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
           </div>
 
           <!-- CTAs Grid -->
-          <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="mt-4 grid grid-cols-2 gap-3">
             <!-- Search / Open Map -->
             <button
               type="button"
               (click)="onSearchSubmit()"
-              class="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
+              class="w-full py-3 px-4 rounded-xl bg-gray-200/80 hover:bg-white/30 text-purple-500 font-semibold text-sm shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
             >
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
               <span>{{ 'nav.search' | translate }}</span>
             </button>
 
@@ -144,12 +135,8 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             <button
               type="button"
               (click)="onNearbyClick()"
-              class="w-full py-3 px-4 rounded-xl bg-gray-200/80 hover:bg-white/30 text-purple-500 border border-white/30 font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 backdrop-blur-md"
+              class="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white border border-white/30 font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 backdrop-blur-md"
             >
-              <svg class="w-4 h-4 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-              </svg>
               <span>{{ 'nav.nearby' | translate }}</span>
             </button>
           </div>
