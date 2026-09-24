@@ -34,9 +34,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         <!-- Logo & Headline -->
         <div class="mb-8 flex flex-col items-center">
           <img
-            src="/assets/logo.png"
+            src="/assets/logo320.png"
             alt="WC-Info Logo"
-            class="w-40 h-40 md:w-24 md:h-24 object-contain mb-4 drop-shadow-2xl animate-bounce-subtle"
+            class="w-40 h-40 md:w-80 md:h-80 object-contain mb-4 drop-shadow-2xl animate-bounce-subtle"
           />
          
         </div>

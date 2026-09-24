@@ -14,7 +14,7 @@ import { LocationService } from '../../../core/services/location.service';
     <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 py-2.5 flex items-center justify-between shadow-xs transition-all">
       <!-- Left: Logo & Brand -->
       <a routerLink="/" class="flex items-center gap-2.5 group">
-        <img src="/assets/logo.svg" alt="WC-Info Logo" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
+        <img src="/assets/logo320.png" alt="WC-Info Logo" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
         <div class="flex flex-col">
           <span class="text-lg font-bold bg-gradient-to-r from-purple-700 to-indigo-600 bg-clip-text text-transparent">
             {{ 'app.title' | translate }}
