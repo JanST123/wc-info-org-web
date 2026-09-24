@@ -114,3 +114,19 @@
   0% { transform: scale(0.5); opacity: 1; }
   100% { transform: scale(2.2); opacity: 0; }
 }
+
+/* Google Maps InfoWindow Dark Mode styling */
+.dark .gm-style .gm-style-iw-c {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .gm-style .gm-style-iw-tc::after {
+  background-color: #1f2937 !important;
+}
+
+.dark .gm-style .gm-ui-hover-effect {
+  filter: invert(1) brightness(1.5);
+}

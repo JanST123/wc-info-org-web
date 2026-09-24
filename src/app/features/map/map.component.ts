@@ -9,6 +9,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  effect,
   inject,
   signal
 } from '@angular/core';
@@ -18,7 +19,89 @@ import { Coordinates } from '../../core/services/location.service';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
 import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { environment } from '../../../environments/environment';
+
+const DARK_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+  {
+    featureType: 'administrative.locality',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#d59563' }]
+  },
+  {
+    featureType: 'poi',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#d59563' }]
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'geometry',
+    stylers: [{ color: '#263c3f' }]
+  },
+  {
+    featureType: 'poi.park',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#6b9a76' }]
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry',
+    stylers: [{ color: '#38414e' }]
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#212a37' }]
+  },
+  {
+    featureType: 'road',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#9ca5b3' }]
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry',
+    stylers: [{ color: '#746855' }]
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [{ color: '#1f2835' }]
+  },
+  {
+    featureType: 'road.highway',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#f3d19c' }]
+  },
+  {
+    featureType: 'transit',
+    elementType: 'geometry',
+    stylers: [{ color: '#2f3948' }]
+  },
+  {
+    featureType: 'transit.station',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#d59563' }]
+  },
+  {
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ color: '#17263c' }]
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#515c6d' }]
+  },
+  {
+    featureType: 'water',
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#17263c' }]
+  }
+];
 
 @Component({
   selector: 'app-map',
@@ -91,6 +174,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   private readonly mapsLoader = inject(GoogleMapsLoaderService);
   private readonly translationService = inject(TranslationService);
+  readonly themeService = inject(ThemeService);
 
   @Input() toilets: Toilet[] = [];
   @Input() selectedToilet: Toilet | null = null;
@@ -114,6 +198,13 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private clickListener?: google.maps.MapsEventListener;
   private moveEndTimer?: ReturnType<typeof setTimeout>;
   private lastEmittedBounds?: { south: number; west: number; north: number; east: number };
+
+  constructor() {
+    effect(() => {
+      const isDark = this.themeService.isDark();
+      this.updateMapTheme(isDark);
+    });
+  }
 
   ngOnInit(): void {
     this.initGoogleMap();
@@ -149,9 +240,31 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.clearAllMarkers();
   }
 
+  private updateMapTheme(isDark: boolean): void {
+    if (!this.googleMap || typeof google === 'undefined') return;
+
+    const colorScheme = (google.maps as any).ColorScheme;
+    const options: google.maps.MapOptions = {
+      styles: isDark ? DARK_MAP_STYLE : null
+    };
+
+    if (colorScheme) {
+      (options as any).colorScheme = isDark ? colorScheme.DARK : colorScheme.LIGHT;
+    }
+
+    this.googleMap.setOptions(options);
+
+    if (this.selectedToilet) {
+      this.updateActiveInfoWindow();
+    }
+  }
+
   private async initGoogleMap(): Promise<void> {
     try {
       const g = await this.mapsLoader.load();
+      const isDark = this.themeService.isDark();
+      const colorScheme = (g.maps as any).ColorScheme;
+
       const mapOptions: google.maps.MapOptions = {
         center: { lat: this.center.lat, lng: this.center.lon },
         zoom: this.zoom,
@@ -161,7 +274,9 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         zoomControlOptions: {
           position: google.maps.ControlPosition.TOP_LEFT
         },
-        gestureHandling: 'greedy'
+        gestureHandling: 'greedy',
+        styles: isDark ? DARK_MAP_STYLE : null,
+        ...(colorScheme ? { colorScheme: isDark ? colorScheme.DARK : colorScheme.LIGHT } : {})
       };
 
       this.googleMap = new g.maps.Map(this.mapContainerElement.nativeElement, mapOptions);
@@ -366,20 +481,20 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
     // 1. Toilet name (first line, bold)
     const nameEl = document.createElement('div');
-    nameEl.className = 'font-bold text-sm text-gray-900 leading-tight mb-1';
+    nameEl.className = 'font-bold text-sm text-gray-900 dark:text-white leading-tight mb-1';
     nameEl.textContent = toilet.name || this.translationService.t('app.title');
     container.appendChild(nameEl);
 
     // 2. Text representation of toilet type
     const typeEl = document.createElement('div');
-    typeEl.className = 'text-xs font-semibold text-purple-700 leading-snug mb-1';
+    typeEl.className = 'text-xs font-semibold text-purple-700 dark:text-purple-400 leading-snug mb-1';
     typeEl.textContent = this.getToiletTypeDescription(toilet);
     container.appendChild(typeEl);
 
     // 3. Address
     if (toilet.address) {
       const addressEl = document.createElement('div');
-      addressEl.className = 'text-xs text-gray-600 leading-snug mb-2';
+      addressEl.className = 'text-xs text-gray-600 dark:text-gray-300 leading-snug mb-2';
       addressEl.textContent = toilet.address;
       container.appendChild(addressEl);
     }
@@ -387,7 +502,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     // 4. Link to open the details view
     const linkEl = document.createElement('button');
     linkEl.type = 'button';
-    linkEl.className = 'inline-flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-800 hover:underline cursor-pointer pt-1.5 border-t border-gray-100 w-full text-left';
+    linkEl.className = 'inline-flex items-center gap-1 text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:underline cursor-pointer pt-1.5 border-t border-gray-100 dark:border-gray-700 w-full text-left';
     linkEl.innerHTML = `<span>${this.translationService.t('detail.viewDetails')}</span> <span aria-hidden="true">&rarr;</span>`;
     linkEl.addEventListener('click', (e) => {
       e.preventDefault();
@@ -467,6 +582,9 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.googleMap.setMapTypeId(
       nextSat ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP
     );
+    if (!nextSat) {
+      this.updateMapTheme(this.themeService.isDark());
+    }
   }
 
   centerOnUser(): void {
