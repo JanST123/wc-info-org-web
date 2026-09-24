@@ -32,6 +32,17 @@ export const TRANSLATIONS_DE: Record<string, string> = {
 
   // Filters
   'filter.title': 'Filter',
+  'filter.expand': 'Filter ausklappen',
+  'filter.collapse': 'Filter einklappen',
+  'filter.summaryAll': 'Zeige **alle** Toiletten an.',
+  'filter.summaryPrefix': 'Zeige nur ',
+  'filter.summarySuffix': ' Toiletten an.',
+  'filter.restrictionOpen': 'jetzt geöffnete',
+  'filter.restrictionPublic': 'öffentliche',
+  'filter.restrictionWheelchair': 'barrierefreie',
+  'filter.restrictionChangingTable': 'mit Wickelraum',
+  'filter.restrictionGenderSeparated': 'getrennte',
+  'filter.restrictionEuroKey': 'mit Euroschlüssel',
   'filter.openNow': 'Nur jetzt geöffnete',
   'filter.publicOnly': 'Nur öffentlich zugängliche',
   'filter.wheelchairOnly': 'Nur barrierefreie',
@@ -44,9 +55,9 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'filter.showWithoutChangingTable': 'Toiletten ohne Wickelraum anzeigen',
   'filter.showWithoutGenderSeparation': 'Toiletten ohne Geschlechtertrennung anzeigen',
   'filter.showWithoutEuroKey': 'Toiletten ohne Euroschlüssel anzeigen',
-  'filter.reset': 'Standardfilter anwenden',
+  'filter.reset': 'Standard Filter anwenden',
   'filter.active': 'Filter aktiv',
-  'filter.nonPublicNotice': 'Nicht-öffentliche Toiletten befinden sich z.B. in Restaurants, Geschäften oder Bahnhöfen und sind oft nur für Kunden bestimmt.',
+  'filter.nonPublicNotice': 'Nicht-öffentliche Toiletten befinden sich beispielsweise in Restaurants, Geschäften oder privaten Einrichtungen und sind oft Kunden oder Gästen vorbehalten.',
   'filter.euroKeyNotice': 'Der Euroschlüssel ist ein europaweit einheitliches Schließsystem für behindertengerechte Toiletten.',
 
   // Status & Opening Hours

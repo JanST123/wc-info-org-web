@@ -8,50 +8,10 @@
         <!-- Desktop / Tablet Landscape Left Pane (>= 768px) -->
         <!-- ============================================== -->
         <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-10 shrink-0 h-full overflow-hidden">
-          <!-- Search & Action Header in Sidebar -->
+          <!-- Filter & Action Header in Sidebar -->
           <div class="shrink-0 p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2.5">
-            <div class="relative">
-              <input
-                type="text"
-                [(ngModel)]="searchQuery"
-                (ngModelChange)="onSearchInput($event)"
-                (focus)="isSearchFocused.set(true)"
-                [placeholder]="'common.searchPlaceholder' | translate"
-                class="w-full pl-9 pr-8 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
-              />
-              <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-
-              @if (searchQuery) {
-                <button
-                  type="button"
-                  (click)="searchQuery = ''; suggestions.set([])"
-                  class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                >
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                </button>
-              }
-
-              <!-- Suggestions Dropdown -->
-              @if (isSearchFocused() && suggestions().length > 0) {
-                <div class="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
-                  @for (place of suggestions(); track place.placeId) {
-                    <div
-                      (click)="selectPlace(place)"
-                      class="px-3 py-2 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer text-xs flex flex-col border-b border-gray-50 dark:border-gray-700 last:border-0"
-                    >
-                      <span class="font-bold text-gray-900 dark:text-gray-100 truncate">{{ place.primaryText }}</span>
-                      <span class="text-[11px] text-gray-500 dark:text-gray-400 truncate">{{ place.secondaryText }}</span>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
+            <!-- Filter Banner Component -->
+            <app-filter-banner />
 
             <!-- Missing Toilet Banner Button -->
             <button
@@ -67,9 +27,6 @@
               </span>
             </button>
           </div>
-
-          <!-- Filter Banner Component -->
-          <app-filter-banner class="shrink-0" />
 
           <!-- Results Summary Header -->
           <div class="shrink-0 px-4 py-2 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
@@ -136,50 +93,10 @@
             class="shrink-0 flex flex-col bg-white dark:bg-gray-900 overflow-hidden z-10 transition-none"
             [style.height.%]="listHeightPercent()"
           >
-            <!-- Search & Missing Toilet Controls Header (shrink-0) -->
-            <div class="shrink-0 p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2">
-              <div class="relative">
-                <input
-                  type="text"
-                  [(ngModel)]="searchQuery"
-                  (ngModelChange)="onSearchInput($event)"
-                  (focus)="isSearchFocused.set(true)"
-                  [placeholder]="'common.searchPlaceholder' | translate"
-                  class="w-full pl-9 pr-8 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-hidden shadow-2xs"
-                />
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"/>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-
-                @if (searchQuery) {
-                  <button
-                    type="button"
-                    (click)="searchQuery = ''; suggestions.set([])"
-                    class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                  >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                }
-
-                <!-- Suggestions Dropdown -->
-                @if (isSearchFocused() && suggestions().length > 0) {
-                  <div class="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
-                    @for (place of suggestions(); track place.placeId) {
-                      <div
-                        (click)="selectPlace(place)"
-                        class="px-3 py-2 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer text-xs flex flex-col border-b border-gray-50 dark:border-gray-700 last:border-0"
-                      >
-                        <span class="font-bold text-gray-900 dark:text-gray-100 truncate">{{ place.primaryText }}</span>
-                        <span class="text-[11px] text-gray-500 dark:text-gray-400 truncate">{{ place.secondaryText }}</span>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
+            <!-- Controls Header (Filter card above Missing Toilet button) -->
+            <div class="shrink-0 p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 space-y-2.5">
+              <!-- Filter Banner Component -->
+              <app-filter-banner />
 
               <!-- Missing Toilet Banner Button -->
               <button
@@ -195,9 +112,6 @@
                 </span>
               </button>
             </div>
-
-            <!-- Filter Banner Component -->
-            <app-filter-banner class="shrink-0" />
 
             <!-- Count Summary (shrink-0) -->
             <div class="shrink-0 px-4 py-1.5 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">

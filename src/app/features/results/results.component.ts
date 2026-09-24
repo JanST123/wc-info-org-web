@@ -1,6 +1,5 @@
-import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FilterBannerComponent } from '../../shared/components/filter-banner/filter-banner.component';
@@ -12,18 +11,15 @@ import { FeedbackModalComponent } from '../feedback/feedback-modal.component';
 import { UpdateModalComponent } from '../update/update-modal.component';
 import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.component';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
-import { LocationService, Coordinates } from '../../core/services/location.service';
-import { PlacesService, PlaceSuggestion } from '../../core/services/places.service';
+import { Coordinates } from '../../core/services/location.service';
 import { Toilet } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-results',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     RouterModule,
     HeaderComponent,
     FilterBannerComponent,
@@ -40,8 +36,6 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 })
 export class ResultsComponent implements OnInit {
   readonly toiletState = inject(ToiletStateService);
-  private readonly locationService = inject(LocationService);
-  private readonly placesService = inject(PlacesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -51,9 +45,6 @@ export class ResultsComponent implements OnInit {
   readonly userLocation = this.toiletState.userLocation;
   readonly isLoading = this.toiletState.isLoading;
 
-  searchQuery = '';
-  readonly isSearchFocused = signal<boolean>(false);
-  readonly suggestions = signal<PlaceSuggestion[]>([]);
   readonly listHeightPercent = signal<number>(60);
 
   private isDragging = false;
@@ -67,22 +58,7 @@ export class ResultsComponent implements OnInit {
   readonly activeFeedbackToilet = signal<Toilet | null>(null);
   readonly activePhotoToilet = signal<Toilet | null>(null);
 
-  private readonly searchSubject = new Subject<string>();
-
   ngOnInit(): void {
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe((query) => {
-      if (query.trim().length >= 2) {
-        this.placesService.searchPlaces(query).subscribe((res) => {
-          this.suggestions.set(res);
-        });
-      } else {
-        this.suggestions.set([]);
-      }
-    });
-
     // Handle query params
     this.route.queryParams.subscribe((params) => {
       if (params['lat'] && params['lon']) {
@@ -100,24 +76,6 @@ export class ResultsComponent implements OnInit {
         }
       }
     });
-  }
-
-  onSearchInput(query: string): void {
-    this.searchSubject.next(query);
-  }
-
-  selectPlace(place: PlaceSuggestion): void {
-    this.isSearchFocused.set(false);
-    this.searchQuery = place.primaryText;
-    this.suggestions.set([]);
-
-    if (place.lat !== undefined && place.lon !== undefined) {
-      this.toiletState.loadToiletsNearby(place.lat, place.lon);
-    } else {
-      this.placesService.getPlaceDetails(place).then((coords) => {
-        this.toiletState.loadToiletsNearby(coords.lat, coords.lon);
-      });
-    }
   }
 
   onBoundsChange(bounds: { south: number; west: number; north: number; east: number }): void {
