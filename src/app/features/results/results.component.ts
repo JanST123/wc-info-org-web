@@ -37,7 +37,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
     TranslatePipe
   ],
   template: `
-    <div class="relative min-h-screen flex flex-col bg-gray-100 text-gray-800 overflow-hidden">
+    <div class="relative min-h-screen flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-100 overflow-hidden">
       <!-- Top Navigation Header -->
       <app-header class="shrink-0" />
 
@@ -46,9 +46,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         <!-- ============================================== -->
         <!-- Desktop / Tablet Landscape Left Pane (>= 768px) -->
         <!-- ============================================== -->
-        <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white border-r border-gray-200 z-10 shrink-0 h-[calc(100vh-57px)]">
+        <aside class="hidden md:flex flex-col w-[440px] lg:w-[480px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-10 shrink-0 h-[calc(100vh-57px)]">
           <!-- Search Header in Sidebar -->
-          <div class="p-3 border-b border-gray-100 bg-gray-50/50">
+          <div class="p-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
             <div class="relative">
               <input
                 type="text"
@@ -56,7 +56,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                 (ngModelChange)="onSearchInput($event)"
                 (focus)="isSearchFocused.set(true)"
                 [placeholder]="'common.searchPlaceholder' | translate"
-                class="w-full pl-9 pr-8 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
+                class="w-full pl-9 pr-8 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
               />
               <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/>
@@ -67,7 +67,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                 <button
                   type="button"
                   (click)="searchQuery = ''; suggestions.set([])"
-                  class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600"
+                  class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -78,14 +78,14 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
               <!-- Suggestions Dropdown -->
               @if (isSearchFocused() && suggestions().length > 0) {
-                <div class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-30">
+                <div class="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30">
                   @for (place of suggestions(); track place.placeId) {
                     <div
                       (click)="selectPlace(place)"
-                      class="px-3 py-2 hover:bg-purple-50 cursor-pointer text-xs flex flex-col border-b border-gray-50 last:border-0"
+                      class="px-3 py-2 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer text-xs flex flex-col border-b border-gray-50 dark:border-gray-700 last:border-0"
                     >
-                      <span class="font-bold text-gray-900 truncate">{{ place.primaryText }}</span>
-                      <span class="text-[11px] text-gray-500 truncate">{{ place.secondaryText }}</span>
+                      <span class="font-bold text-gray-900 dark:text-gray-100 truncate">{{ place.primaryText }}</span>
+                      <span class="text-[11px] text-gray-500 dark:text-gray-400 truncate">{{ place.secondaryText }}</span>
                     </div>
                   }
                 </div>
@@ -97,10 +97,10 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
           <app-filter-banner />
 
           <!-- Results Summary Header -->
-          <div class="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
+          <div class="px-4 py-2 bg-gray-50 dark:bg-gray-900/80 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
             <span>{{ toilets().length }} Toiletten in diesem Bereich</span>
             @if (isLoading()) {
-              <span class="inline-flex items-center gap-1 text-purple-600 font-semibold">
+              <span class="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 font-semibold">
                 <svg class="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
                   <path d="M12 2v4M12 18v4"/>
@@ -122,8 +122,8 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
               />
             } @empty {
               @if (!isLoading()) {
-                <div class="p-8 text-center text-gray-400 space-y-2">
-                  <svg class="w-10 h-10 mx-auto text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <div class="p-8 text-center text-gray-400 dark:text-gray-500 space-y-2">
+                  <svg class="w-10 h-10 mx-auto text-gray-300 dark:text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="8" y1="12" x2="16" y2="12"/>
                   </svg>
@@ -151,7 +151,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
           <!-- Mobile Floating Search Bar on Top (< 768px) -->
           <div class="md:hidden absolute top-3 left-3 right-3 z-20">
-            <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
               <div class="p-2 flex items-center gap-2">
                 <svg class="w-4 h-4 text-gray-400 ml-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="11" cy="11" r="8"/>
@@ -162,7 +162,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                   [(ngModel)]="searchQuery"
                   (ngModelChange)="onSearchInput($event)"
                   [placeholder]="'common.searchPlaceholder' | translate"
-                  class="w-full py-1.5 text-xs bg-transparent focus:outline-hidden text-gray-800"
+                  class="w-full py-1.5 text-xs bg-transparent focus:outline-hidden text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 />
               </div>
               <app-filter-banner />
@@ -173,18 +173,18 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
           <!-- Mobile Bottom Sheet Drawer (< 768px) -->
           <!-- ============================================== -->
           <div
-            class="md:hidden absolute bottom-0 left-0 right-0 z-20 bg-white rounded-t-2xl shadow-2xl border-t border-gray-200 transition-all duration-300 flex flex-col"
+            class="md:hidden absolute bottom-0 left-0 right-0 z-20 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl border-t border-gray-200 dark:border-gray-800 transition-all duration-300 flex flex-col"
             [ngClass]="mobileDrawerClasses()"
           >
             <!-- Drag Handle & Drawer Header -->
             <div
               (click)="toggleMobileDrawer()"
-              class="p-2.5 flex flex-col items-center justify-center cursor-pointer select-none bg-gray-50 rounded-t-2xl border-b border-gray-100"
+              class="p-2.5 flex flex-col items-center justify-center cursor-pointer select-none bg-gray-50 dark:bg-gray-800 rounded-t-2xl border-b border-gray-100 dark:border-gray-750"
             >
-              <div class="w-10 h-1 rounded-full bg-gray-300 mb-1.5"></div>
-              <div class="flex items-center justify-between w-full px-3 text-xs font-bold text-gray-600">
+              <div class="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600 mb-1.5"></div>
+              <div class="flex items-center justify-between w-full px-3 text-xs font-bold text-gray-600 dark:text-gray-300">
                 <span>{{ toilets().length }} Toiletten</span>
-                <span class="text-[10px] text-purple-600 font-semibold uppercase">
+                <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold uppercase">
                   {{ drawerState() === 'peek' ? 'Mehr anzeigen ↑' : 'Einklappen ↓' }}
                 </span>
               </div>

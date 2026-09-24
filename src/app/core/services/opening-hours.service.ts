@@ -52,7 +52,7 @@ export class OpeningHoursService {
         isOpen: false,
         is247: false,
         statusText: this.translationService.t('status.tempClosed'),
-        badgeClass: 'bg-orange-100 text-orange-700 border-orange-200',
+        badgeClass: 'bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
         urgency: 'warning'
       };
     }
@@ -63,7 +63,7 @@ export class OpeningHoursService {
         isOpen: true,
         is247: true,
         statusText: this.translationService.t('status.open247'),
-        badgeClass: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        badgeClass: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
         urgency: 'open'
       };
     }
@@ -82,7 +82,7 @@ export class OpeningHoursService {
           isOpen: true,
           is247: false,
           statusText: this.translationService.t('status.closesIn', { time: `${diffMinutes} Min.` }),
-          badgeClass: 'bg-rose-100 text-rose-700 border-rose-200 font-semibold',
+          badgeClass: 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 font-semibold',
           urgency: 'urgent'
         };
       } else if (diffMinutes > 30 && diffMinutes <= 180) {
@@ -93,7 +93,7 @@ export class OpeningHoursService {
           isOpen: true,
           is247: false,
           statusText: this.translationService.t('status.closesIn', { time: timeStr }),
-          badgeClass: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+          badgeClass: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
           urgency: 'open'
         };
       }
@@ -110,7 +110,7 @@ export class OpeningHoursService {
           isOpen: false,
           is247: false,
           statusText: this.translationService.t('status.opensIn', { time: `${diffMinutes} Min.` }),
-          badgeClass: 'bg-purple-100 text-purple-700 border-purple-200',
+          badgeClass: 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
           urgency: 'closed'
         };
       } else if (diffMinutes > 0 && diffMinutes <= 720) {
@@ -119,7 +119,7 @@ export class OpeningHoursService {
           isOpen: false,
           is247: false,
           statusText: this.translationService.t('status.opensAt', { time: timeStr }),
-          badgeClass: 'bg-purple-100 text-purple-700 border-purple-200',
+          badgeClass: 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
           urgency: 'closed'
         };
       }
@@ -130,7 +130,7 @@ export class OpeningHoursService {
         isOpen: true,
         is247: false,
         statusText: this.translationService.t('status.open'),
-        badgeClass: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        badgeClass: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
         urgency: 'open'
       };
     }
@@ -139,7 +139,7 @@ export class OpeningHoursService {
       isOpen: false,
       is247: false,
       statusText: this.translationService.t('status.closed'),
-      badgeClass: 'bg-gray-100 text-gray-600 border-gray-200',
+      badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
       urgency: 'closed'
     };
   }

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TranslationService } from '../../../core/services/translation.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { ToiletStateService } from '../../../core/services/toilet-state.service';
 import { LocationService } from '../../../core/services/location.service';
@@ -11,12 +12,12 @@ import { LocationService } from '../../../core/services/location.service';
   standalone: true,
   imports: [CommonModule, RouterModule, TranslatePipe],
   template: `
-    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 py-2.5 flex items-center justify-between shadow-xs transition-all">
+    <header class="sticky top-0 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 flex items-center justify-between shadow-xs transition-colors">
       <!-- Left: Logo & Brand -->
       <a routerLink="/" class="flex items-center gap-2.5 group">
         <img src="/assets/logo320.png" alt="WC-Info Logo" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
         <div class="flex flex-col">
-          <span class="text-lg font-bold bg-gradient-to-r from-purple-700 to-indigo-600 bg-clip-text text-transparent">
+          <span class="text-lg font-bold bg-gradient-to-r from-purple-700 to-indigo-600 dark:from-purple-400 dark:to-indigo-300 bg-clip-text text-transparent">
             {{ 'app.title' | translate }}
           </span>
         </div>
@@ -39,7 +40,7 @@ import { LocationService } from '../../../core/services/location.service';
         <!-- Nearby GPS Trigger -->
         <button
           (click)="triggerNearby()"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs md:text-sm font-medium transition-all active:scale-95"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs md:text-sm font-medium transition-all active:scale-95"
           [title]="'nav.nearby' | translate"
         >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -61,23 +62,41 @@ import { LocationService } from '../../../core/services/location.service';
           <span class="hidden md:inline">{{ 'nav.addToilet' | translate }}</span>
         </button>
 
+        <!-- Theme Toggle Button -->
+        <button
+          type="button"
+          (click)="toggleTheme()"
+          class="p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors active:scale-95 flex items-center justify-center"
+          [title]="themeService.isDark() ? 'Light Mode' : 'Dark Mode'"
+          aria-label="Toggle theme"
+        >
+          @if (themeService.isDark()) {
+            <!-- Sun icon -->
+            <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+          } @else {
+            <!-- Moon icon -->
+            <svg class="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          }
+        </button>
+
         <!-- Language Selector Button -->
-        <div class="flex items-center border border-gray-200 rounded-full p-0.5 bg-gray-50 text-xs font-semibold">
+        <div class="flex items-center border border-gray-200 dark:border-gray-700 rounded-full p-0.5 bg-gray-50 dark:bg-gray-800 text-xs font-semibold">
           <button
             (click)="setLang('de')"
-            [class.bg-white]="translationService.currentLang() === 'de'"
-            [class.text-purple-700]="translationService.currentLang() === 'de'"
-            [class.shadow-xs]="translationService.currentLang() === 'de'"
-            class="px-2 py-1 rounded-full text-gray-600 transition-colors"
+            [ngClass]="translationService.currentLang() === 'de' ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-xs' : 'text-gray-600 dark:text-gray-400'"
+            class="px-2 py-1 rounded-full transition-colors"
           >
             DE
           </button>
           <button
             (click)="setLang('en')"
-            [class.bg-white]="translationService.currentLang() === 'en'"
-            [class.text-purple-700]="translationService.currentLang() === 'en'"
-            [class.shadow-xs]="translationService.currentLang() === 'en'"
-            class="px-2 py-1 rounded-full text-gray-600 transition-colors"
+            [ngClass]="translationService.currentLang() === 'en' ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-xs' : 'text-gray-600 dark:text-gray-400'"
+            class="px-2 py-1 rounded-full transition-colors"
           >
             EN
           </button>
@@ -88,12 +107,17 @@ import { LocationService } from '../../../core/services/location.service';
 })
 export class HeaderComponent {
   readonly translationService = inject(TranslationService);
+  readonly themeService = inject(ThemeService);
   private readonly toiletState = inject(ToiletStateService);
   private readonly locationService = inject(LocationService);
   private readonly router = inject(Router);
 
   setLang(lang: 'de' | 'en'): void {
     this.translationService.setLanguage(lang);
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   openUrgent(): void {
@@ -117,3 +141,4 @@ export class HeaderComponent {
     this.toiletState.openCreateWizard();
   }
 }
+

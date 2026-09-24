@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { PlacesService, PlaceSuggestion } from '../../core/services/places.service';
 import { LocationService } from '../../core/services/location.service';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
@@ -19,11 +20,10 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
       <!-- Background Image with Overlay -->
       <div class="absolute inset-0 z-0">
         <img
-          src="/assets/lavendel.webp"
+          [src]="themeService.isDark() ? '/assets/lavendel-dark.webp' : '/assets/lavendel.webp'"
           alt="Lavender background"
-          class="w-full h-full object-cover object-center scale-105 transform animate-pulse-slow"
+          class="w-full h-full object-cover object-center scale-105 transform animate-pulse-slow transition-opacity duration-300"
         />
-        <!--<div class="absolute inset-0 bg-gradient-to-b from-purple-950/40 via-gray-900/45 to-gray-950/60"></div>-->
       </div>
 
       <!-- App Header -->
@@ -38,13 +38,11 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             alt="WC-Info Logo"
             class="w-40 h-40 md:w-80 md:h-80 object-contain mb-4 drop-shadow-2xl animate-bounce-subtle"
           />
-         
         </div>
 
         <!-- Search Card -->
-        <div class="w-full max-w-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-4 md:p-6 rounded-2xl shadow-2xl relative text-left">
+        <div class="w-full max-w-2xl bg-white/10 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-4 md:p-6 rounded-2xl shadow-2xl relative text-left">
           <div class="mb-8 flex flex-col items-center">
-            
             <p class="mt-3 text-sm md:text-lg text-purple-200/90 max-w-xl font-medium">
               {{ 'app.subtitle' | translate }}
             </p>
@@ -53,22 +51,20 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
           <!-- Autocomplete Input Box -->
           <div class="relative">
             <div class="relative flex items-center">
-
-
               <input
                 type="text"
                 [(ngModel)]="searchQuery"
                 (ngModelChange)="onSearchInput($event)"
                 (focus)="isFocused.set(true)"
                 [placeholder]="'common.searchPlaceholder' | translate"
-                class="w-full pl-8 pr-4 py-3.5 bg-white text-gray-900 placeholder-gray-400 rounded-xl text-sm md:text-base font-medium shadow-inner focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                class="w-full pl-8 pr-4 py-3.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-sm md:text-base font-medium shadow-inner focus:outline-hidden focus:ring-2 focus:ring-purple-500 border border-transparent dark:border-gray-700"
               />
 
               @if (searchQuery) {
                 <button
                   type="button"
                   (click)="clearSearch()"
-                  class="absolute right-3 text-gray-400 hover:text-gray-600 p-1"
+                  class="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1"
                 >
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -80,19 +76,19 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
             <!-- Autocomplete Suggestions Dropdown -->
             @if (isFocused() && suggestions().length > 0) {
-              <div class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-30 text-gray-800">
+              <div class="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden z-30 text-gray-800 dark:text-gray-100">
                 @for (place of suggestions(); track place.placeId) {
                   <div
                     (click)="selectPlace(place)"
-                    class="px-4 py-3 hover:bg-purple-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0 transition-colors"
+                    class="px-4 py-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-3 border-b border-gray-50 dark:border-gray-700 last:border-0 transition-colors"
                   >
-                    <svg class="w-4 h-4 text-purple-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
                     <div class="flex flex-col min-w-0">
-                      <span class="text-sm font-semibold text-gray-900 truncate">{{ place.primaryText }}</span>
-                      <span class="text-xs text-gray-500 truncate">{{ place.secondaryText }}</span>
+                      <span class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ place.primaryText }}</span>
+                      <span class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ place.secondaryText }}</span>
                     </div>
                   </div>
                 }
@@ -101,8 +97,8 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
             <!-- Recent Searches Dropdown if input is empty and focused -->
             @if (isFocused() && !searchQuery && recentSearches().length > 0) {
-              <div class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 p-3 z-30 text-gray-800">
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">
+              <div class="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 p-3 z-30 text-gray-800 dark:text-gray-100">
+                <div class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-1">
                   {{ 'common.recentSearches' | translate }}
                 </div>
                 <div class="flex flex-wrap gap-1.5">
@@ -110,7 +106,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
                     <button
                       type="button"
                       (click)="onSelectRecent(item)"
-                      class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-purple-100 text-xs font-medium text-gray-700 hover:text-purple-800 transition-colors"
+                      class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-medium text-gray-700 dark:text-gray-200 hover:text-purple-800 dark:hover:text-purple-200 transition-colors"
                     >
                       {{ item }}
                     </button>
@@ -126,7 +122,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             <button
               type="button"
               (click)="onSearchSubmit()"
-              class="w-full py-3 px-4 rounded-xl bg-gray-200/80 hover:bg-white/30 text-purple-500 font-semibold text-sm shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
+              class="w-full py-3 px-4 rounded-xl bg-gray-200/80 dark:bg-gray-800/80 hover:bg-white/30 dark:hover:bg-gray-700 text-purple-600 dark:text-purple-300 font-semibold text-sm shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 border border-transparent dark:border-gray-700"
             >
               <span>{{ 'nav.search' | translate }}</span>
             </button>
@@ -135,7 +131,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
             <button
               type="button"
               (click)="onNearbyClick()"
-              class="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white border border-white/30 font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 backdrop-blur-md"
+              class="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white border border-white/30 dark:border-purple-500 font-semibold text-sm transition-all active:scale-98 flex items-center justify-center gap-2 backdrop-blur-md shadow-md"
             >
               <span>{{ 'nav.nearby' | translate }}</span>
             </button>
@@ -165,6 +161,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   `
 })
 export class HomeComponent implements OnInit {
+  readonly themeService = inject(ThemeService);
   private readonly placesService = inject(PlacesService);
   private readonly locationService = inject(LocationService);
   private readonly toiletState = inject(ToiletStateService);

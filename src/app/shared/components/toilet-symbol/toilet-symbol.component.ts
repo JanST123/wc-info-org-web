@@ -9,11 +9,11 @@ import { TranslationService } from '../../../core/services/translation.service';
   standalone: true,
   imports: [CommonModule, TranslatePipe],
   template: `
-    <div class="flex flex-wrap items-center gap-1.5 text-xs text-gray-700">
+    <div class="flex flex-wrap items-center gap-1.5 text-xs text-gray-700 dark:text-gray-300">
       <!-- Wheelchair Accessible -->
       @if (toilet.hasWheelchairAccess) {
         <span
-          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium"
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-medium"
           [title]="'attr.wheelchair' | translate"
         >
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -29,7 +29,7 @@ import { TranslationService } from '../../../core/services/translation.service';
       <!-- Changing Table -->
       @if (toilet.hasChangingTable) {
         <span
-          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200 font-medium"
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-pink-50 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800 font-medium"
           [title]="'attr.changingTable' | translate"
         >
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -42,7 +42,7 @@ import { TranslationService } from '../../../core/services/translation.service';
       <!-- Euro-key -->
       @if (toilet.euroKey === 'yes' || toilet.euroKey === 'true' || toilet.euroKey === '1') {
         <span
-          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium"
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-medium"
           [title]="'attr.euroKey' | translate"
         >
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -56,18 +56,18 @@ import { TranslationService } from '../../../core/services/translation.service';
 
       <!-- Unisex or Gender Separation -->
       @if (toilet.isUnisex) {
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-medium">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-medium">
           <span>{{ 'attr.unisex' | translate }}</span>
         </span>
       } @else if (toilet.isGenderSeparated) {
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-medium">
           <span>{{ 'attr.genderSeparated' | translate }}</span>
         </span>
       }
 
       <!-- Public / Non-Public -->
       @if (toilet.publicAccessible === false) {
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200 font-medium">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800 font-medium">
           <span>{{ 'attr.nonPublic' | translate }}</span>
         </span>
       }

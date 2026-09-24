@@ -11,12 +11,12 @@ import * as exifr from 'exifr';
   template: `
     <div class="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
       <div
-        class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden text-gray-800 flex flex-col"
+        class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden text-gray-800 dark:text-gray-100 flex flex-col"
         (click)="$event.stopPropagation()"
       >
         <!-- Modal Header -->
-        <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-          <div class="flex items-center gap-2 text-purple-700 font-bold text-lg">
+        <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-purple-700 dark:text-purple-400 font-bold text-lg">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
@@ -26,7 +26,7 @@ import * as exifr from 'exifr';
           <button
             type="button"
             (click)="onCancel.emit()"
-            class="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+            class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
           >
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
@@ -36,25 +36,25 @@ import * as exifr from 'exifr';
         </div>
 
         <!-- Modal Content -->
-        <div class="p-6 space-y-4 text-sm text-gray-600">
+        <div class="p-6 space-y-4 text-sm text-gray-600 dark:text-gray-300">
           <p class="whitespace-pre-line leading-relaxed">
             {{ 'photo.legalText' | translate }}
           </p>
 
-          <label class="flex items-start gap-3 p-3.5 rounded-xl bg-purple-50/50 border border-purple-100 cursor-pointer">
+          <label class="flex items-start gap-3 p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/50 cursor-pointer">
             <input
               type="checkbox"
               [checked]="isConfirmed()"
               (change)="isConfirmed.set(!isConfirmed())"
-              class="w-4 h-4 mt-0.5 text-purple-600 rounded-sm focus:ring-purple-500 border-gray-300"
+              class="w-4 h-4 mt-0.5 text-purple-600 rounded-sm focus:ring-purple-500 border-gray-300 dark:border-gray-600"
             />
-            <span class="text-xs font-semibold text-purple-950">
+            <span class="text-xs font-semibold text-purple-950 dark:text-purple-200">
               {{ 'photo.legalConfirm' | translate }}
             </span>
           </label>
 
           @if (isUploading()) {
-            <div class="flex items-center justify-center gap-2 p-4 text-purple-700 font-semibold text-sm">
+            <div class="flex items-center justify-center gap-2 p-4 text-purple-700 dark:text-purple-400 font-semibold text-sm">
               <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
@@ -64,7 +64,7 @@ import * as exifr from 'exifr';
           }
 
           @if (uploadError()) {
-            <p class="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl border border-rose-200">
+            <p class="p-3 bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 text-xs rounded-xl border border-rose-200 dark:border-rose-900/50">
               {{ uploadError() }}
             </p>
           }
@@ -80,11 +80,11 @@ import * as exifr from 'exifr';
         />
 
         <!-- Modal Footer -->
-        <div class="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-2">
+        <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/80 flex items-center justify-end gap-2">
           <button
             type="button"
             (click)="onCancel.emit()"
-            class="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-100 transition-colors"
+            class="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             {{ 'common.cancel' | translate }}
           </button>

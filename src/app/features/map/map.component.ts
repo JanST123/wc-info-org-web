@@ -31,8 +31,8 @@ import { environment } from '../../../environments/environment';
 
       <!-- Loading Overlay if Google Maps is still loading -->
       @if (!isMapReady()) {
-        <div class="absolute inset-0 bg-gray-50 flex items-center justify-center z-10">
-          <div class="flex items-center gap-2 text-purple-700 text-sm font-semibold">
+        <div class="absolute inset-0 bg-gray-50 dark:bg-gray-900 flex items-center justify-center z-10">
+          <div class="flex items-center gap-2 text-purple-700 dark:text-purple-400 text-sm font-semibold">
             <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"/>
               <path d="M12 2v4M12 18v4"/>
@@ -48,7 +48,7 @@ import { environment } from '../../../environments/environment';
         <button
           type="button"
           (click)="toggleMapType()"
-          class="p-2.5 bg-white/95 backdrop-blur-md rounded-xl shadow-md border border-gray-200 text-gray-700 hover:text-purple-700 hover:bg-white transition-all active:scale-95"
+          class="p-2.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:text-purple-700 dark:hover:text-purple-400 hover:bg-white dark:hover:bg-gray-800 transition-all active:scale-95"
           [title]="isSatellite() ? 'Karte' : 'Satellit'"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -61,7 +61,7 @@ import { environment } from '../../../environments/environment';
         <button
           type="button"
           (click)="centerOnUser()"
-          class="p-2.5 bg-white/95 backdrop-blur-md rounded-xl shadow-md border border-gray-200 text-gray-700 hover:text-purple-700 hover:bg-white transition-all active:scale-95"
+          class="p-2.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:text-purple-700 dark:hover:text-purple-400 hover:bg-white dark:hover:bg-gray-800 transition-all active:scale-95"
           [title]="'nav.nearby' | translate"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
