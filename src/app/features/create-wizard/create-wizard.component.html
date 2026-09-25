@@ -36,6 +36,12 @@
           </button>
         </div>
 
+        <div class="text-sm text-purple-600 dark:text-purple-400 p-2 w-full flex align-baseline justify-center gap-1">
+          <a class="underline" (click)="onOpenMunicipalityMessage()">
+            {{ 'create.companyOrMunicipality' | translate }}
+          </a>
+        </div>
+
         <!-- Progress Bar -->
         @if (currentStepId() !== 'success') {
           <div class="w-full bg-gray-100 dark:bg-gray-800 h-1.5 overflow-hidden">
@@ -54,7 +60,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full bg-purple-500 text-white text-center pt-2">
-                  <i class="fa-solid fa-building text-xl"></i>
+                  <i class="fa-regular fa-building text-xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -818,4 +824,63 @@
         (onCancel)="showPhotoModal.set(false)"
         (onUploaded)="onPhotoUploaded($event)"
       />
+    }
+
+    @if(showMunicipalityMessageModal()) {
+      <div class="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+        <div
+          class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden text-gray-800 dark:text-gray-100 flex flex-col"
+          (click)="$event.stopPropagation()"
+        >
+          <!-- Modal Header -->
+          <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-purple-700 dark:text-purple-400 font-bold text-lg">
+              <i class="fa-regular fa-building"></i>
+              <span>{{ 'create.municipalityTitle' | translate }}</span>
+            </div>
+
+            <button
+              type="button"
+              (click)="showMunicipalityMessageModal.set(false)"
+              class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            >
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal Content -->
+          <div class="p-6 space-y-4 text-sm text-gray-600 dark:text-gray-300">
+            @if(language() === 'de') {
+              <p>Möchten sie eine große Anzahl an Toiletten als Unternehmen, Gemeinde oder Betreiber mehrerer Toiletten hinzufügen?</p>
+              <p>Gerne können Sie uns per E-Mail an hi{{ '@' }}wc-info.org kontaktieren und uns Ihre Toiletten-Daten in einem beliebigen Format (z.B. als CSV, Excel oder Textliste) senden. Wir würden uns freuen, diese Toiletten für Sie zu importieren!</p>
+            } @else {
+              <p>Would you like to add a large number of toilets as a company, municipality or operator of multiple toilets?</p>
+              <p>Feel free to contact us via email at hi{{ '@' }}wc-info.org and send us your toilet data in any format (e.g. as CSV, Excel or text list). We would be happy to import these toilets for you!</p>
+            }
+
+             <!-- Modal Footer -->
+            <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/80 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                (click)="showMunicipalityMessageModal.set(false)"
+                class="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                {{ 'common.close' | translate }}
+              </button>
+
+              <button
+                type="button"
+                (click)="sendMunicipalityEmail()"
+                class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95"
+              >
+                {{ 'common.send_email' | translate }}
+              </button>
+            </div>
+           
+          </div>
+        </div>
+      </div>
     }

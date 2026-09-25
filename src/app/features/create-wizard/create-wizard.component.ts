@@ -145,8 +145,12 @@ export class CreateWizardComponent implements OnInit {
   readonly showPhotoModal = signal<boolean>(false);
   readonly uploadedPhotosCount = signal<number>(0);
 
+  readonly showMunicipalityMessageModal = signal<boolean>(false);
+
   // Comment (Step 14)
   comment = '';
+
+  language = this.translationService.currentLang;
 
   // Dynamic step engine
   readonly activeSteps = computed<WizardStepId[]>(() => {
@@ -705,5 +709,15 @@ export class CreateWizardComponent implements OnInit {
     };
 
     this.onCreated.emit(created);
+  }
+
+  onOpenMunicipalityMessage() {
+    this.showMunicipalityMessageModal.set(true);
+  }
+
+  sendMunicipalityEmail() {
+    const subject = encodeURIComponent(this.translationService.t('createWizard.municipalityEmail.subject'));
+    const mailtoLink = `mailto:hi@wc-info.org?subject=${subject}`;
+    window.location.href = mailtoLink;
   }
 }

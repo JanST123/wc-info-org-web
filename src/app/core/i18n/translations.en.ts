@@ -30,6 +30,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'common.optional': '(optional)',
   'common.share': 'Share',
   'common.copied': 'Link copied to clipboard',
+  'common.send_email': 'Send Email',
 
   // Filters
   'filter.title': 'Filters',
@@ -137,6 +138,9 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   // Create Wizard
   'create.title': 'Add New Restroom',
   'create.step': 'Question {current} of {total}',
+  'create.companyOrMunicipality': 'Company or municipality? Please click here',
+  'createWizard.municipalityEmail.subject': 'Request for data import of restrooms',
+  'create.municipalityTitle': 'Company or municipality?',
   'create.savedBadge': '✓ Restroom saved',
   'create.step1.title': 'Welcome to the WC-Info Contribution Wizard',
   'create.step1.text': 'Help the community by adding new public restrooms. You can cancel at any point – critical data is automatically saved as you proceed.',

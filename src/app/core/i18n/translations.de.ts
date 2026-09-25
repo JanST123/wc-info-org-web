@@ -30,6 +30,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'common.optional': '(optional)',
   'common.share': 'Teilen',
   'common.copied': 'Link in die Zwischenablage kopiert',
+  'common.send_email': 'E-Mail senden',
 
   // Filters
   'filter.title': 'Filter',
@@ -137,6 +138,9 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   // Create Wizard
   'create.title': 'Neue Toilette eintragen',
   'create.step': 'Frage {current} von {total}',
+  'create.companyOrMunicipality': 'Firma oder Kommune? Hier entlang bitte',
+  'create.municipalityTitle': 'Firma oder Komune?',
+  'createWizard.municipalityEmail.subject': 'Anfrage für Datenimport von Toiletten',
   'create.savedBadge': '✓ Toilette gespeichert',
   'create.step1.title': 'Willkommen beim WC-Info Erfassungsassistenten',
   'create.step1.text': 'Hilf der Community, indem du neue öffentliche Toiletten hinzufügst. Du kannst den Vorgang jederzeit unterbrechen – wichtige Daten werden automatisch gespeichert.',
