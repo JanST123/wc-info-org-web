@@ -15,6 +15,7 @@ export class ToiletStateService {
   readonly selectedToilet = signal<Toilet | null>(null);
   readonly filterSettings = signal<ToiletFilterSettings>(DEFAULT_FILTER_SETTINGS);
   readonly userLocation = signal<Coordinates | null>(null);
+  readonly searchLocation = signal<{ lat: number; lon: number; name?: string } | null>(null);
   readonly mapCenter = signal<Coordinates>({ lat: 52.520008, lon: 13.404954 }); // Default Berlin
   readonly zoom = signal<number>(14);
   readonly isLoading = signal<boolean>(false);
@@ -27,25 +28,25 @@ export class ToiletStateService {
   readonly isFeedbackOpen = signal<boolean>(false);
   readonly isUpdateOpen = signal<boolean>(false);
 
-  // Computed: Toilets with live distances from userLocation (if available)
+  // Computed: Toilets with live distances relative to searched location (or userLocation / mapCenter)
   readonly enrichedToilets = computed(() => {
     const list = this.toilets();
-    const user = this.userLocation();
+    const target = this.searchLocation() || this.userLocation() || this.mapCenter();
 
-    if (!user) {
+    if (!target) {
       return list;
     }
 
     return list
       .map((t) => {
-        const distanceMeters = this.locationService.calculateDistance(user.lat, user.lon, t.lat, t.lon);
+        const distanceMeters = this.locationService.calculateDistance(target.lat, target.lon, t.lat, t.lon);
         return {
           ...t,
           distanceMeters,
           distance: distanceMeters / 1000
         };
       })
-      .sort((a, b) => (a.distanceMeters || 0) - (b.distanceMeters || 0));
+      .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
   });
 
   // Computed: Active filter count (deviations from defaults)
@@ -79,6 +80,13 @@ export class ToiletStateService {
   private lastBounds: { south: number; west: number; north: number; east: number } | null = null;
   private lastNearby: { lat: number; lon: number; distance: number } | null = null;
 
+  setSearchLocation(location: { lat: number; lon: number; name?: string } | null): void {
+    this.searchLocation.set(location);
+    if (location) {
+      this.mapCenter.set({ lat: location.lat, lon: location.lon });
+    }
+  }
+
   setFilterSettings(settings: ToiletFilterSettings): void {
     this.filterSettings.set(settings);
     this.reloadCurrentView();
@@ -103,6 +111,9 @@ export class ToiletStateService {
         this.lastNearby.lon,
         this.lastNearby.distance
       );
+    } else if (this.searchLocation()) {
+      const loc = this.searchLocation()!;
+      this.loadToiletsNearby(loc.lat, loc.lon);
     } else if (this.userLocation()) {
       const user = this.userLocation()!;
       this.loadToiletsNearby(user.lat, user.lon);
@@ -139,8 +150,11 @@ export class ToiletStateService {
     });
   }
 
-  loadToiletsNearby(lat: number, lon: number, distance = 10): void {
+  loadToiletsNearby(lat: number, lon: number, distance = 10, name?: string): void {
     this.lastNearby = { lat, lon, distance };
+    if (!this.searchLocation() || this.searchLocation()?.lat !== lat || this.searchLocation()?.lon !== lon) {
+      this.searchLocation.set({ lat, lon, name: name || this.searchLocation()?.name });
+    }
     const filterQuery = buildApiFilterQuery(this.filterSettings());
     this.isLoading.set(true);
     this.error.set(null);

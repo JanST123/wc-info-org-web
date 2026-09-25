@@ -35,6 +35,7 @@ export class HeaderComponent {
   triggerNearby(): void {
     this.locationService.getCurrentPosition()
       .then((coords) => {
+        this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon });
         this.toiletState.loadToiletsNearby(coords.lat, coords.lon);
         this.router.navigate(['/results'], {
           queryParams: { lat: coords.lat, lon: coords.lon }

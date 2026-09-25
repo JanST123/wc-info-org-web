@@ -12,6 +12,7 @@ import { UpdateModalComponent } from '../update/update-modal.component';
 import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.component';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { Coordinates } from '../../core/services/location.service';
+import { PlacesService } from '../../core/services/places.service';
 import { Toilet } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 
@@ -36,6 +37,7 @@ import { TranslatePipe } from '../../core/pipes/translate.pipe';
 })
 export class ResultsComponent implements OnInit {
   readonly toiletState = inject(ToiletStateService);
+  private readonly placesService = inject(PlacesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -64,10 +66,33 @@ export class ResultsComponent implements OnInit {
       if (params['lat'] && params['lon']) {
         const lat = parseFloat(params['lat']);
         const lon = parseFloat(params['lon']);
+        const name = params['name'] || undefined;
         if (!isNaN(lat) && !isNaN(lon)) {
-          this.toiletState.loadToiletsNearby(lat, lon);
+          this.toiletState.setSearchLocation({ lat, lon, name });
+          this.toiletState.loadToiletsNearby(lat, lon, 10, name);
+        }
+      } else if (params['q']) {
+        const query = (params['q'] as string).trim();
+        if (query) {
+          this.placesService.searchPlaces(query).subscribe((suggestions) => {
+            if (suggestions.length > 0) {
+              const first = suggestions[0];
+              if (first.lat !== undefined && first.lon !== undefined) {
+                this.toiletState.setSearchLocation({ lat: first.lat, lon: first.lon, name: first.primaryText });
+                this.toiletState.loadToiletsNearby(first.lat, first.lon, 10, first.primaryText);
+              } else {
+                this.placesService.getPlaceDetails(first).then((coords) => {
+                  this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: first.primaryText });
+                  this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, first.primaryText);
+                }).catch(() => {
+                  this.toiletState.reloadCurrentView();
+                });
+              }
+            }
+          });
         }
       }
+
       if (params['toilet']) {
         const id = parseInt(params['toilet'], 10);
         const match = this.toilets().find((t) => t.id === id);

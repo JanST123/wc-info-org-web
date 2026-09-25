@@ -218,14 +218,16 @@ export class HomeComponent implements OnInit {
     this.isFocused.set(false);
 
     if (place.lat !== undefined && place.lon !== undefined) {
-      this.toiletState.loadToiletsNearby(place.lat, place.lon);
+      this.toiletState.setSearchLocation({ lat: place.lat, lon: place.lon, name: place.primaryText });
+      this.toiletState.loadToiletsNearby(place.lat, place.lon, 10, place.primaryText);
       this.router.navigate(['/results'], {
         queryParams: { lat: place.lat, lon: place.lon, name: place.primaryText }
       });
     } else {
       this.placesService.getPlaceDetails(place)
         .then((coords) => {
-          this.toiletState.loadToiletsNearby(coords.lat, coords.lon);
+          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: place.primaryText });
+          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, place.primaryText);
           this.router.navigate(['/results'], {
             queryParams: { lat: coords.lat, lon: coords.lon, name: place.primaryText }
           });
@@ -248,6 +250,7 @@ export class HomeComponent implements OnInit {
   onNearbyClick(): void {
     this.locationService.getCurrentPosition()
       .then((coords) => {
+        this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon });
         this.toiletState.loadToiletsNearby(coords.lat, coords.lon);
         this.router.navigate(['/results'], {
           queryParams: { lat: coords.lat, lon: coords.lon }
