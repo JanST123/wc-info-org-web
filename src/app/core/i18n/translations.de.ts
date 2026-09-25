@@ -68,6 +68,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'status.opensAt': 'öffnet um {time}',
   'status.opensIn': 'öffnet in {time}',
   'status.tempClosed': 'Vorübergehend geschlossen',
+  'status.nonPublic': 'Nicht öffentlich',
   'days.0': 'Sonntag',
   'days.1': 'Montag',
   'days.2': 'Dienstag',

@@ -10,6 +10,15 @@ export interface ToiletStatusInfo {
   urgency: 'urgent' | 'warning' | 'open' | 'closed';
 }
 
+export interface DetailedStatus {
+  title: string;
+  subtitle?: string;
+  isOpen: boolean;
+  isTemporaryClosed: boolean;
+  colorClass: string;
+  subtitleColorClass?: string;
+}
+
 export interface DaySchedule {
   dayIndex: number; // 0=Sunday, 1=Monday...
   dayName: string;
@@ -142,6 +151,85 @@ export class OpeningHoursService {
       badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
       urgency: 'closed'
     };
+  }
+
+  getDetailedStatus(toilet: Toilet): DetailedStatus {
+    if (toilet.status === 'temporary_closed' || toilet.temporaryClosed) {
+      return {
+        title: this.translationService.t('status.tempClosed'),
+        isOpen: false,
+        isTemporaryClosed: true,
+        colorClass: 'text-amber-600 dark:text-amber-400'
+      };
+    }
+
+    const is247 = this.is24HoursOpen(toilet);
+    if (is247) {
+      return {
+        title: this.translationService.t('status.open'),
+        subtitle: this.translationService.t('status.open247'),
+        isOpen: true,
+        isTemporaryClosed: false,
+        colorClass: 'text-emerald-600 dark:text-emerald-400',
+        subtitleColorClass: 'text-gray-500 dark:text-gray-400'
+      };
+    }
+
+    const now = new Date();
+    const isOpen = toilet.isOpen ?? false;
+
+    if (isOpen) {
+      let subtitle: string | undefined;
+      let subtitleColorClass = 'text-gray-500 dark:text-gray-400';
+
+      if (toilet.closeTimestamp) {
+        const closeDate = new Date(toilet.closeTimestamp);
+        const diffMs = closeDate.getTime() - now.getTime();
+        const diffMinutes = Math.floor(diffMs / 60000);
+
+        if (diffMinutes > 0 && diffMinutes <= 30) {
+          subtitle = this.translationService.t('status.closesIn', { time: `${diffMinutes} Min.` });
+          subtitleColorClass = 'text-rose-600 dark:text-rose-400 font-semibold';
+        } else if (diffMinutes > 30 && diffMinutes <= 180) {
+          const hours = Math.floor(diffMinutes / 60);
+          const mins = diffMinutes % 60;
+          const timeStr = hours > 0 ? `${hours} Std. ${mins} Min.` : `${mins} Min.`;
+          subtitle = this.translationService.t('status.closesIn', { time: timeStr });
+        }
+      }
+
+      return {
+        title: this.translationService.t('status.open'),
+        subtitle,
+        isOpen: true,
+        isTemporaryClosed: false,
+        colorClass: 'text-emerald-600 dark:text-emerald-400',
+        subtitleColorClass
+      };
+    } else {
+      let subtitle: string | undefined;
+      if (toilet.openTimestamp) {
+        const openDate = new Date(toilet.openTimestamp);
+        const diffMs = openDate.getTime() - now.getTime();
+        const diffMinutes = Math.floor(diffMs / 60000);
+
+        if (diffMinutes > 0 && diffMinutes <= 60) {
+          subtitle = this.translationService.t('status.opensIn', { time: `${diffMinutes} Min.` });
+        } else if (diffMinutes > 0 && diffMinutes <= 720) {
+          const timeStr = openDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          subtitle = this.translationService.t('status.opensAt', { time: timeStr });
+        }
+      }
+
+      return {
+        title: this.translationService.t('status.closed'),
+        subtitle,
+        isOpen: false,
+        isTemporaryClosed: false,
+        colorClass: 'text-gray-500 dark:text-gray-400',
+        subtitleColorClass: 'text-purple-600 dark:text-purple-400'
+      };
+    }
   }
 
   getWeeklySchedule(toilet: Toilet): DaySchedule[] {

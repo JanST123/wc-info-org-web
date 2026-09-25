@@ -68,6 +68,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'status.opensAt': 'opens at {time}',
   'status.opensIn': 'opens in {time}',
   'status.tempClosed': 'Temporarily closed',
+  'status.nonPublic': 'Non-public',
   'days.0': 'Sunday',
   'days.1': 'Monday',
   'days.2': 'Tuesday',
