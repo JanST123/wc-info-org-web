@@ -330,24 +330,22 @@ import { TranslationService } from '../../core/services/translation.service';
     <!-- Lightbox Modal -->
     @if (activeLightboxPhoto()) {
       <div
-        class="fixed inset-0 z-60 bg-black/95 flex items-center justify-center p-4 animate-fadeIn"
+        class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 animate-fadeIn cursor-default select-none"
         (click)="activeLightboxPhoto.set(null)"
       >
         <button
           type="button"
           (click)="activeLightboxPhoto.set(null)"
-          class="absolute top-4 right-4 text-white p-2 rounded-full hover:bg-white/20 transition-colors"
+          class="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/30 active:scale-95 p-3 rounded-full transition-all cursor-pointer z-10 flex items-center justify-center shadow-lg"
+          aria-label="Close photo"
         >
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
+          <i class="fa-solid fa-xmark text-2xl text-white"></i>
         </button>
 
         <img
           [src]="activeLightboxPhoto()!.url"
           [alt]="toilet.name"
-          class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+          class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl pointer-events-auto"
           (click)="$event.stopPropagation()"
         />
       </div>

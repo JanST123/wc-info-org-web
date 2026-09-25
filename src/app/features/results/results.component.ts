@@ -13,7 +13,7 @@ import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.comp
 import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { Coordinates } from '../../core/services/location.service';
 import { PlacesService } from '../../core/services/places.service';
-import { Toilet } from '../../core/models/toilet.model';
+import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 
 @Component({
@@ -59,6 +59,7 @@ export class ResultsComponent implements OnInit {
   readonly activeUpdateToilet = signal<Toilet | null>(null);
   readonly activeFeedbackToilet = signal<Toilet | null>(null);
   readonly activePhotoToilet = signal<Toilet | null>(null);
+  readonly activeLightboxPhoto = signal<{ photo: ToiletPhoto; title?: string } | null>(null);
 
   ngOnInit(): void {
     // Handle query params
@@ -154,6 +155,10 @@ export class ResultsComponent implements OnInit {
 
   onPhotoUploaded(data: { url: string; thumbUrl?: string; filename: string }): void {
     this.activePhotoToilet.set(null);
+  }
+
+  onOpenPhoto(photo: ToiletPhoto, toilet: Toilet): void {
+    this.activeLightboxPhoto.set({ photo, title: toilet.name });
   }
 
   startDragging(event: MouseEvent | TouchEvent): void {

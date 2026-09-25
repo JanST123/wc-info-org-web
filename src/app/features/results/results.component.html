@@ -50,6 +50,7 @@
                 (onSelect)="onSelectToilet($event)"
                 (onOpenDetails)="onOpenDetails($event)"
                 (onNavigate)="onStartNavigation($event)"
+                (onOpenPhoto)="onOpenPhoto($event, toilet)"
               />
             } @empty {
               @if (!isLoading()) {
@@ -134,6 +135,7 @@
                   (onSelect)="onSelectToilet($event)"
                   (onOpenDetails)="onOpenDetails($event)"
                   (onNavigate)="onStartNavigation($event)"
+                  (onOpenPhoto)="onOpenPhoto($event, toilet)"
                 />
               } @empty {
                 @if (!isLoading()) {
@@ -224,5 +226,29 @@
           (onCancel)="activePhotoToilet.set(null)"
           (onUploaded)="onPhotoUploaded($event)"
         />
+      }
+
+      <!-- 6. Global Lightbox Modal -->
+      @if (activeLightboxPhoto()) {
+        <div
+          class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 animate-fadeIn cursor-default select-none"
+          (click)="activeLightboxPhoto.set(null)"
+        >
+          <button
+            type="button"
+            (click)="activeLightboxPhoto.set(null)"
+            class="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/30 active:scale-95 p-3 rounded-full transition-all cursor-pointer z-10 flex items-center justify-center shadow-lg"
+            aria-label="Close photo"
+          >
+            <i class="fa-solid fa-xmark text-2xl text-white"></i>
+          </button>
+
+          <img
+            [src]="activeLightboxPhoto()!.photo.url"
+            [alt]="activeLightboxPhoto()!.title || 'Toilet Photo'"
+            class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl pointer-events-auto"
+            (click)="$event.stopPropagation()"
+          />
+        </div>
       }
     </div>

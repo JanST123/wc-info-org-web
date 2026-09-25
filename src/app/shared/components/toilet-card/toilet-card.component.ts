@@ -24,20 +24,13 @@ export class ToiletCardComponent {
   @Output() onSelect = new EventEmitter<Toilet>();
   @Output() onOpenDetails = new EventEmitter<Toilet>();
   @Output() onNavigate = new EventEmitter<Toilet>();
+  @Output() onOpenPhoto = new EventEmitter<ToiletPhoto>();
 
   readonly showNonPublicInfo = signal(false);
-  readonly activeLightboxPhoto = signal<ToiletPhoto | null>(null);
 
-  openLightbox(photo: ToiletPhoto, event: MouseEvent): void {
+  openPhoto(photo: ToiletPhoto, event: MouseEvent): void {
     event.stopPropagation();
-    this.activeLightboxPhoto.set(photo);
-  }
-
-  closeLightbox(event?: MouseEvent): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    this.activeLightboxPhoto.set(null);
+    this.onOpenPhoto.emit(photo);
   }
 
   get displayTitle(): string {
