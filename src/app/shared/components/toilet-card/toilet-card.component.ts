@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Toilet } from '../../../core/models/toilet.model';
+import { Toilet, ToiletPhoto } from '../../../core/models/toilet.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { ToiletSymbolComponent } from '../toilet-symbol/toilet-symbol.component';
 import { LocationService } from '../../../core/services/location.service';
@@ -26,6 +26,19 @@ export class ToiletCardComponent {
   @Output() onNavigate = new EventEmitter<Toilet>();
 
   readonly showNonPublicInfo = signal(false);
+  readonly activeLightboxPhoto = signal<ToiletPhoto | null>(null);
+
+  openLightbox(photo: ToiletPhoto, event: MouseEvent): void {
+    event.stopPropagation();
+    this.activeLightboxPhoto.set(photo);
+  }
+
+  closeLightbox(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.activeLightboxPhoto.set(null);
+  }
 
   get displayTitle(): string {
     if (this.toilet.owner && this.toilet.owner.trim().length > 0 && this.toilet.name && this.toilet.owner !== this.toilet.name) {
