@@ -138,7 +138,12 @@
 
           <!-- 2. STEP: name -->
           @if (currentStepId() === 'name') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-signs-post text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.nameTitle' | translate }}
@@ -168,7 +173,12 @@
 
           <!-- 3. STEP: sensor_location -->
           @if (currentStepId() === 'sensor_location') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-location-arrow text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.sensorTitle' | translate }}
@@ -182,7 +192,7 @@
                 <button
                   type="button"
                   (click)="handleSensorChoice(true)"
-                  class="p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-left flex items-center justify-between transition-all hover:bg-gray-50 dark:hover:bg-gray-800/60"
+                  class="p-4 rounded-xl border bg-purple-50 border-gray-200 dark:border-gray-700 text-left flex items-center justify-between transition-all hover:bg-gray-50 dark:hover:bg-gray-800/60"
                   [ngClass]="usedSensorLocation() === true ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100' : ''"
                 >
                   <div class="flex items-center gap-3">
@@ -212,7 +222,12 @@
 
           <!-- 4. CONDITIONAL STEP: map_location (Only if no place selected and sensor = no) -->
           @if (currentStepId() === 'map_location') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-regular fa-map text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.mapTitle' | translate }}
@@ -242,7 +257,12 @@
 
           <!-- 5. STEP: gender_separated -->
           @if (currentStepId() === 'gender_separated') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-restroom text-2xl"></i>
+                </div>
+              </div>
               <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                 {{ 'create.genderTitle' | translate }}
               </h3>
@@ -254,7 +274,7 @@
                   class="p-4 rounded-xl border text-left flex items-center justify-between transition-all"
                   [ngClass]="isGenderSeparated() === true
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
-                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
+                    : 'bg-purple-50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
                   <span class="font-bold text-sm">{{ 'create.genderYes' | translate }}</span>
                   <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
@@ -277,7 +297,12 @@
 
           <!-- 6. STEP: wheelchair (barrier-free) -->
           @if (currentStepId() === 'wheelchair') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-wheelchair text-2xl"></i>
+                </div>
+              </div>
               <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                 {{ 'create.wheelchairTitle' | translate }}
               </h3>
@@ -289,7 +314,7 @@
                   class="p-4 rounded-xl border text-left flex items-center justify-between transition-all"
                   [ngClass]="hasWheelchairAccess() === true
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
-                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
+                    : 'bg-purple-50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
                   <span class="font-bold text-sm">{{ 'create.wheelchairYes' | translate }}</span>
                   <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
@@ -312,10 +337,20 @@
 
           <!-- 7. CONDITIONAL STEP: euro_key (Only if wheelchair = true) -->
           @if (currentStepId() === 'euro_key') {
-            <div class="space-y-4">
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-                {{ 'create.euroKeyTitle' | translate }}
-              </h3>
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-key text-2xl"></i>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+                  {{ 'create.euroKeyTitle' | translate }}
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ 'create.euroKeySub' | translate }}
+                </p>
+              </div>
 
               <div class="grid grid-cols-1 gap-3">
                 <button
@@ -324,7 +359,7 @@
                   class="p-4 rounded-xl border text-left flex items-center justify-between transition-all"
                   [ngClass]="euroKey() === 'yes'
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
-                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
+                    : 'bg-purple-50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
                   <span class="font-bold text-sm">{{ 'create.euroKeyYes' | translate }}</span>
                   <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
@@ -359,7 +394,12 @@
 
           <!-- 8. CONDITIONAL STEP: address (Only if no place selected) -->
           @if (currentStepId() === 'address') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-envelope text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.addressTitle' | translate }}
@@ -370,12 +410,12 @@
               </div>
 
               <div class="space-y-4">
-                <input
-                  type="text"
+                <textarea
+                  rows="3"
                   [(ngModel)]="address"
                   [placeholder]="'create.addressPlaceholder' | translate"
                   class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 outline-hidden transition-all"
-                />
+                ></textarea>
 
                 <div class="flex items-center gap-3">
                   <button
@@ -400,6 +440,11 @@
           <!-- 9. CONDITIONAL STEP: opening_hours (Only if no place or place has no hours) -->
           @if (currentStepId() === 'opening_hours') {
             <div class="space-y-4">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-clock text-2xl"></i>
+                </div>
+              </div>
               @if (knowsOpeningHours() === null) {
                 <div class="space-y-1">
                   <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
