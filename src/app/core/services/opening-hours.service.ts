@@ -190,7 +190,7 @@ export class OpeningHoursService {
         if (diffMinutes > 0 && diffMinutes <= 30) {
           subtitle = this.translationService.t('status.closesIn', { time: `${diffMinutes} Min.` });
           subtitleColorClass = 'text-rose-600 dark:text-rose-400 font-semibold';
-        } else if (diffMinutes > 30 && diffMinutes <= 180) {
+        } else {
           const hours = Math.floor(diffMinutes / 60);
           const mins = diffMinutes % 60;
           const timeStr = hours > 0 ? `${hours} Std. ${mins} Min.` : `${mins} Min.`;
@@ -227,7 +227,7 @@ export class OpeningHoursService {
 
         if (diffMinutes > 0 && diffMinutes <= 60) {
           subtitle = this.translationService.t('status.opensIn', { time: `${diffMinutes} Min.` });
-        } else if (diffMinutes > 0 && diffMinutes <= 720) {
+        } else {
           const timeStr = openDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           subtitle = this.translationService.t('status.opensAt', { time: timeStr });
         }
