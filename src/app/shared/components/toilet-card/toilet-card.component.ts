@@ -14,16 +14,16 @@ import { TranslationService } from '../../../core/services/translation.service';
   template: `
     <div
       (click)="selectCard()"
-      class="group p-3.5 bg-white dark:bg-gray-800 rounded-2xl border transition-all duration-200 cursor-pointer text-left hover:shadow-md relative overflow-hidden"
-      [ngClass]="isSelected ? 'border-purple-500 dark:border-purple-500 ring-2 ring-purple-200 dark:ring-purple-900/50 bg-purple-50/40 dark:bg-purple-950/30' : 'border-gray-200 dark:border-gray-700/80'"
+      class="group py-3.5 px-4 transition-all duration-200 cursor-pointer text-left relative border-b border-gray-150 dark:border-gray-800 last:border-b-0"
+      [ngClass]="isSelected ? 'bg-purple-50/70 dark:bg-purple-950/40' : 'hover:bg-gray-50/70 dark:hover:bg-gray-800/40'"
     >
       <!-- Top Row: Headline & Subtitle on left, Open status & Non-public on right -->
       <div class="flex items-start justify-between gap-3">
-        <!-- Left: Name & Owner / Subtitle -->
+        <!-- Left: Headline & Subtitle -->
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-1.5 flex-wrap">
-            <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors leading-snug">
-              {{ toilet.name || ('app.title' | translate) }}
+            <h3 class="text-sm sm:text-[15px] font-bold text-gray-900 dark:text-gray-100 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors leading-snug">
+              {{ displayTitle }}
             </h3>
             @if (toilet.isQualified) {
               <span class="inline-flex items-center text-purple-600 dark:text-purple-400 shrink-0" [title]="'attr.verified' | translate">
@@ -34,9 +34,9 @@ import { TranslationService } from '../../../core/services/translation.service';
             }
           </div>
 
-          @if (toilet.owner && toilet.owner !== toilet.name) {
-            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5 leading-tight line-clamp-2">
-              {{ toilet.owner }}
+          @if (displaySubtitle) {
+            <p class="text-xs sm:text-[13px] text-gray-600 dark:text-gray-300 mt-0.5 leading-snug line-clamp-3">
+              {{ displaySubtitle }}
             </p>
           }
         </div>
@@ -84,20 +84,22 @@ import { TranslationService } from '../../../core/services/translation.service';
       }
 
       <!-- Middle: Symbol Icons -->
-      <div class="mt-2.5 mb-1.5 flex items-center gap-2">
-        <app-toilet-symbol [toilet]="toilet" />
-      </div>
+      @if (hasSymbols) {
+        <div class="mt-2 mb-1 flex items-center gap-2">
+          <app-toilet-symbol [toilet]="toilet" />
+        </div>
+      }
 
       <!-- Comment if present -->
       @if (toilet.comment) {
-        <p class="text-xs text-gray-500 dark:text-gray-400 italic line-clamp-1 mb-1.5">
+        <p class="text-xs text-gray-500 dark:text-gray-400 italic line-clamp-1 mt-1">
           "{{ toilet.comment }}"
         </p>
       }
 
       <!-- Photo thumbnails if available -->
       @if (toilet.photos && toilet.photos.length > 0) {
-        <div class="flex items-center gap-1.5 overflow-x-auto py-1 mb-2 no-scrollbar" (click)="$event.stopPropagation()">
+        <div class="flex items-center gap-1.5 overflow-x-auto py-1 my-1.5 no-scrollbar" (click)="$event.stopPropagation()">
           @for (photo of toilet.photos.slice(0, 3); track photo.id || $index) {
             <img
               [src]="photo.urlThumb || photo.url"
@@ -115,11 +117,11 @@ import { TranslationService } from '../../../core/services/translation.service';
       }
 
       <!-- Bottom Row: Address on bottom left, Distance on bottom right -->
-      <div class="flex items-end justify-between gap-3 mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800/80">
+      <div class="flex items-end justify-between gap-3 mt-2">
         <!-- Bottom Left: Address -->
         <div class="flex-1 min-w-0">
           @if (toilet.address) {
-            <p class="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+            <p class="text-xs sm:text-[13px] text-gray-700 dark:text-gray-300 line-clamp-2">
               {{ toilet.address }}
             </p>
           }
@@ -128,7 +130,7 @@ import { TranslationService } from '../../../core/services/translation.service';
         <!-- Bottom Right: Distance -->
         @if (formattedDistance) {
           <div class="shrink-0 text-right">
-            <span class="text-sm font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+            <span class="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               {{ formattedDistance }}
             </span>
           </div>
@@ -176,7 +178,33 @@ export class ToiletCardComponent {
   @Output() onOpenDetails = new EventEmitter<Toilet>();
   @Output() onNavigate = new EventEmitter<Toilet>();
 
-  readonly showNonPublicInfo = signal<boolean>(false);
+  readonly showNonPublicInfo = signal(false);
+
+  get displayTitle(): string {
+    if (this.toilet.owner && this.toilet.owner.trim().length > 0 && this.toilet.name && this.toilet.owner !== this.toilet.name) {
+      return this.toilet.owner;
+    }
+    return this.toilet.name || '';
+  }
+
+  get displaySubtitle(): string | null {
+    if (this.toilet.owner && this.toilet.owner.trim().length > 0 && this.toilet.name && this.toilet.owner !== this.toilet.name) {
+      return this.toilet.name;
+    }
+    return null;
+  }
+
+  get hasSymbols(): boolean {
+    return !!(
+      this.toilet.hasWheelchairAccess ||
+      this.toilet.hasChangingTable ||
+      this.toilet.isGenderSeparated ||
+      this.toilet.isUnisex ||
+      this.toilet.euroKey === 'yes' ||
+      this.toilet.euroKey === 'true' ||
+      this.toilet.euroKey === '1'
+    );
+  }
 
   get status(): DetailedStatus {
     this.translationService.currentLang();
