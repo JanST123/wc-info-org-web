@@ -142,7 +142,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
         <div class="mt-8 relative z-10">
           <button
             type="button"
-            (click)="router.navigate(['/urgent'])"
+            (click)="openUrgent()"
             class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-rose-600/90 hover:bg-rose-600 text-white font-bold text-sm shadow-xl transition-all hover:scale-105 active:scale-95 border border-rose-400/40 backdrop-blur-md cursor-pointer"
           >
             <svg class="w-5 h-5 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -259,6 +259,11 @@ export class HomeComponent implements OnInit {
       .catch((err) => {
         alert(err.message || 'Could not determine location');
       });
+  }
+
+  openUrgent(): void {
+    this.toiletState.setNavigationTarget(null);
+    this.router.navigate(['/urgent'], { queryParams: {} });
   }
 
   onSelectRecent(item: string): void {

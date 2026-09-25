@@ -29,7 +29,8 @@ export class HeaderComponent {
   }
 
   openUrgent(): void {
-    this.router.navigate(['/urgent']);
+    this.toiletState.setNavigationTarget(null);
+    this.router.navigate(['/urgent'], { queryParams: {} });
   }
 
   triggerNearby(): void {
