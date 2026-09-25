@@ -191,7 +191,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   readonly isMapReady = signal<boolean>(false);
 
   private googleMap?: google.maps.Map;
-  private infoWindow?: google.maps.InfoWindow;
+  private infoWindow?: any;
   private markersMap = new Map<number, google.maps.marker.AdvancedMarkerElement>();
   private userMarker?: google.maps.marker.AdvancedMarkerElement;
   private idleListener?: google.maps.MapsEventListener;

@@ -216,46 +216,82 @@ export class CreateWizardComponent implements OnInit {
       await this.mapsLoader.load();
 
       if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
-        const dummyDiv = document.createElement('div');
-        const service: google.maps.places.PlacesService = new (window as any).google.maps.places.PlacesService(dummyDiv);
         const center = new (window as any).google.maps.LatLng(this.lat(), this.lon());
 
-        service.nearbySearch(
-          {
-            location: center,
-            radius: 100,
-            rankBy: google.maps.places.RankBy.DISTANCE,
-          },
-          (results: any[], status: any) => {
-            this.loadingNearbyPlaces.set(false);
-            if (status === 'OK' && results && results.length > 0) {
-              const mapped: NearbyPlaceOption[] = results
-                .slice(0, 3)
-                .map((r: any) => {
-                  const placeLat = r.geometry?.location?.lat?.() ?? this.lat();
-                  const placeLng = r.geometry?.location?.lng?.() ?? this.lon();
-                  const dist = Math.round(
-                    this.locationService.calculateDistance(this.lat(), this.lon(), placeLat, placeLng)
-                  );
 
-                  return {
-                    placeId: r.place_id,
-                    name: r.name,
-                    vicinity: r.vicinity || r.formatted_address,
-                    distanceMeters: dist,
-                    lat: placeLat,
-                    lon: placeLng
-                  };
-                });
-              this.nearbyPlaces.set(mapped);
-            } else {
-              this.nearbyPlaces.set([]);
-            }
-          }
-        );
+
+        const [
+            { Place, SearchNearbyRankPreference },
+        ] = await Promise.all([
+            google.maps.importLibrary('places'),
+        ]);
+
+        const request = {
+            // required parameters
+            fields: [
+                'displayName',
+                'location',
+                'formattedAddress',
+                'regularOpeningHours',
+            ],
+            locationRestriction: {
+                center,
+                radius: 100,
+            },
+            // optional parameters
+            maxResultCount: 3,
+            rankPreference: SearchNearbyRankPreference.DISTANCE,
+        };
+
+        const { places } = await Place.searchNearby(request);
+
+     
+        this.loadingNearbyPlaces.set(false);
+        if (places && places.length > 0) {
+          const mapped = places
+            .slice(0, 3)
+            .map((r) => {
+              r.location?.lat
+              const placeLat = r.location?.lat?.() ?? this.lat();
+              const placeLng = r.location?.lng?.() ?? this.lon();
+              const dist = Math.round(
+                this.locationService.calculateDistance(this.lat(), this.lon(), placeLat, placeLng)
+              );
+
+              return {
+                placeId: r.id,
+                name: r.displayName ?? '',
+                vicinity: r.formattedAddress ?? '',
+                distanceMeters: dist,
+                lat: placeLat,
+                lon: placeLng,
+                openingHours: r.regularOpeningHours?.periods?.map((p) => ({
+                  open: {
+                    day: p.open?.day ?? 0,
+                    hour: p.open?.hour ?? 0,
+                    minute: p.open?.minute ?? 0
+                  },
+                  close: p.close
+                    ? {
+                        day: p.close?.day ?? 0,
+                        hour: p.close?.hour ?? 0,
+                        minute: p.close?.minute ?? 0
+                      }
+                    : null
+                })) || undefined
+              };
+            });
+
+          this.nearbyPlaces.set(mapped);
+        } else {
+          this.nearbyPlaces.set([]);
+        }
         return;
+            
+        
       }
-    } catch {
+    } catch(e) {
+      console.error('Error loading Google Maps Places API', e);
       // Fallback
     }
 
