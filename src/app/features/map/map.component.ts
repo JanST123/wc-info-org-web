@@ -195,14 +195,22 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private markersMap = new Map<number, google.maps.marker.AdvancedMarkerElement>();
   private userMarker?: google.maps.marker.AdvancedMarkerElement;
   private idleListener?: google.maps.MapsEventListener;
+  private zoomListener?: google.maps.MapsEventListener;
   private clickListener?: google.maps.MapsEventListener;
   private moveEndTimer?: ReturnType<typeof setTimeout>;
   private lastEmittedBounds?: { south: number; west: number; north: number; east: number };
+  private isFirstThemeRun = true;
 
   constructor() {
     effect(() => {
       const isDark = this.themeService.isDark();
-      this.updateMapTheme(isDark);
+      if (this.isFirstThemeRun) {
+        this.isFirstThemeRun = false;
+        return;
+      }
+      if (this.googleMap) {
+        this.reloadGoogleMap();
+      }
     });
   }
 
@@ -232,42 +240,59 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cleanupMap();
+  }
+
+  private cleanupMap(): void {
     if (this.moveEndTimer) clearTimeout(this.moveEndTimer);
     if (this.idleListener) google.maps.event.removeListener(this.idleListener);
+    if (this.zoomListener) google.maps.event.removeListener(this.zoomListener);
     if (this.clickListener) google.maps.event.removeListener(this.clickListener);
+    this.idleListener = undefined;
+    this.zoomListener = undefined;
+    this.clickListener = undefined;
     this.infoWindow?.close();
     this.infoWindow = undefined;
     this.clearAllMarkers();
   }
 
-  private updateMapTheme(isDark: boolean): void {
+  private reloadGoogleMap(): void {
     if (!this.googleMap || typeof google === 'undefined') return;
 
-    const colorScheme = (google.maps as any).ColorScheme;
-    const options: google.maps.MapOptions = {
-      styles: isDark ? DARK_MAP_STYLE : null
-    };
+    // Capture current view state
+    const center = this.googleMap.getCenter();
+    const currentCenter = center
+      ? { lat: center.lat(), lng: center.lng() }
+      : { lat: this.center.lat, lng: this.center.lon };
+    const currentZoom = this.googleMap.getZoom() ?? this.zoom;
+    const currentMapTypeId = this.googleMap.getMapTypeId() ?? (this.isSatellite() ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP);
 
-    if (colorScheme) {
-      (options as any).colorScheme = isDark ? colorScheme.DARK : colorScheme.LIGHT;
+    this.cleanupMap();
+    if (this.mapContainerElement?.nativeElement) {
+      this.mapContainerElement.nativeElement.innerHTML = '';
     }
 
-    this.googleMap.setOptions(options);
-
-    if (this.selectedToilet) {
-      this.updateActiveInfoWindow();
-    }
+    this.initGoogleMap(currentCenter, currentZoom, currentMapTypeId);
   }
 
-  private async initGoogleMap(): Promise<void> {
+  private async initGoogleMap(
+    centerOverride?: { lat: number; lng: number },
+    zoomOverride?: number,
+    mapTypeIdOverride?: google.maps.MapTypeId | string
+  ): Promise<void> {
     try {
       const g = await this.mapsLoader.load();
       const isDark = this.themeService.isDark();
       const colorScheme = (g.maps as any).ColorScheme;
 
+      const center = centerOverride || { lat: this.center.lat, lng: this.center.lon };
+      const zoom = zoomOverride !== undefined ? zoomOverride : this.zoom;
+      const mapTypeId = mapTypeIdOverride || (this.isSatellite() ? g.maps.MapTypeId.HYBRID : g.maps.MapTypeId.ROADMAP);
+
       const mapOptions: google.maps.MapOptions = {
-        center: { lat: this.center.lat, lng: this.center.lon },
-        zoom: this.zoom,
+        center,
+        zoom,
+        mapTypeId,
         mapId: environment.googleMapsMapId || 'DEMO_MAP_ID',
         disableDefaultUI: true,
         zoomControl: true,
@@ -287,7 +312,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       this.idleListener = this.googleMap.addListener('dragend', () => {
         this.emitCurrentBounds();
       });
-      this.googleMap.addListener('zoom_changed', () => {
+      this.zoomListener = this.googleMap.addListener('zoom_changed', () => {
         this.emitCurrentBounds();
       });
 
@@ -584,9 +609,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.googleMap.setMapTypeId(
       nextSat ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP
     );
-    if (!nextSat) {
-      this.updateMapTheme(this.themeService.isDark());
-    }
   }
 
   centerOnUser(): void {
