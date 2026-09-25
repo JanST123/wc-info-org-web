@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "maplibre-gl/dist/maplibre-gl.css";
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

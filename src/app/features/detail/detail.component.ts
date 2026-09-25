@@ -28,10 +28,8 @@ import { TranslationService } from '../../core/services/translation.service';
                 </span>
               }
               @if (toilet.isQualified) {
-                <span class="inline-flex items-center text-purple-600 dark:text-purple-400" [title]="'attr.verified' | translate">
-                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
+                <span class="inline-flex items-center text-green-600 dark:text-green-500" [title]="'attr.verified' | translate">
+                  <i class="fa-solid fa-circle-check text-base text-green-600 dark:text-green-500"></i>
                 </span>
               }
             </div>
@@ -150,12 +148,7 @@ import { TranslationService } from '../../core/services/translation.service';
               <!-- Wheelchair -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.hasWheelchairAccess ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="4" r="2"/>
-                    <path d="M18 19a6 6 0 0 1-12 0 6 6 0 0 1 12 0Z"/>
-                    <path d="m14 13 3 3"/>
-                    <path d="M9 13v-2a2 2 0 0 1 2-2h3"/>
-                  </svg>
+                  <i class="fa-solid fa-wheelchair text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.wheelchair' | translate }}</span>
@@ -168,9 +161,7 @@ import { TranslationService } from '../../core/services/translation.service';
               <!-- Changing Table -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.hasChangingTable ? 'bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/>
-                  </svg>
+                  <i class="fa-solid fa-baby text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.changingTable' | translate }}</span>
@@ -183,11 +174,7 @@ import { TranslationService } from '../../core/services/translation.service';
               <!-- Euro Key -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="isEuroKeyRequired ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/>
-                    <path d="m21 2-9.6 9.6"/>
-                    <circle cx="7.5" cy="15.5" r="5.5"/>
-                  </svg>
+                  <i class="fa-solid fa-key text-xs"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.euroKey' | translate }}</span>
@@ -200,12 +187,11 @@ import { TranslationService } from '../../core/services/translation.service';
               <!-- Partitioning -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
+                  @if (toilet.isGenderSeparated) {
+                    <i class="fa-solid fa-restroom text-sm"></i>
+                  } @else {
+                    <i class="fa-solid fa-toilet-paper text-sm"></i>
+                  }
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'create.step9.title' | translate }}</span>
@@ -235,10 +221,7 @@ import { TranslationService } from '../../core/services/translation.service';
               <!-- Public Access -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.publicAccessible !== false ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300' : 'bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300'">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="m9 12 2 2 4-4"/>
-                  </svg>
+                  <i class="fa-solid fa-circle-check text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'create.step5.title' | translate }}</span>
