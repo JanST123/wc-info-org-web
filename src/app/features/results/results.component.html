@@ -195,7 +195,7 @@
       @if (activeDetailToilet()) {
         <app-detail
           [toilet]="activeDetailToilet()!"
-          (onClose)="activeDetailToilet.set(null)"
+          (onClose)="onCloseDetails()"
           (onStartNavigation)="onStartNavigation($event)"
           (onSuggestEdit)="onOpenSuggestEdit($event)"
           (onReportProblem)="onOpenReportProblem($event)"

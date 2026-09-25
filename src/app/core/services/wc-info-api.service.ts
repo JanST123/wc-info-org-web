@@ -38,6 +38,12 @@ export class WcInfoApiService {
     );
   }
 
+  fetchToiletById(id: number): Observable<Toilet> {
+    return this.http.get<any>(`${this.baseUrl}/toilet/${id}`).pipe(
+      map((item) => normalizeToiletList([item])[0])
+    );
+  }
+
   fetchToiletsInBounds(south: number, west: number, north: number, east: number, filter?: string): Observable<Toilet[]> {
     let params = new HttpParams();
     if (filter) {

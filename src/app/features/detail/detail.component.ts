@@ -50,7 +50,7 @@ export class DetailComponent {
   }
 
   shareToilet(): void {
-    const shareUrl = window.location.origin + '/results?toilet=' + this.toilet.id;
+    const shareUrl = window.location.href;
     if (navigator.share) {
       navigator.share({
         title: this.toilet.name || 'WC-Info',

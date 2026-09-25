@@ -11,6 +11,8 @@ import { LocationService } from '../../core/services/location.service';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
+import { createPlaceSlug } from '../../core/utils/slug.utils';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -220,45 +222,24 @@ export class HomeComponent implements OnInit {
     if (place.lat !== undefined && place.lon !== undefined) {
       this.toiletState.setSearchLocation({ lat: place.lat, lon: place.lon, name: place.primaryText });
       this.toiletState.loadToiletsNearby(place.lat, place.lon, 10, place.primaryText);
-      this.router.navigate(['/results'], {
-        queryParams: { lat: place.lat, lon: place.lon, name: place.primaryText }
-      });
-    } else {
-      this.placesService.getPlaceDetails(place)
-        .then((coords) => {
-          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: place.primaryText });
-          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, place.primaryText);
-          this.router.navigate(['/results'], {
-            queryParams: { lat: coords.lat, lon: coords.lon, name: place.primaryText }
-          });
-        })
-        .catch(() => {
-          this.router.navigate(['/results'], { queryParams: { q: place.primaryText } });
-        });
     }
+    const slug = createPlaceSlug(place.primaryText, place.placeId);
+    this.router.navigate(['/Toilets', slug]);
   }
 
   onSearchSubmit(): void {
     if (this.searchQuery.trim()) {
-      this.saveRecentSearch(this.searchQuery.trim());
-      this.router.navigate(['/results'], { queryParams: { q: this.searchQuery.trim() } });
+      const term = this.searchQuery.trim();
+      this.saveRecentSearch(term);
+      const slug = createPlaceSlug(term);
+      this.router.navigate(['/Toilets', slug]);
     } else {
-      this.router.navigate(['/results']);
+      this.router.navigate(['/Toilets']);
     }
   }
 
   onNearbyClick(): void {
-    this.locationService.getCurrentPosition()
-      .then((coords) => {
-        this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon });
-        this.toiletState.loadToiletsNearby(coords.lat, coords.lon);
-        this.router.navigate(['/results'], {
-          queryParams: { lat: coords.lat, lon: coords.lon }
-        });
-      })
-      .catch((err) => {
-        alert(err.message || 'Could not determine location');
-      });
+    this.router.navigate(['/Toilets', 'Aktueller-Standort---NEARBY']);
   }
 
   openUrgent(): void {

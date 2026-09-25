@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FilterBannerComponent } from '../../shared/components/filter-banner/filter-banner.component';
@@ -11,10 +11,12 @@ import { FeedbackModalComponent } from '../feedback/feedback-modal.component';
 import { UpdateModalComponent } from '../update/update-modal.component';
 import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.component';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
-import { Coordinates } from '../../core/services/location.service';
+import { Coordinates, LocationService } from '../../core/services/location.service';
 import { PlacesService } from '../../core/services/places.service';
+import { WcInfoApiService } from '../../core/services/wc-info-api.service';
 import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { parsePlaceSlug, parseToiletSlug, createToiletSlug } from '../../core/utils/slug.utils';
 
 @Component({
   selector: 'app-results',
@@ -38,6 +40,9 @@ import { TranslatePipe } from '../../core/pipes/translate.pipe';
 export class ResultsComponent implements OnInit {
   readonly toiletState = inject(ToiletStateService);
   private readonly placesService = inject(PlacesService);
+  private readonly locationService = inject(LocationService);
+  private readonly api = inject(WcInfoApiService);
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
@@ -48,6 +53,7 @@ export class ResultsComponent implements OnInit {
   readonly isLoading = this.toiletState.isLoading;
 
   readonly listHeightPercent = signal<number>(60);
+  readonly currentPlaceSlug = signal<string>('Aktueller-Standort---NEARBY');
 
   private isDragging = false;
   private startY = 0;
@@ -62,7 +68,25 @@ export class ResultsComponent implements OnInit {
   readonly activeLightboxPhoto = signal<{ photo: ToiletPhoto; title?: string } | null>(null);
 
   ngOnInit(): void {
-    // Handle query params
+    // 1. Handle route path params (:placeSlug, :toiletSlug)
+    this.route.params.subscribe((params) => {
+      const placeSlug = params['placeSlug'] as string | undefined;
+      const toiletSlug = params['toiletSlug'] as string | undefined;
+
+      if (placeSlug) {
+        this.currentPlaceSlug.set(placeSlug);
+        this.handlePlaceSlug(placeSlug);
+      }
+
+      if (toiletSlug) {
+        const toiletId = parseToiletSlug(toiletSlug);
+        if (toiletId) {
+          this.loadAndOpenToiletDetail(toiletId);
+        }
+      }
+    });
+
+    // 2. Handle legacy / query params
     this.route.queryParams.subscribe((params) => {
       if (params['lat'] && params['lon']) {
         const lat = parseFloat(params['lat']);
@@ -75,31 +99,92 @@ export class ResultsComponent implements OnInit {
       } else if (params['q']) {
         const query = (params['q'] as string).trim();
         if (query) {
-          this.placesService.searchPlaces(query).subscribe((suggestions) => {
-            if (suggestions.length > 0) {
-              const first = suggestions[0];
-              if (first.lat !== undefined && first.lon !== undefined) {
-                this.toiletState.setSearchLocation({ lat: first.lat, lon: first.lon, name: first.primaryText });
-                this.toiletState.loadToiletsNearby(first.lat, first.lon, 10, first.primaryText);
-              } else {
-                this.placesService.getPlaceDetails(first).then((coords) => {
-                  this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: first.primaryText });
-                  this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, first.primaryText);
-                }).catch(() => {
-                  this.toiletState.reloadCurrentView();
-                });
-              }
-            }
-          });
+          this.placesService.searchAndResolveFirst(query)
+            .then((result) => {
+              this.toiletState.setSearchLocation({ lat: result.lat, lon: result.lon, name: result.name });
+              this.toiletState.loadToiletsNearby(result.lat, result.lon, 10, result.name);
+            })
+            .catch(() => {
+              this.toiletState.reloadCurrentView();
+            });
         }
       }
 
       if (params['toilet']) {
         const id = parseInt(params['toilet'], 10);
-        const match = this.toilets().find((t) => t.id === id);
-        if (match) {
-          this.activeDetailToilet.set(match);
+        if (!isNaN(id)) {
+          this.loadAndOpenToiletDetail(id);
         }
+      }
+    });
+  }
+
+  private handlePlaceSlug(placeSlug: string): void {
+    const parsed = parsePlaceSlug(placeSlug);
+
+    if (parsed.type === 'nearby') {
+      this.locationService.getCurrentPosition()
+        .then((coords) => {
+          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: parsed.name });
+          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, parsed.name);
+        })
+        .catch((err) => {
+          console.warn('Geolocation error for nearby route:', err);
+          this.toiletState.reloadCurrentView();
+        });
+      return;
+    }
+
+    if (parsed.type === 'place_id' && parsed.placeId) {
+      this.placesService.getPlaceDetailsByPlaceId(parsed.placeId, parsed.rawName)
+        .then((coords) => {
+          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: coords.name || parsed.name });
+          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, coords.name || parsed.name);
+        })
+        .catch((err) => {
+          console.error('Failed to resolve placeId for slug:', placeSlug, err);
+          this.placesService.searchAndResolveFirst(parsed.name)
+            .then((coords) => {
+              this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: coords.name || parsed.name });
+              this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, coords.name || parsed.name);
+            })
+            .catch(() => this.toiletState.reloadCurrentView());
+        });
+      return;
+    }
+
+    if (parsed.type === 'query') {
+      this.placesService.searchAndResolveFirst(parsed.name)
+        .then((coords) => {
+          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: coords.name || parsed.name });
+          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, coords.name || parsed.name);
+        })
+        .catch((err) => {
+          console.error('Failed to resolve place query for slug:', placeSlug, err);
+          this.toiletState.reloadCurrentView();
+        });
+      return;
+    }
+  }
+
+  private loadAndOpenToiletDetail(id: number): void {
+    const existing = this.toilets().find((t) => t.id === id);
+    if (existing) {
+      this.activeDetailToilet.set(existing);
+      this.toiletState.setSelectedToilet(existing);
+      return;
+    }
+
+    this.api.fetchToiletById(id).subscribe({
+      next: (toilet) => {
+        if (toilet) {
+          this.toiletState.addToiletToState(toilet);
+          this.activeDetailToilet.set(toilet);
+          this.toiletState.setSelectedToilet(toilet);
+        }
+      },
+      error: (err) => {
+        console.warn('Could not fetch toilet details for id:', id, err);
       }
     });
   }
@@ -114,6 +199,16 @@ export class ResultsComponent implements OnInit {
 
   onOpenDetails(toilet: Toilet): void {
     this.activeDetailToilet.set(toilet);
+    this.toiletState.setSelectedToilet(toilet);
+    const placeSlug = this.currentPlaceSlug() || 'Aktueller-Standort---NEARBY';
+    const toiletSlug = createToiletSlug(toilet.name, toilet.id);
+    this.location.go(`/Toilets/${placeSlug}/${toiletSlug}`);
+  }
+
+  onCloseDetails(): void {
+    this.activeDetailToilet.set(null);
+    const placeSlug = this.currentPlaceSlug() || 'Aktueller-Standort---NEARBY';
+    this.location.go(`/Toilets/${placeSlug}`);
   }
 
   onStartNavigation(toilet: Toilet): void {

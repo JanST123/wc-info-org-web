@@ -5,6 +5,12 @@ import { UrgentNavigateComponent } from './features/urgent-navigate/urgent-navig
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
+  { path: 'Toilets/:placeSlug/:toiletSlug', component: ResultsComponent },
+  { path: 'Toilets/:placeSlug', component: ResultsComponent },
+  { path: 'Toilets', component: ResultsComponent },
+  { path: 'Toilet/:placeSlug/:toiletSlug', component: ResultsComponent },
+  { path: 'Toilet/:placeSlug', component: ResultsComponent },
+  { path: 'Toilet', component: ResultsComponent },
   { path: 'results', component: ResultsComponent },
   { path: 'urgent', component: UrgentNavigateComponent },
   { path: '**', redirectTo: '' }

@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, catchError } from 'rxjs';
+import { Observable, map, of, catchError, firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { GoogleMapsLoaderService } from './google-maps-loader.service';
 
 export interface PlaceSuggestion {
   placeId: string;
@@ -16,6 +17,7 @@ export interface PlaceSuggestion {
 })
 export class PlacesService {
   private readonly http = inject(HttpClient);
+  private readonly mapsLoader = inject(GoogleMapsLoaderService);
 
   searchPlaces(query: string): Observable<PlaceSuggestion[]> {
     if (!query || query.trim().length < 2) {
@@ -70,28 +72,84 @@ export class PlacesService {
     );
   }
 
-  getPlaceDetails(place: PlaceSuggestion): Promise<{ lat: number; lon: number }> {
+  getPlaceDetails(place: PlaceSuggestion): Promise<{ lat: number; lon: number; name?: string }> {
     if (place.lat !== undefined && place.lon !== undefined) {
-      return Promise.resolve({ lat: place.lat, lon: place.lon });
+      return Promise.resolve({ lat: place.lat, lon: place.lon, name: place.primaryText });
     }
 
-    if (typeof window !== 'undefined' && (window as any).google?.maps?.places && place.placeId) {
-      return new Promise((resolve, reject) => {
-        const dummyDiv = document.createElement('div');
-        const service = new (window as any).google.maps.places.PlacesService(dummyDiv);
-        service.getDetails({ placeId: place.placeId, fields: ['geometry'] }, (result: any, status: any) => {
-          if (status === 'OK' && result?.geometry?.location) {
-            resolve({
-              lat: result.geometry.location.lat(),
-              lon: result.geometry.location.lng()
-            });
-          } else {
-            reject(new Error('Failed to resolve place geometry'));
-          }
-        });
+    return this.getPlaceDetailsByPlaceId(place.placeId, place.primaryText);
+  }
+
+  async getPlaceDetailsByPlaceId(placeId: string, fallbackName?: string): Promise<{ lat: number; lon: number; name?: string }> {
+    try {
+      await this.mapsLoader.load();
+    } catch {
+      // ignore loader error, fallback below
+    }
+
+    if (typeof window !== 'undefined' && (window as any).google?.maps?.places && placeId) {
+      const googleResult = await new Promise<{ lat: number; lon: number; name?: string } | null>((resolve) => {
+        try {
+          const dummyDiv = document.createElement('div');
+          const service = new (window as any).google.maps.places.PlacesService(dummyDiv);
+          service.getDetails(
+            { placeId, fields: ['geometry', 'name', 'formatted_address'] },
+            (result: any, status: any) => {
+              if (status === 'OK' && result?.geometry?.location) {
+                resolve({
+                  lat: result.geometry.location.lat(),
+                  lon: result.geometry.location.lng(),
+                  name: result.name || fallbackName?.replace(/-/g, ' ')
+                });
+              } else {
+                resolve(null);
+              }
+            }
+          );
+        } catch {
+          resolve(null);
+        }
       });
+
+      if (googleResult) {
+        return googleResult;
+      }
     }
 
-    return Promise.reject(new Error('Coordinates not found for place'));
+    // Fallback: If placeId was numeric (OSM) or Google getDetails failed, search by name
+    if (fallbackName && fallbackName.trim()) {
+      return this.searchAndResolveFirst(fallbackName.replace(/-/g, ' '));
+    }
+
+    throw new Error('Coordinates not found for placeId: ' + placeId);
+  }
+
+  async searchAndResolveFirst(query: string): Promise<{ lat: number; lon: number; name?: string }> {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      throw new Error('Empty search query');
+    }
+
+    const suggestions = await firstValueFrom(this.searchPlaces(trimmed));
+    if (!suggestions || suggestions.length === 0) {
+      // Nominatim direct geocode fallback
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmed)}&limit=1`;
+      const direct = await firstValueFrom(this.http.get<any[]>(url).pipe(catchError(() => of([]))));
+      if (direct && direct.length > 0) {
+        return {
+          lat: parseFloat(direct[0].lat),
+          lon: parseFloat(direct[0].lon),
+          name: direct[0].name || trimmed
+        };
+      }
+      throw new Error('No places found for ' + trimmed);
+    }
+
+    const first = suggestions[0];
+    if (first.lat !== undefined && first.lon !== undefined) {
+      return { lat: first.lat, lon: first.lon, name: first.primaryText };
+    }
+
+    return this.getPlaceDetails(first);
   }
 }
