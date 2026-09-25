@@ -117,7 +117,8 @@ export class ResultsComponent implements OnInit {
   }
 
   onStartNavigation(toilet: Toilet): void {
-    this.router.navigate(['/urgent']);
+    this.toiletState.setNavigationTarget(toilet);
+    this.router.navigate(['/urgent'], { queryParams: { toilet: toilet.id } });
   }
 
   onOpenSuggestEdit(toilet: Toilet): void {

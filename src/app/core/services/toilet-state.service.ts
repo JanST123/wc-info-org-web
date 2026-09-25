@@ -62,6 +62,13 @@ export class ToiletStateService {
     return count;
   });
 
+  // Navigation target signal
+  readonly navigationTargetToilet = signal<Toilet | null>(null);
+
+  setNavigationTarget(toilet: Toilet | null): void {
+    this.navigationTargetToilet.set(toilet);
+  }
+
   constructor() {
     this.initUserLocation();
   }
@@ -70,7 +77,9 @@ export class ToiletStateService {
     this.locationService.getCurrentPosition()
       .then((coords) => {
         this.userLocation.set(coords);
-        this.mapCenter.set(coords);
+        if (!this.searchLocation()) {
+          this.mapCenter.set(coords);
+        }
       })
       .catch(() => {
         // Geolocation denied or unavailable
@@ -83,6 +92,7 @@ export class ToiletStateService {
   setSearchLocation(location: { lat: number; lon: number; name?: string } | null): void {
     this.searchLocation.set(location);
     if (location) {
+      this.lastBounds = null;
       this.mapCenter.set({ lat: location.lat, lon: location.lon });
     }
   }
@@ -151,6 +161,7 @@ export class ToiletStateService {
   }
 
   loadToiletsNearby(lat: number, lon: number, distance = 10, name?: string): void {
+    this.lastBounds = null;
     this.lastNearby = { lat, lon, distance };
     if (!this.searchLocation() || this.searchLocation()?.lat !== lat || this.searchLocation()?.lon !== lon) {
       this.searchLocation.set({ lat, lon, name: name || this.searchLocation()?.name });

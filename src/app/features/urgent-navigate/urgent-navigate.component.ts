@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LocationService, Coordinates } from '../../core/services/location.service';
 import { CompassService } from '../../core/services/compass.service';
 import { WcInfoApiService } from '../../core/services/wc-info-api.service';
+import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { Toilet } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
@@ -20,7 +21,7 @@ import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-
         <button
           type="button"
           (click)="goBack()"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold backdrop-blur-md transition-colors"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer"
         >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"/>
@@ -29,10 +30,17 @@ import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-
         </button>
 
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
-          <span class="text-sm font-black tracking-wider uppercase text-rose-400">
-            {{ 'urgent.title' | translate }}
-          </span>
+          @if (isEmergency()) {
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            <span class="text-sm font-black tracking-wider uppercase text-rose-400">
+              {{ 'urgent.title' | translate }}
+            </span>
+          } @else {
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span class="text-sm font-black tracking-wider uppercase text-emerald-400">
+              {{ 'detail.navigate' | translate }}
+            </span>
+          }
         </div>
 
         <div class="w-16"></div>
@@ -187,13 +195,16 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   private readonly locationService = inject(LocationService);
   private readonly compassService = inject(CompassService);
   private readonly api = inject(WcInfoApiService);
+  private readonly toiletState = inject(ToiletStateService);
   private readonly translationService = inject(TranslationService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   readonly isLoading = signal<boolean>(true);
   readonly statusMessage = signal<string>('');
   readonly targetToilet = signal<Toilet | null>(null);
   readonly isFallback = signal<boolean>(false);
+  readonly isEmergency = signal<boolean>(true);
   readonly userCoords = signal<Coordinates | null>(null);
   readonly deviceHeading = this.compassService.heading;
   readonly hasCompassPermission = this.compassService.permissionGranted;
@@ -238,8 +249,43 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.startEmergencySearch();
+    this.route.queryParams.subscribe((params) => {
+      const toiletId = params['toilet'] ? parseInt(params['toilet'], 10) : null;
+      const targetFromState = this.toiletState.navigationTargetToilet();
+
+      if (targetFromState && (!toiletId || targetFromState.id === toiletId)) {
+        this.startDirectNavigation(targetFromState);
+      } else if (toiletId) {
+        const found = this.toiletState.toilets().find((t) => t.id === toiletId);
+        if (found) {
+          this.startDirectNavigation(found);
+        } else {
+          this.startEmergencySearch();
+        }
+      } else {
+        this.startEmergencySearch();
+      }
+    });
     this.compassService.startListening();
+  }
+
+  startDirectNavigation(toilet: Toilet): void {
+    this.isEmergency.set(false);
+    this.isFallback.set(false);
+    this.targetToilet.set(toilet);
+    this.isLoading.set(true);
+    this.statusMessage.set(this.translationService.t('urgent.locating'));
+
+    this.locationService.getCurrentPosition()
+      .then((coords) => {
+        this.userCoords.set(coords);
+        this.startWatchingPosition();
+        this.isLoading.set(false);
+      })
+      .catch((err) => {
+        this.isLoading.set(false);
+        console.error('Location error:', err);
+      });
   }
 
   ngOnDestroy(): void {

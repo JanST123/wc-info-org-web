@@ -283,8 +283,11 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       this.infoWindow = new google.maps.InfoWindow();
       this.isMapReady.set(true);
 
-      // Listen for camera idle event
-      this.idleListener = this.googleMap.addListener('idle', () => {
+      // Listen for user drag and zoom interaction
+      this.idleListener = this.googleMap.addListener('dragend', () => {
+        this.emitCurrentBounds();
+      });
+      this.googleMap.addListener('zoom_changed', () => {
         this.emitCurrentBounds();
       });
 
@@ -297,7 +300,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
       this.updateToiletMarkers();
       this.updateUserMarker();
-      this.emitCurrentBounds();
     } catch (err) {
       console.error('Google Maps failed to initialize:', err);
     }
