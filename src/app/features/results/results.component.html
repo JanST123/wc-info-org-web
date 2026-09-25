@@ -13,6 +13,8 @@
             <!-- Filter Banner Component -->
             <app-filter-banner />
 
+            <div class="w-full h-1"></div>
+
             <!-- Missing Toilet Banner Button -->
             <button
               type="button"
@@ -98,6 +100,8 @@
               <!-- Filter Banner Component -->
               <app-filter-banner />
 
+              <div class="w-full h-1"></div>
+
               <!-- Missing Toilet Banner Button -->
               <button
                 type="button"
@@ -128,7 +132,10 @@
 
             <!-- Scrollable Toilet Cards List (flex-1 min-h-0 overflow-y-auto) -->
             <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
-              @for (toilet of toilets(); track toilet.id) {
+              @for (toilet of toilets(); track toilet.id; let idx = $index) {
+                @if(idx > 0) {
+                    <div class="w-[95vw] ml-2 h-1 border-t border-purple-200 dark:border-purple-800/60"></div>
+                }
                 <app-toilet-card
                   [toilet]="toilet"
                   [isSelected]="selectedToilet()?.id === toilet.id"

@@ -127,7 +127,7 @@
 
       <!-- Active Action Buttons: ONLY visible if row is active (clicked once) -->
       @if (isSelected) {
-        <div class="mt-3 pt-2.5 border-t border-purple-200 dark:border-purple-800/60 flex items-center justify-between gap-3 animate-fadeIn" (click)="$event.stopPropagation()">
+        <div class="mt-3 pt-2.5 flex items-center justify-between gap-3 animate-fadeIn" (click)="$event.stopPropagation()">
           <button
             type="button"
             (click)="onNavigate.emit(toilet)"
