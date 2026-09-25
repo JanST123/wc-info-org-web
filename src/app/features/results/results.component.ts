@@ -16,7 +16,7 @@ import { PlacesService } from '../../core/services/places.service';
 import { WcInfoApiService } from '../../core/services/wc-info-api.service';
 import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
-import { parsePlaceSlug, parseToiletSlug, createToiletSlug } from '../../core/utils/slug.utils';
+import { parsePlaceSlug, parseToiletSlug, createToiletSlug, createPlaceSlug } from '../../core/utils/slug.utils';
 
 @Component({
   selector: 'app-results',
@@ -138,15 +138,22 @@ export class ResultsComponent implements OnInit {
     if (parsed.type === 'place_id' && parsed.placeId) {
       this.placesService.getPlaceDetailsByPlaceId(parsed.placeId, parsed.rawName)
         .then((coords) => {
-          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: coords.name || parsed.name });
-          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, coords.name || parsed.name);
+          const resolvedName = coords.name || parsed.name;
+          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: resolvedName });
+          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, resolvedName);
+          this.saveRecentSearch(resolvedName, parsed.placeId);
         })
         .catch((err) => {
           console.error('Failed to resolve placeId for slug:', placeSlug, err);
           this.placesService.searchAndResolveFirst(parsed.name)
             .then((coords) => {
-              this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: coords.name || parsed.name });
-              this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, coords.name || parsed.name);
+              const resolvedName = coords.name || parsed.name;
+              this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: resolvedName });
+              this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, resolvedName);
+              if (coords.placeId) {
+                this.currentPlaceSlug.set(createPlaceSlug(resolvedName, coords.placeId));
+                this.saveRecentSearch(resolvedName, coords.placeId);
+              }
             })
             .catch(() => this.toiletState.reloadCurrentView());
         });
@@ -156,14 +163,38 @@ export class ResultsComponent implements OnInit {
     if (parsed.type === 'query') {
       this.placesService.searchAndResolveFirst(parsed.name)
         .then((coords) => {
-          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: coords.name || parsed.name });
-          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, coords.name || parsed.name);
+          const resolvedName = coords.name || parsed.name;
+          this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: resolvedName });
+          this.toiletState.loadToiletsNearby(coords.lat, coords.lon, 10, resolvedName);
+          if (coords.placeId) {
+            this.currentPlaceSlug.set(createPlaceSlug(resolvedName, coords.placeId));
+            this.saveRecentSearch(resolvedName, coords.placeId);
+          } else {
+            this.saveRecentSearch(resolvedName);
+          }
         })
         .catch((err) => {
           console.error('Failed to resolve place query for slug:', placeSlug, err);
           this.toiletState.reloadCurrentView();
         });
       return;
+    }
+  }
+
+  private saveRecentSearch(name: string, placeId?: string): void {
+    try {
+      const slug = createPlaceSlug(name, placeId);
+      const newItem = { name, placeId, slug };
+      const data = localStorage.getItem('wc_recent_searches');
+      const existing = data ? JSON.parse(data) : [];
+      const current = Array.isArray(existing) ? existing.map((i: any) => typeof i === 'string' ? { name: i, slug: createPlaceSlug(i) } : i) : [];
+      const filtered = current.filter(
+        (s: any) => s.slug?.toLowerCase() !== slug.toLowerCase() && s.name?.toLowerCase() !== name.toLowerCase()
+      );
+      const updated = [newItem, ...filtered].slice(0, 5);
+      localStorage.setItem('wc_recent_searches', JSON.stringify(updated));
+    } catch {
+      // Ignore
     }
   }
 

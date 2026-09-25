@@ -13,6 +13,12 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { createPlaceSlug } from '../../core/utils/slug.utils';
 
+export interface RecentSearchItem {
+  name: string;
+  placeId?: string;
+  slug: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -104,13 +110,13 @@ import { createPlaceSlug } from '../../core/utils/slug.utils';
                   {{ 'common.recentSearches' | translate }}
                 </div>
                 <div class="flex flex-wrap gap-1.5">
-                  @for (item of recentSearches(); track item) {
+                  @for (item of recentSearches(); track item.slug) {
                     <button
                       type="button"
                       (click)="onSelectRecent(item)"
                       class="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-medium text-gray-700 dark:text-gray-200 hover:text-purple-800 dark:hover:text-purple-200 transition-colors cursor-pointer"
                     >
-                      {{ item }}
+                      {{ item.name }}
                     </button>
                   }
                 </div>
@@ -165,14 +171,13 @@ import { createPlaceSlug } from '../../core/utils/slug.utils';
 export class HomeComponent implements OnInit {
   readonly themeService = inject(ThemeService);
   private readonly placesService = inject(PlacesService);
-  private readonly locationService = inject(LocationService);
   private readonly toiletState = inject(ToiletStateService);
   readonly router = inject(Router);
 
   searchQuery = '';
   readonly isFocused = signal<boolean>(false);
   readonly suggestions = signal<PlaceSuggestion[]>([]);
-  readonly recentSearches = signal<string[]>([]);
+  readonly recentSearches = signal<RecentSearchItem[]>([]);
 
   private funnyFooters = [
     "Made of stardust 💫",
@@ -216,7 +221,7 @@ export class HomeComponent implements OnInit {
   }
 
   selectPlace(place: PlaceSuggestion): void {
-    this.saveRecentSearch(place.primaryText);
+    this.saveRecentSearch(place.primaryText, place.placeId);
     this.isFocused.set(false);
 
     if (place.lat !== undefined && place.lon !== undefined) {
@@ -247,9 +252,9 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/urgent'], { queryParams: {} });
   }
 
-  onSelectRecent(item: string): void {
-    this.searchQuery = item;
-    this.onSearchSubmit();
+  onSelectRecent(item: RecentSearchItem): void {
+    this.searchQuery = item.name;
+    this.router.navigate(['/Toilets', item.slug]);
   }
 
   @HostListener('document:click', ['$event'])
@@ -264,17 +269,34 @@ export class HomeComponent implements OnInit {
     try {
       const data = localStorage.getItem('wc_recent_searches');
       if (data) {
-        this.recentSearches.set(JSON.parse(data).slice(0, 5));
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          const items: RecentSearchItem[] = parsed.map((item) => {
+            if (typeof item === 'string') {
+              return { name: item, slug: createPlaceSlug(item) };
+            }
+            return {
+              name: item.name || 'Standort',
+              placeId: item.placeId,
+              slug: item.slug || createPlaceSlug(item.name, item.placeId)
+            };
+          });
+          this.recentSearches.set(items.slice(0, 5));
+        }
       }
     } catch {
       // Ignore
     }
   }
 
-  private saveRecentSearch(term: string): void {
+  private saveRecentSearch(name: string, placeId?: string): void {
     try {
-      const current = this.recentSearches().filter((s) => s.toLowerCase() !== term.toLowerCase());
-      const updated = [term, ...current].slice(0, 5);
+      const slug = createPlaceSlug(name, placeId);
+      const newItem: RecentSearchItem = { name, placeId, slug };
+      const current = this.recentSearches().filter(
+        (s) => s.slug.toLowerCase() !== slug.toLowerCase() && s.name.toLowerCase() !== name.toLowerCase()
+      );
+      const updated = [newItem, ...current].slice(0, 5);
       this.recentSearches.set(updated);
       localStorage.setItem('wc_recent_searches', JSON.stringify(updated));
     } catch {
