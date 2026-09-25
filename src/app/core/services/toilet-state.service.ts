@@ -199,7 +199,7 @@ export class ToiletStateService {
   }
 
   openCreateWizard(coords?: Coordinates): void {
-    this.createInitialCoords.set(coords || this.userLocation() || this.mapCenter());
+    this.createInitialCoords.set(coords || this.searchLocation() || this.userLocation() || this.mapCenter());
     this.isCreateWizardOpen.set(true);
   }
 
