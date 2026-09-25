@@ -208,6 +208,18 @@ export class OpeningHoursService {
       };
     } else {
       let subtitle: string | undefined;
+
+      if (toilet.placeOpeningHours === null || toilet.placeOpeningHours === undefined || toilet.placeOpeningHours.length === 0) {
+        return {
+          title: this.translationService.t('status.no_opening_hours'),
+          subtitle,
+          isOpen: false,
+          isTemporaryClosed: false,
+          colorClass: 'text-gray-500 dark:text-gray-400',
+          subtitleColorClass: 'text-purple-600 dark:text-purple-400'
+        };
+      }
+
       if (toilet.openTimestamp) {
         const openDate = new Date(toilet.openTimestamp);
         const diffMs = openDate.getTime() - now.getTime();

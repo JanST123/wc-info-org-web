@@ -63,6 +63,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   // Status & Opening Hours
   'status.open': 'Open now',
   'status.closed': 'Closed',
+  'status.no_opening_hours': 'No opening hours',
   'status.open247': 'Open 24/7',
   'status.closesIn': 'closes in {time}',
   'status.opensAt': 'opens at {time}',
