@@ -224,7 +224,7 @@ export class ResultsComponent implements OnInit {
     this.toiletState.loadToiletsInBounds(bounds.south, bounds.west, bounds.north, bounds.east);
   }
 
-  onSelectToilet(toilet: Toilet): void {
+  onSelectToilet(toilet: Toilet | null): void {
     this.toiletState.setSelectedToilet(toilet);
   }
 

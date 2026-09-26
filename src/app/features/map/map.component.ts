@@ -183,7 +183,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() userLocation: Coordinates | null = null;
 
   @Output() boundsChange = new EventEmitter<{ south: number; west: number; north: number; east: number }>();
-  @Output() toiletSelect = new EventEmitter<Toilet>();
+  @Output() toiletSelect = new EventEmitter<Toilet | null>();
   @Output() openDetails = new EventEmitter<Toilet>();
   @Output() mapCreate = new EventEmitter<Coordinates>();
 
@@ -196,6 +196,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private userMarker?: google.maps.marker.AdvancedMarkerElement;
   private idleListener?: google.maps.MapsEventListener;
   private zoomListener?: google.maps.MapsEventListener;
+  private dragStartListener?: google.maps.MapsEventListener;
+  private mapClickListener?: google.maps.MapsEventListener;
   private clickListener?: google.maps.MapsEventListener;
   private moveEndTimer?: ReturnType<typeof setTimeout>;
   private lastEmittedBounds?: { south: number; west: number; north: number; east: number };
@@ -247,9 +249,13 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     if (this.moveEndTimer) clearTimeout(this.moveEndTimer);
     if (this.idleListener) google.maps.event.removeListener(this.idleListener);
     if (this.zoomListener) google.maps.event.removeListener(this.zoomListener);
+    if (this.dragStartListener) google.maps.event.removeListener(this.dragStartListener);
+    if (this.mapClickListener) google.maps.event.removeListener(this.mapClickListener);
     if (this.clickListener) google.maps.event.removeListener(this.clickListener);
     this.idleListener = undefined;
     this.zoomListener = undefined;
+    this.dragStartListener = undefined;
+    this.mapClickListener = undefined;
     this.clickListener = undefined;
     this.infoWindow?.close();
     this.infoWindow = undefined;
@@ -305,8 +311,31 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       };
 
       this.googleMap = new g.maps.Map(this.mapContainerElement.nativeElement, mapOptions);
-      this.infoWindow = new google.maps.InfoWindow();
+      this.infoWindow = new google.maps.InfoWindow({
+        disableAutoPan: true
+      });
+      this.infoWindow.addListener('closeclick', () => {
+        if (this.selectedToilet) {
+          this.toiletSelect.emit(null);
+        }
+      });
       this.isMapReady.set(true);
+
+      // Deselect toilet when user starts dragging the map
+      this.dragStartListener = this.googleMap.addListener('dragstart', () => {
+        if (this.selectedToilet) {
+          this.infoWindow?.close();
+          this.toiletSelect.emit(null);
+        }
+      });
+
+      // Deselect toilet when user clicks on empty map space
+      this.mapClickListener = this.googleMap.addListener('click', () => {
+        if (this.selectedToilet) {
+          this.infoWindow?.close();
+          this.toiletSelect.emit(null);
+        }
+      });
 
       // Listen for user drag and zoom interaction
       this.idleListener = this.googleMap.addListener('dragend', () => {
@@ -401,7 +430,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.highlightSelectedMarkersOnly();
-    this.updateActiveInfoWindow();
   }
 
   private getMarkerIconName(toilet: Toilet): string {
@@ -551,6 +579,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
     const content = this.createInfoWindowContent(this.selectedToilet);
     this.infoWindow.setContent(content);
+    this.infoWindow.setOptions({ disableAutoPan: true });
 
     const marker = this.markersMap.get(this.selectedToilet.id);
     if (marker) {
