@@ -1,5 +1,4 @@
 import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -10,6 +9,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { PlacesService, PlaceSuggestion } from '../../core/services/places.service';
 import { LocationService } from '../../core/services/location.service';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
+import { SeoService } from '../../core/services/seo.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { createPlaceSlug } from '../../core/utils/slug.utils';
@@ -170,7 +170,7 @@ export interface RecentSearchItem {
   `
 })
 export class HomeComponent implements OnInit {
-  private readonly titleService = inject(Title);
+  private readonly seoService = inject(SeoService);
   readonly themeService = inject(ThemeService);
   private readonly placesService = inject(PlacesService);
   private readonly toiletState = inject(ToiletStateService);
@@ -193,7 +193,10 @@ export class HomeComponent implements OnInit {
   private readonly searchSubject = new Subject<string>();
 
   ngOnInit(): void {
-    this.titleService.setTitle('WC-Info - wc-info.org');
+    this.seoService.updateSeo({
+      title: 'WC-Info - wc-info.org',
+      description: 'Finde saubere und barrierefreie öffentliche Toiletten in deiner Nähe auf wc-info.org.'
+    });
     this.loadRecentSearches();
 
     window.setInterval(() => {

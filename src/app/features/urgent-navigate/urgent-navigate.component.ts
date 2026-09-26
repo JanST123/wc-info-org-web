@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LocationService, Coordinates } from '../../core/services/location.service';
 import { CompassService } from '../../core/services/compass.service';
 import { WcInfoApiService } from '../../core/services/wc-info-api.service';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
+import { SeoService } from '../../core/services/seo.service';
 import { Toilet } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
@@ -193,7 +193,7 @@ import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-
   `
 })
 export class UrgentNavigateComponent implements OnInit, OnDestroy {
-  private readonly titleService = inject(Title);
+  private readonly seoService = inject(SeoService);
   private readonly locationService = inject(LocationService);
   private readonly compassService = inject(CompassService);
   private readonly api = inject(WcInfoApiService);
@@ -251,7 +251,10 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.titleService.setTitle('Notfall-Navigation - wc-info.org');
+    this.seoService.updateSeo({
+      title: 'Notfall-Navigation - wc-info.org',
+      description: 'Schnellste Notfall-Navigation zur nächsten barrierefreien öffentlichen Toilette.'
+    });
     this.route.queryParams.subscribe((params) => {
       const toiletId = params['toilet'] ? parseInt(params['toilet'], 10) : null;
       const targetFromState = this.toiletState.navigationTargetToilet();

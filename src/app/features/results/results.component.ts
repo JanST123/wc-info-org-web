@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnInit, ViewChild, effect, inject, signal } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import * as exifr from 'exifr';
@@ -17,6 +16,7 @@ import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { Coordinates, LocationService } from '../../core/services/location.service';
 import { PlacesService } from '../../core/services/places.service';
 import { WcInfoApiService } from '../../core/services/wc-info-api.service';
+import { SeoService } from '../../core/services/seo.service';
 import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { parsePlaceSlug, parseToiletSlug, createToiletSlug, createPlaceSlug } from '../../core/utils/slug.utils';
@@ -49,7 +49,7 @@ export class ResultsComponent implements OnInit {
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly titleService = inject(Title);
+  private readonly seoService = inject(SeoService);
 
   readonly toilets = this.toiletState.enrichedToilets;
   readonly selectedToilet = this.toiletState.selectedToilet;
@@ -67,13 +67,21 @@ export class ResultsComponent implements OnInit {
         const titlePart = (detailToilet.owner && detailToilet.owner.trim().length > 0)
           ? detailToilet.owner.trim()
           : (detailToilet.name && detailToilet.name.trim().length > 0 ? detailToilet.name.trim() : 'Toilette');
-        this.titleService.setTitle(`${titlePart} - wc-info.org`);
+        const title = `${titlePart} - wc-info.org`;
+        const address = detailToilet.address ? `${detailToilet.address} · ` : '';
+        const desc = `${address}${detailToilet.name || titlePart} - Öffentliche Toilette auf wc-info.org`;
+        const image = detailToilet.photos && detailToilet.photos.length > 0 ? detailToilet.photos[0].url : undefined;
+        this.seoService.updateSeo({ title, description: desc, image });
         return;
       }
 
       const searchLoc = this.toiletState.searchLocation();
       if (searchLoc?.name && searchLoc.name.trim().length > 0) {
-        this.titleService.setTitle(`${searchLoc.name.trim()} - wc-info.org`);
+        const placeName = searchLoc.name.trim();
+        this.seoService.updateSeo({
+          title: `${placeName} - wc-info.org`,
+          description: `Öffentliche Toiletten und barrierefreie WCs in ${placeName} finden auf wc-info.org.`
+        });
         return;
       }
 
@@ -81,12 +89,19 @@ export class ResultsComponent implements OnInit {
       if (placeSlug) {
         const parsed = parsePlaceSlug(placeSlug);
         if (parsed.name && parsed.name.trim().length > 0) {
-          this.titleService.setTitle(`${parsed.name.trim()} - wc-info.org`);
+          const placeName = parsed.name.trim();
+          this.seoService.updateSeo({
+            title: `${placeName} - wc-info.org`,
+            description: `Öffentliche Toiletten und barrierefreie WCs in ${placeName} finden auf wc-info.org.`
+          });
           return;
         }
       }
 
-      this.titleService.setTitle('Öffentliche Toiletten - wc-info.org');
+      this.seoService.updateSeo({
+        title: 'Öffentliche Toiletten - wc-info.org',
+        description: 'Öffentliche Toiletten und barrierefreie WCs in deiner Nähe finden auf wc-info.org.'
+      });
     });
   }
 
