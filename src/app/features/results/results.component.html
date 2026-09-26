@@ -229,7 +229,16 @@
         />
       }
 
-      <!-- 5. Photo Upload Modal -->
+      <!-- Direct File Input for Already-Confirmed Users -->
+      <input
+        #directFileInput
+        type="file"
+        accept="image/*"
+        (change)="onDirectPhotoSelected($event)"
+        class="hidden"
+      />
+
+      <!-- 5. Photo Upload Modal (First time legal confirmation) -->
       @if (activePhotoToilet()) {
         <app-photo-legal-modal
           [toiletId]="activePhotoToilet()!.id"

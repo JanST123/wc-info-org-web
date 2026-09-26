@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import * as exifr from 'exifr';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FilterBannerComponent } from '../../shared/components/filter-banner/filter-banner.component';
 import { ToiletCardComponent } from '../../shared/components/toilet-card/toilet-card.component';
@@ -251,12 +252,70 @@ export class ResultsComponent implements OnInit {
     this.activeUpdateToilet.set(toilet);
   }
 
+  @ViewChild('directFileInput') directFileInput?: ElementRef<HTMLInputElement>;
+  private activePhotoUploadToilet: Toilet | null = null;
+  readonly isDirectUploadingPhoto = signal<boolean>(false);
+
   onOpenReportProblem(toilet: Toilet): void {
     this.activeFeedbackToilet.set(toilet);
   }
 
   onOpenAddPhoto(toilet: Toilet): void {
-    this.activePhotoToilet.set(toilet);
+    let isConfirmed = false;
+    try {
+      isConfirmed = localStorage.getItem('wc_photo_legal_confirmed') === 'true';
+    } catch {
+      // Ignore
+    }
+
+    if (isConfirmed) {
+      this.activePhotoUploadToilet = toilet;
+      this.directFileInput?.nativeElement?.click();
+    } else {
+      this.activePhotoToilet.set(toilet);
+    }
+  }
+
+  async onDirectPhotoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0 || !this.activePhotoUploadToilet) return;
+
+    const file = input.files[0];
+    const toilet = this.activePhotoUploadToilet;
+    this.isDirectUploadingPhoto.set(true);
+
+    let exifDataString: string | undefined;
+    let fixedGeo: { lat: number; lon: number } | undefined;
+
+    try {
+      const parsed = await exifr.parse(file, { gps: true });
+      if (parsed) {
+        exifDataString = JSON.stringify(parsed);
+        if (parsed.latitude && parsed.longitude) {
+          fixedGeo = { lat: parsed.latitude, lon: parsed.longitude };
+        }
+      }
+    } catch {
+      // Ignore exif parse error
+    }
+
+    this.api.uploadPhoto(file, toilet.id, exifDataString, fixedGeo).subscribe({
+      next: () => {
+        this.isDirectUploadingPhoto.set(false);
+        this.activePhotoUploadToilet = null;
+        input.value = '';
+        this.toiletState.reloadCurrentView();
+        if (this.activeDetailToilet()?.id === toilet.id) {
+          this.loadAndOpenToiletDetail(toilet.id);
+        }
+      },
+      error: (err) => {
+        this.isDirectUploadingPhoto.set(false);
+        this.activePhotoUploadToilet = null;
+        input.value = '';
+        console.error('Photo upload failed:', err);
+      }
+    });
   }
 
   onMapCreate(coords: Coordinates): void {
@@ -270,6 +329,7 @@ export class ResultsComponent implements OnInit {
   onToiletCreated(toilet: Toilet): void {
     this.toiletState.closeCreateWizard();
     this.toiletState.addToiletToState(toilet);
+    this.toiletState.reloadCurrentView();
   }
 
   onToiletUpdated(toilet: Toilet): void {
@@ -278,10 +338,18 @@ export class ResultsComponent implements OnInit {
     if (this.activeDetailToilet()?.id === toilet.id) {
       this.activeDetailToilet.set(toilet);
     }
+    this.toiletState.reloadCurrentView();
   }
 
   onPhotoUploaded(data: { url: string; thumbUrl?: string; filename: string }): void {
+    const toiletId = this.activePhotoToilet()?.id;
     this.activePhotoToilet.set(null);
+    if (toiletId) {
+      this.toiletState.reloadCurrentView();
+      if (this.activeDetailToilet()?.id === toiletId) {
+        this.loadAndOpenToiletDetail(toiletId);
+      }
+    }
   }
 
   onOpenPhoto(photo: ToiletPhoto, toilet: Toilet): void {

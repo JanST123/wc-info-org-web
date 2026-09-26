@@ -117,8 +117,8 @@ import * as exifr from 'exifr';
           <button
             type="button"
             [disabled]="!isConfirmed() || isUploading()"
-            (click)="fileInput.click()"
-            class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95"
+            (click)="onConfirmAndPick(fileInput)"
+            class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
           >
             {{ 'photo.legalAccept' | translate }}
           </button>
@@ -138,6 +138,15 @@ export class PhotoLegalModalComponent {
   readonly isConfirmed = signal<boolean>(false);
   readonly isUploading = signal<boolean>(false);
   readonly uploadError = signal<string | null>(null);
+
+  onConfirmAndPick(fileInput: HTMLInputElement): void {
+    try {
+      localStorage.setItem('wc_photo_legal_confirmed', 'true');
+    } catch {
+      // Ignore localStorage errors
+    }
+    fileInput.click();
+  }
 
   async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;

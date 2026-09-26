@@ -83,7 +83,7 @@
 
       <!-- Photo thumbnails if available -->
       @if (toilet.photos && toilet.photos.length > 0) {
-        <div class="flex items-center gap-1.5 overflow-x-auto py-1 my-1.5 no-scrollbar" (click)="$event.stopPropagation()">
+        <div class="flex items-center gap-1.5 overflow-x-auto py-1 my-1.5 no-scrollbar">
           @for (photo of toilet.photos.slice(0, 3); track photo.id || $index) {
             <img
               [src]="photo.urlThumb || photo.url"

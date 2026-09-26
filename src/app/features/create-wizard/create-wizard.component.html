@@ -807,16 +807,34 @@
                   </div>
                 }
 
+                <!-- Direct File Input for Already-Confirmed Users -->
+                <input
+                  #directPhotoInput
+                  type="file"
+                  accept="image/*"
+                  (change)="onDirectPhotoSelected($event)"
+                  class="hidden"
+                />
+
                 <button
                   type="button"
-                  (click)="showPhotoModal.set(true)"
-                  class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md transition-all active:scale-95 inline-flex items-center gap-2"
+                  [disabled]="isUploadingDirectPhoto()"
+                  (click)="triggerPhotoUpload()"
+                  class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95 inline-flex items-center gap-2 cursor-pointer"
                 >
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                  <span>{{ 'create.photoUploadBtn' | translate }}</span>
+                  @if (isUploadingDirectPhoto()) {
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 2v4M12 18v4"/>
+                    </svg>
+                    <span>{{ 'photo.uploading' | translate }}</span>
+                  } @else {
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"/>
+                      <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    <span>{{ 'create.photoUploadBtn' | translate }}</span>
+                  }
                 </button>
               </div>
             </div>

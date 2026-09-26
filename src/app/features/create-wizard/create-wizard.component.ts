@@ -25,6 +25,7 @@ import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
 import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.component';
 import confetti from 'canvas-confetti';
+import * as exifr from 'exifr';
 
 export type WizardStepId =
   | 'place_id'
@@ -646,6 +647,61 @@ export class CreateWizardComponent implements OnInit {
   }
 
   // --- Step 13: Photos ---
+  @ViewChild('directPhotoInput') directPhotoInputRef?: ElementRef<HTMLInputElement>;
+  readonly isUploadingDirectPhoto = signal<boolean>(false);
+
+  triggerPhotoUpload(): void {
+    let isConfirmed = false;
+    try {
+      isConfirmed = localStorage.getItem('wc_photo_legal_confirmed') === 'true';
+    } catch {
+      // Ignore
+    }
+
+    if (isConfirmed) {
+      this.directPhotoInputRef?.nativeElement?.click();
+    } else {
+      this.showPhotoModal.set(true);
+    }
+  }
+
+  async onDirectPhotoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const toiletId = this.createdToiletId() || undefined;
+    this.isUploadingDirectPhoto.set(true);
+
+    let exifDataString: string | undefined;
+    let fixedGeo: { lat: number; lon: number } | undefined;
+
+    try {
+      const parsed = await exifr.parse(file, { gps: true });
+      if (parsed) {
+        exifDataString = JSON.stringify(parsed);
+        if (parsed.latitude && parsed.longitude) {
+          fixedGeo = { lat: parsed.latitude, lon: parsed.longitude };
+        }
+      }
+    } catch {
+      // Ignore exif parse error
+    }
+
+    this.api.uploadPhoto(file, toiletId, exifDataString, fixedGeo).subscribe({
+      next: () => {
+        this.isUploadingDirectPhoto.set(false);
+        this.uploadedPhotosCount.update((c) => c + 1);
+        input.value = '';
+      },
+      error: (err) => {
+        this.isUploadingDirectPhoto.set(false);
+        input.value = '';
+        console.error('Direct photo upload failed:', err);
+      }
+    });
+  }
+
   onPhotoUploaded(data: { url: string; thumbUrl?: string; filename: string }): void {
     this.uploadedPhotosCount.update((c) => c + 1);
     this.showPhotoModal.set(false);
