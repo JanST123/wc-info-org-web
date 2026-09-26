@@ -66,7 +66,7 @@ import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-
               </div>
             }
 
-            <div class="flex items-start justify-between gap-2">
+            <div class="flex items-start justify-between flex-col gap-2">
               <div>
                 <h3 class="text-lg font-extrabold text-white line-clamp-1">
                   {{ targetToilet()!.name || ('app.title' | translate) }}
@@ -339,7 +339,8 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
           }))
           .sort((a, b) => a.distanceMeters - b.distanceMeters);
 
-        const closestPublic = sorted[0];
+        // we filter for opened, but the api returns also toilets without opening ours and this are not good for emergency
+        const closestPublic = sorted.find(t => (t.placeOpeningHours?.length ?? 0) > 0 || t.accessibleOutsideOpeningTimes);
 
         // Step 2: Fallback algorithm (< 500m check)
         if (!closestPublic || closestPublic.distanceMeters > 500) {
@@ -355,7 +356,8 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
                 }))
                 .sort((a, b) => a.distanceMeters - b.distanceMeters);
 
-              const closestFallback = sortedFallback[0];
+              // we filter for opened, but the api returns also toilets without opening ours and this are not good for emergency
+              const closestFallback = sortedFallback.find(t => (t.placeOpeningHours?.length ?? 0) > 0 || t.accessibleOutsideOpeningTimes);
 
               if (closestFallback && (!closestPublic || closestFallback.distanceMeters < closestPublic.distanceMeters)) {
                 this.targetToilet.set(closestFallback);

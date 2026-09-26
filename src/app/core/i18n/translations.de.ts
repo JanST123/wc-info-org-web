@@ -73,6 +73,8 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'status.opensIn': 'öffnet in {time}',
   'status.tempClosed': 'Vorübergehend geschlossen',
   'status.nonPublic': 'Nicht öffentlich',
+  'status.closedButAccessible': 'aber außerhalb der Öffnungszeiten zugänglich',
+  'status.closedButAccessibleLong': 'Geschlossen, aber ausserhalb Öffnungszeigen zugänglich',
   'days.0': 'Sonntag',
   'days.1': 'Montag',
   'days.2': 'Dienstag',

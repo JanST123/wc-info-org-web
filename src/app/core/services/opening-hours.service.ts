@@ -80,6 +80,16 @@ export class OpeningHoursService {
     const now = new Date();
     const isOpen = toilet.isOpen ?? false;
 
+    if (!isOpen && toilet.accessibleOutsideOpeningTimes) {
+      return {
+          isOpen: true,
+          is247: false,
+          statusText: this.translationService.t('status.closedButAccessibleLong'),
+          badgeClass: 'bg-orange-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 font-semibold',
+          urgency: 'open'
+        };
+    }
+
     // Check close countdown if open and closeTimestamp exists
     if (isOpen && toilet.closeTimestamp) {
       const closeDate = new Date(toilet.closeTimestamp);
@@ -144,6 +154,16 @@ export class OpeningHoursService {
       };
     }
 
+    if (toilet.placeOpeningHours === null || toilet.placeOpeningHours === undefined || toilet.placeOpeningHours.length === 0) {
+      return {
+        isOpen: false,
+        statusText: this.translationService.t('status.no_opening_hours'),
+        is247: false,
+        badgeClass: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
+        urgency: 'closed'
+      };
+    }
+
     return {
       isOpen: false,
       is247: false,
@@ -177,6 +197,17 @@ export class OpeningHoursService {
 
     const now = new Date();
     const isOpen = toilet.isOpen ?? false;
+
+    if (!isOpen && toilet.accessibleOutsideOpeningTimes) {
+      return {
+        title: this.translationService.t('status.closed'),
+        subtitle: this.translationService.t('status.closedButAccessible'),
+        isOpen: true,
+        isTemporaryClosed: false,
+        colorClass: 'text-gray-500 dark:text-gray-400',
+        subtitleColorClass: 'text-emerald-600 dark:text-gray-400'
+      };
+    }
 
     if (isOpen) {
       let subtitle: string | undefined;
