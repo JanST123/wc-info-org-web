@@ -64,25 +64,26 @@ export class PlacesService {
   }
 
   private fallbackNominatim(trimmed: string): Observable<PlaceSuggestion[]> {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmed)}&limit=5&addressdetails=1`;
-    return this.http.get<any[]>(url).pipe(
-      map((items) => {
-        return items.map((item) => {
-          const parts = (item.display_name || '').split(',');
-          const primary = parts[0]?.trim() || item.name || trimmed;
-          const secondary = parts.slice(1, 4).join(',').trim();
+    return of([]);
+    // const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmed)}&limit=5&addressdetails=1`;
+    // return this.http.get<any[]>(url).pipe(
+    //   map((items) => {
+    //     return items.map((item) => {
+    //       const parts = (item.display_name || '').split(',');
+    //       const primary = parts[0]?.trim() || item.name || trimmed;
+    //       const secondary = parts.slice(1, 4).join(',').trim();
 
-          return {
-            placeId: String(item.place_id || item.osm_id),
-            primaryText: primary,
-            secondaryText: secondary,
-            lat: parseFloat(item.lat),
-            lon: parseFloat(item.lon)
-          };
-        });
-      }),
-      catchError(() => of([]))
-    );
+    //       return {
+    //         placeId: String(item.place_id || item.osm_id),
+    //         primaryText: primary,
+    //         secondaryText: secondary,
+    //         lat: parseFloat(item.lat),
+    //         lon: parseFloat(item.lon)
+    //       };
+    //     });
+    //   }),
+    //   catchError(() => of([]))
+    // );
   }
 
   getPlaceDetails(place: PlaceSuggestion): Promise<ResolvedPlace> {
@@ -182,16 +183,16 @@ export class PlacesService {
     }
 
     // 3. Fallback to Nominatim direct geocoding
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmed)}&limit=1`;
-    const direct = await firstValueFrom(this.http.get<any[]>(url).pipe(catchError(() => of([]))));
-    if (direct && direct.length > 0) {
-      return {
-        lat: parseFloat(direct[0].lat),
-        lon: parseFloat(direct[0].lon),
-        name: direct[0].name || trimmed,
-        placeId: String(direct[0].place_id || direct[0].osm_id)
-      };
-    }
+    // const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmed)}&limit=1`;
+    // const direct = await firstValueFrom(this.http.get<any[]>(url).pipe(catchError(() => of([]))));
+    // if (direct && direct.length > 0) {
+    //   return {
+    //     lat: parseFloat(direct[0].lat),
+    //     lon: parseFloat(direct[0].lon),
+    //     name: direct[0].name || trimmed,
+    //     placeId: String(direct[0].place_id || direct[0].osm_id)
+    //   };
+    // }
 
     throw new Error('No places found for ' + trimmed);
   }
