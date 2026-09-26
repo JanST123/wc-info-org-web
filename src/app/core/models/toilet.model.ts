@@ -42,7 +42,7 @@ export interface Toilet {
   hasChangingTable?: boolean;
   publicAccessible?: boolean;
   accessibleOutsideOpeningTimes?: boolean;
-  euroKey?: string | null;            // "yes", "no", "true", "false", "1", "0"
+  euroKey?: string | null;            // "yes", "no", "unknown"
   storageSpace?: 'none' | 'little' | 'much' | string | null;
   
   // Opening Hours

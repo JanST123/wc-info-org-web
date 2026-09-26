@@ -50,7 +50,7 @@ export class DetailComponent {
   readonly showEuroKeyModal = signal<boolean>(false);
   readonly isUploadingPhoto = signal<boolean>(false);
   readonly showPhotoModal = signal<boolean>(false);
-
+  
   triggerAddPhoto(): void {
     const isConfirmed = typeof window !== 'undefined' && localStorage.getItem('wc_photo_legal_confirmed') === 'true';
     if (isConfirmed) {
@@ -138,10 +138,6 @@ export class DetailComponent {
     return null;
   }
 
-  get isEuroKeyRequired(): boolean {
-    const k = this.toilet.euroKey;
-    return k === 'yes' || k === 'true' || k === '1';
-  }
 
   get weeklySchedule() {
     this.translationService.currentLang();

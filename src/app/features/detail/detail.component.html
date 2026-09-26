@@ -192,7 +192,7 @@
                 class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3 cursor-pointer hover:bg-purple-50/50 dark:hover:bg-purple-950/20 transition-colors"
                 [title]="'euroKeyModal.title' | translate"
               >
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="isEuroKeyRequired ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.euroKey === 'yes' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
                   <i aria-hidden="true" class="fa-solid fa-key text-xs"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
@@ -201,7 +201,7 @@
                     <i class="fa-solid fa-circle-info text-[10px] text-purple-600 dark:text-purple-400"></i>
                   </div>
                   <span class="text-xs font-bold truncate text-gray-900 dark:text-gray-100">
-                    {{ (isEuroKeyRequired ? 'attr.euroKeyRequired' : 'attr.noEuroKeyRequired') | translate }}
+                    {{ (toilet.euroKey === 'yes' ? 'attr.euroKeyRequired' : toilet.euroKey === 'unknown' ? 'attr.unknownEuroKey' : 'attr.noEuroKeyRequired') | translate }}
                   </span>
                 </div>
               </div>
@@ -216,9 +216,9 @@
                   }
                 </div>
                 <div class="flex flex-col min-w-0">
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'create.step9.title' | translate }}</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.genderSeparated' | translate }}</span>
                   <span class="text-xs font-bold truncate text-gray-900 dark:text-gray-100">
-                    {{ (toilet.isUnisex ? 'attr.unisex' : (toilet.isGenderSeparated ? 'attr.genderSeparated' : 'common.unknown')) | translate }}
+                    {{ (toilet.isUnisex ? 'common.no' : (toilet.isGenderSeparated ? 'common.yes' : 'common.unknown')) | translate }}
                   </span>
                 </div>
               </div>
@@ -246,9 +246,9 @@
                   <i aria-hidden="true" class="fa-solid fa-circle-check text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'create.step5.title' | translate }}</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.public' | translate }}</span>
                   <span class="text-xs font-bold truncate text-gray-900 dark:text-gray-100">
-                    {{ (toilet.publicAccessible !== false ? 'attr.public' : 'attr.nonPublic') | translate }}
+                    {{ (toilet.publicAccessible !== false ? 'common.yes' : 'common.no') | translate }}
                   </span>
                 </div>
               </div>
