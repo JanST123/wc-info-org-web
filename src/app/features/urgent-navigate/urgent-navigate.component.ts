@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LocationService, Coordinates } from '../../core/services/location.service';
@@ -192,6 +193,7 @@ import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-
   `
 })
 export class UrgentNavigateComponent implements OnInit, OnDestroy {
+  private readonly titleService = inject(Title);
   private readonly locationService = inject(LocationService);
   private readonly compassService = inject(CompassService);
   private readonly api = inject(WcInfoApiService);
@@ -249,6 +251,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
+    this.titleService.setTitle('Notfall-Navigation - wc-info.org');
     this.route.queryParams.subscribe((params) => {
       const toiletId = params['toilet'] ? parseInt(params['toilet'], 10) : null;
       const targetFromState = this.toiletState.navigationTargetToilet();

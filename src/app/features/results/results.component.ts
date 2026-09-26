@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, effect, inject, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import * as exifr from 'exifr';
@@ -48,6 +49,7 @@ export class ResultsComponent implements OnInit {
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly titleService = inject(Title);
 
   readonly toilets = this.toiletState.enrichedToilets;
   readonly selectedToilet = this.toiletState.selectedToilet;
@@ -57,6 +59,36 @@ export class ResultsComponent implements OnInit {
 
   readonly listHeightPercent = signal<number>(60);
   readonly currentPlaceSlug = signal<string>('Aktueller-Standort---NEARBY');
+
+  constructor() {
+    effect(() => {
+      const detailToilet = this.activeDetailToilet();
+      if (detailToilet) {
+        const titlePart = (detailToilet.owner && detailToilet.owner.trim().length > 0)
+          ? detailToilet.owner.trim()
+          : (detailToilet.name && detailToilet.name.trim().length > 0 ? detailToilet.name.trim() : 'Toilette');
+        this.titleService.setTitle(`${titlePart} - wc-info.org`);
+        return;
+      }
+
+      const searchLoc = this.toiletState.searchLocation();
+      if (searchLoc?.name && searchLoc.name.trim().length > 0) {
+        this.titleService.setTitle(`${searchLoc.name.trim()} - wc-info.org`);
+        return;
+      }
+
+      const placeSlug = this.currentPlaceSlug();
+      if (placeSlug) {
+        const parsed = parsePlaceSlug(placeSlug);
+        if (parsed.name && parsed.name.trim().length > 0) {
+          this.titleService.setTitle(`${parsed.name.trim()} - wc-info.org`);
+          return;
+        }
+      }
+
+      this.titleService.setTitle('Öffentliche Toiletten - wc-info.org');
+    });
+  }
 
   private isDragging = false;
   private startY = 0;

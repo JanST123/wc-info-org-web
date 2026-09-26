@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -169,6 +170,7 @@ export interface RecentSearchItem {
   `
 })
 export class HomeComponent implements OnInit {
+  private readonly titleService = inject(Title);
   readonly themeService = inject(ThemeService);
   private readonly placesService = inject(PlacesService);
   private readonly toiletState = inject(ToiletStateService);
@@ -191,6 +193,7 @@ export class HomeComponent implements OnInit {
   private readonly searchSubject = new Subject<string>();
 
   ngOnInit(): void {
+    this.titleService.setTitle('WC-Info - wc-info.org');
     this.loadRecentSearches();
 
     window.setInterval(() => {
