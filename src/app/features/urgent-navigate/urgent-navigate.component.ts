@@ -296,7 +296,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/Toilets']);
+    this.router.navigate(['/Toilets/Nearby---Nearby']);
   }
 
   enableCompass(): void {
