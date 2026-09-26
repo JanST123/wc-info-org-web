@@ -177,6 +177,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'create.addressPlaceholder': 'Straße, Hausnummer, PLZ, Ort...',
   'create.saveAddress': 'Adresse speichern',
   'create.skipAddress': 'Nein, überspringen',
+  'create.saveName': 'Weiter',
   'create.hoursPromptTitle': 'Möchtest du die Öffnungszeiten eingeben?',
   'create.hoursPromptSub': 'Du kannst im nächten Schritt auch ein Photo der Öffnungszeiten hochladen, dann machen wir das für dich.',
   'create.hoursPromptYes': 'Ja, Öffnungszeiten erfassen',

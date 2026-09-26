@@ -177,6 +177,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'create.addressPlaceholder': 'Street, number, postal code, city...',
   'create.saveAddress': 'Save address',
   'create.skipAddress': 'No, skip',
+  'create.saveName': 'Continue',
   'create.hoursPromptTitle': 'Would you like to enter opening hours?',
   'create.hoursPromptSub': 'You can also upload a photo of the opening hours in the next step and we will take care of it for you.',
   'create.hoursPromptYes': 'Yes, enter opening hours',
