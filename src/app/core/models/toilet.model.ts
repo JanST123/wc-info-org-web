@@ -120,7 +120,7 @@ export function normalizeToilet(raw: any): Toilet {
           url: p.url || '',
           urlThumb: p.url_thumb ?? p.urlThumb ?? p.url,
           isMain: toFlexibleBool(p.is_main ?? p.isMain),
-          filename: p.filename
+          filename: p.filename || (p.url ? p.url.split('/').pop()?.split('?')[0] : undefined)
         }))
       : []
   };

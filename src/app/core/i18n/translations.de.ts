@@ -220,10 +220,15 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'create.successTitle': 'Toilette erfolgreich eingetragen!',
   'create.successSub': 'Vielen Dank für deinen wertvollen Beitrag zur WC-Info Community.',
 
-  // Photo & Legal
   'photo.upload': 'Foto hochladen',
   'photo.uploading': 'Foto wird hochgeladen...',
   'photo.success': 'Foto erfolgreich hochgeladen',
+  'photo.removePhoto': 'Foto entfernen',
+  'photo.deleteTitle': 'Foto löschen?',
+  'photo.deleteMessage': 'Handelt es sich um ein unpassendes Foto oder hast du persönliche Gründe, es zu löschen? Wenn du \'Löschen\' wählst, wird das Foto sofort gelöscht und danach von uns geprüft. Wir behalten uns vor, das Foto wiederherzustellen, wenn es als angemessen eingestuft wird und keine Persönlichkeitsrechte verletzt.',
+  'photo.deleteCancel': 'Abbrechen',
+  'photo.deleteConfirmBtn': 'Löschen',
+  'photo.deleting': 'Foto wird gelöscht...',
   'photo.legalTitle': 'Bevor du dein erstes Foto hochlädst',
   'photo.legalIntro': 'Bilder von Toiletten sollten nach Möglichkeit keine Personen beinhalten. Wenn du doch Bilder von anderen Menschen hochlädst, greifst du evtl. in deren Persönlichkeitsrecht ein. Bitte vergewissere dich daher, dass die Menschen, die auf den Fotos zu sehen sind, damit einverstanden sind, dass du die Bilder hier veröffentlichst. Bitte halte dich zudem an geltendes Recht. Dies bedeutet u.A.:',
   'photo.legalBullet1': 'Keine illegalen, rassistischen, diskriminierenden oder gegen die Menschenwürde verstossenden Inhalte',

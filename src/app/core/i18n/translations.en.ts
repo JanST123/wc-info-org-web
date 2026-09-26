@@ -220,10 +220,15 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'create.successTitle': 'toilet added successfully!',
   'create.successSub': 'Thank you for your valuable contribution to the WC-Info community.',
 
-  // Photo & Legal
   'photo.upload': 'Upload photo',
   'photo.uploading': 'Uploading photo...',
   'photo.success': 'Photo uploaded successfully',
+  'photo.removePhoto': 'Remove photo',
+  'photo.deleteTitle': 'Delete Photo?',
+  'photo.deleteMessage': 'Is this an inappropriate photo or do you have personal reasons to delete it? If you select \'Delete\', the photo will be deleted immediately and reviewed by us afterwards. We reserve the right to restore the photo if it is deemed appropiate and does not violate personal rights.',
+  'photo.deleteCancel': 'Cancel',
+  'photo.deleteConfirmBtn': 'Delete',
+  'photo.deleting': 'Deleting photo...',
   'photo.legalTitle': 'Before uploading your first photo',
   'photo.legalIntro': 'Photos of toilets should preferably not contain any people. If you do upload photos of other people, you may infringe on their personal rights. Please ensure that anyone visible in the photos agrees to having their image published here. Please also abide by applicable law. This means among other things:',
   'photo.legalBullet1': 'No illegal, racist, discriminatory or human dignity violating content',

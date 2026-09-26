@@ -9,17 +9,20 @@ import { LocationService } from '../../core/services/location.service';
 import { TranslationService } from '../../core/services/translation.service';
 
 import { EuroKeyModalComponent } from '../../shared/components/euro-key-modal/euro-key-modal.component';
+import { PhotoLightboxModalComponent } from '../../shared/components/photo-lightbox-modal/photo-lightbox-modal.component';
+import { ToiletStateService } from '../../core/services/toilet-state.service';
 
 @Component({
   selector: 'app-detail',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, OpeningTimeBadgeComponent, EuroKeyModalComponent],
+  imports: [CommonModule, TranslatePipe, OpeningTimeBadgeComponent, EuroKeyModalComponent, PhotoLightboxModalComponent],
   templateUrl: './detail.component.html',
 })
 export class DetailComponent {
   private readonly openingHoursService = inject(OpeningHoursService);
   private readonly locationService = inject(LocationService);
   private readonly translationService = inject(TranslationService);
+  private readonly toiletState = inject(ToiletStateService);
 
   @Input({ required: true }) toilet!: Toilet;
 
@@ -28,9 +31,21 @@ export class DetailComponent {
   @Output() onSuggestEdit = new EventEmitter<Toilet>();
   @Output() onReportProblem = new EventEmitter<Toilet>();
   @Output() onAddPhoto = new EventEmitter<Toilet>();
+  @Output() onPhotoDeleted = new EventEmitter<{ toiletId?: number; photo: ToiletPhoto }>();
 
   readonly activeLightboxPhoto = signal<ToiletPhoto | null>(null);
   readonly showEuroKeyModal = signal<boolean>(false);
+
+  handlePhotoDeleted(event: { toiletId?: number; photo: ToiletPhoto }): void {
+    if (this.toilet.photos) {
+      this.toilet.photos = this.toilet.photos.filter(
+        (p) => p !== event.photo && p.id !== event.photo.id && p.url !== event.photo.url
+      );
+    }
+    this.toiletState.reloadCurrentView();
+    this.activeLightboxPhoto.set(null);
+    this.onPhotoDeleted.emit(event);
+  }
 
   get formattedDistance(): string | null {
     if (this.toilet.distanceMeters !== undefined && this.toilet.distanceMeters !== null) {

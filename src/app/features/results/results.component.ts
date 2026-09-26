@@ -11,6 +11,7 @@ import { CreateWizardComponent } from '../create-wizard/create-wizard.component'
 import { FeedbackModalComponent } from '../feedback/feedback-modal.component';
 import { UpdateModalComponent } from '../update/update-modal.component';
 import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.component';
+import { PhotoLightboxModalComponent } from '../../shared/components/photo-lightbox-modal/photo-lightbox-modal.component';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { Coordinates, LocationService } from '../../core/services/location.service';
 import { PlacesService } from '../../core/services/places.service';
@@ -34,6 +35,7 @@ import { parsePlaceSlug, parseToiletSlug, createToiletSlug, createPlaceSlug } fr
     FeedbackModalComponent,
     UpdateModalComponent,
     PhotoLegalModalComponent,
+    PhotoLightboxModalComponent,
     TranslatePipe
   ],
   templateUrl: './results.component.html',
@@ -66,7 +68,7 @@ export class ResultsComponent implements OnInit {
   readonly activeUpdateToilet = signal<Toilet | null>(null);
   readonly activeFeedbackToilet = signal<Toilet | null>(null);
   readonly activePhotoToilet = signal<Toilet | null>(null);
-  readonly activeLightboxPhoto = signal<{ photo: ToiletPhoto; title?: string } | null>(null);
+  readonly activeLightboxPhoto = signal<{ photo: ToiletPhoto; toiletId?: number; title?: string } | null>(null);
 
   ngOnInit(): void {
     // 1. Handle route path params (:placeSlug, :toiletSlug)
@@ -353,7 +355,15 @@ export class ResultsComponent implements OnInit {
   }
 
   onOpenPhoto(photo: ToiletPhoto, toilet: Toilet): void {
-    this.activeLightboxPhoto.set({ photo, title: toilet.name });
+    this.activeLightboxPhoto.set({ photo, toiletId: toilet.id, title: toilet.name });
+  }
+
+  onLightboxPhotoDeleted(event: { toiletId?: number; photo: ToiletPhoto }): void {
+    this.activeLightboxPhoto.set(null);
+    this.toiletState.reloadCurrentView();
+    if (event.toiletId && this.activeDetailToilet()?.id === event.toiletId) {
+      this.loadAndOpenToiletDetail(event.toiletId);
+    }
   }
 
   startDragging(event: MouseEvent | TouchEvent): void {
