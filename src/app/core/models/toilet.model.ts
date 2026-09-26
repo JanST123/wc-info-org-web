@@ -186,6 +186,7 @@ export interface AddToiletPropertiesResponse {
 
 export interface UploadPhotoResponse {
   success: boolean;
+  id?: number;
   toiletId?: number;
   filename: string;
   imageUrl?: string;
