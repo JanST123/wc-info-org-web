@@ -54,6 +54,13 @@ export interface NearbyPlaceOption {
   openingHours?: GooglePlacesPeriod[];
 }
 
+export interface OpeningHoursPeriodModel {
+  days: number[];
+  is247: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
 @Component({
   selector: 'app-create-wizard',
   standalone: true,
@@ -113,13 +120,14 @@ export class CreateWizardComponent implements OnInit {
 
   // Opening Hours (Step 9)
   readonly knowsOpeningHours = signal<boolean | null>(null);
-  readonly hours247 = signal<boolean>(false);
-  readonly selectedDays = signal<number[]>([1, 2, 3, 4, 5, 6, 0]); // Mon..Sat, Sun
-  period1Open = '08:00';
-  period1Close = '20:00';
-  readonly hasPeriod2 = signal<boolean>(false);
-  period2Open = '14:00';
-  period2Close = '22:00';
+  readonly periods = signal<OpeningHoursPeriodModel[]>([
+    {
+      days: [1, 2, 3, 4, 5, 6, 0], // Monday - Sunday
+      is247: false,
+      openTime: '08:00',
+      closeTime: '20:00'
+    }
+  ]);
   readonly configuredOpeningHours = signal<GooglePlacesPeriod[] | null>(null);
 
   readonly dayOptions = [
@@ -528,17 +536,58 @@ export class CreateWizardComponent implements OnInit {
   }
 
   // --- Step 9: Opening Hours ---
-  toggleDay(day: number): void {
-    const current = [...this.selectedDays()];
-    const index = current.indexOf(day);
-    if (index >= 0) {
-      if (current.length > 1) {
-        current.splice(index, 1);
+  addPeriod(): void {
+    this.periods.update((list) => [
+      ...list,
+      {
+        days: [6, 0], // Sa, So by default for second period
+        is247: false,
+        openTime: '10:00',
+        closeTime: '18:00'
       }
-    } else {
-      current.push(day);
+    ]);
+  }
+
+  removePeriod(index: number): void {
+    if (this.periods().length > 1) {
+      this.periods.update((list) => list.filter((_, i) => i !== index));
     }
-    this.selectedDays.set(current);
+  }
+
+  toggleDayForPeriod(periodIndex: number, day: number): void {
+    this.periods.update((list) =>
+      list.map((p, i) => {
+        if (i !== periodIndex) return p;
+        const days = [...p.days];
+        const idx = days.indexOf(day);
+        if (idx >= 0) {
+          if (days.length > 1) {
+            days.splice(idx, 1);
+          }
+        } else {
+          days.push(day);
+        }
+        return { ...p, days };
+      })
+    );
+  }
+
+  toggle247ForPeriod(periodIndex: number): void {
+    this.periods.update((list) =>
+      list.map((p, i) => {
+        if (i !== periodIndex) return p;
+        return { ...p, is247: !p.is247 };
+      })
+    );
+  }
+
+  updatePeriodTime(periodIndex: number, field: 'openTime' | 'closeTime', value: string): void {
+    this.periods.update((list) =>
+      list.map((p, i) => {
+        if (i !== periodIndex) return p;
+        return { ...p, [field]: value };
+      })
+    );
   }
 
   skipOpeningHours(): void {
@@ -548,31 +597,23 @@ export class CreateWizardComponent implements OnInit {
 
   saveOpeningHoursAndNext(): void {
     const periods: GooglePlacesPeriod[] = [];
-    const days = this.selectedDays();
 
-    if (this.hours247()) {
-      for (const day of days) {
-        periods.push({
-          open: { day, hour: 0, minute: 0 },
-          close: null
-        });
-      }
-    } else {
-      const [h1Open, m1Open] = this.period1Open.split(':').map((n) => parseInt(n, 10) || 0);
-      const [h1Close, m1Close] = this.period1Close.split(':').map((n) => parseInt(n, 10) || 0);
-
-      for (const day of days) {
-        periods.push({
-          open: { day, hour: h1Open, minute: m1Open },
-          close: { day, hour: h1Close, minute: m1Close }
-        });
-
-        if (this.hasPeriod2()) {
-          const [h2Open, m2Open] = this.period2Open.split(':').map((n) => parseInt(n, 10) || 0);
-          const [h2Close, m2Close] = this.period2Close.split(':').map((n) => parseInt(n, 10) || 0);
+    for (const p of this.periods()) {
+      if (p.is247) {
+        for (const day of p.days) {
           periods.push({
-            open: { day, hour: h2Open, minute: m2Open },
-            close: { day, hour: h2Close, minute: m2Close }
+            open: { day, hour: 0, minute: 0 },
+            close: null
+          });
+        }
+      } else {
+        const [hOpen, mOpen] = (p.openTime || '08:00').split(':').map((n) => parseInt(n, 10) || 0);
+        const [hClose, mClose] = (p.closeTime || '20:00').split(':').map((n) => parseInt(n, 10) || 0);
+
+        for (const day of p.days) {
+          periods.push({
+            open: { day, hour: hOpen, minute: mOpen },
+            close: { day, hour: hClose, minute: mClose }
           });
         }
       }
