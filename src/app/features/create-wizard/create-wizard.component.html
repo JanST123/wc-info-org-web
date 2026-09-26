@@ -60,7 +60,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full bg-purple-500 text-white text-center pt-2">
-                  <i class="fa-regular fa-building text-xl"></i>
+                  <i aria-hidden="true" class="fa-regular fa-building text-xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -141,7 +141,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-signs-post text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-signs-post text-2xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -186,7 +186,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-location-arrow text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-location-arrow text-2xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -235,7 +235,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-regular fa-map text-2xl"></i>
+                  <i aria-hidden="true" class="fa-regular fa-map text-2xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -270,7 +270,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-restroom text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-restroom text-2xl"></i>
                 </div>
               </div>
               <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
@@ -310,7 +310,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-wheelchair text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-wheelchair text-2xl"></i>
                 </div>
               </div>
               <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
@@ -350,7 +350,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-key text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-key text-2xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -407,7 +407,7 @@
             <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-envelope text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-envelope text-2xl"></i>
                 </div>
               </div>
               <div class="space-y-1">
@@ -449,10 +449,10 @@
 
           <!-- 9. CONDITIONAL STEP: opening_hours (Only if no place or place has no hours) -->
           @if (currentStepId() === 'opening_hours') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
               <div class="flex align-center justify-center">
                 <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
-                  <i class="fa-solid fa-clock text-2xl"></i>
+                  <i aria-hidden="true" class="fa-solid fa-clock text-2xl"></i>
                 </div>
               </div>
               @if (knowsOpeningHours() === null) {
@@ -514,7 +514,7 @@
                               (click)="removePeriod(idx)"
                               class="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 font-semibold inline-flex items-center gap-1 transition-colors"
                             >
-                              <i class="fa-solid fa-trash-can text-[11px]"></i>
+                              <i aria-hidden="true" class="fa-solid fa-trash-can text-[11px]"></i>
                               <span>{{ 'create.removePeriod' | translate }}</span>
                             </button>
                           }
@@ -584,7 +584,7 @@
                       (click)="addPeriod()"
                       class="w-full py-2.5 rounded-xl border border-dashed border-purple-300 dark:border-purple-800 text-purple-600 dark:text-purple-400 text-xs font-bold hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors inline-flex items-center justify-center gap-1.5"
                     >
-                      <i class="fa-solid fa-plus text-xs"></i>
+                      <i aria-hidden="true" class="fa-solid fa-plus text-xs"></i>
                       <span>{{ 'create.addPeriod' | translate }}</span>
                     </button>
                   }
@@ -603,10 +603,20 @@
 
           <!-- 10. STEP: public_accessible -->
           @if (currentStepId() === 'public_accessible') {
-            <div class="space-y-4">
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-                {{ 'create.publicTitle' | translate }}
-              </h3>
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i aria-hidden="true" class="fa-solid fa-user-group text-2xl"></i>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+                  {{ 'create.publicTitle' | translate }}
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ 'create.publicSub' | translate }}
+                </p>
+            </div>
 
               <div class="grid grid-cols-1 gap-3">
                 <button
@@ -638,7 +648,12 @@
 
           <!-- 11. STEP: accessible_outside -->
           @if (currentStepId() === 'accessible_outside') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i aria-hidden="true" class="fa-solid fa-moon text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.outsideAccessTitle' | translate }}
@@ -648,16 +663,16 @@
                 </p>
               </div>
 
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 gap-3">
                 <button
                   type="button"
                   (click)="setOutsideAccess(true)"
                   class="p-4 rounded-xl border text-center font-bold text-sm transition-all"
                   [ngClass]="accessibleOutsideOpeningTimes() === true
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
-                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
+                    : 'bg-purple-50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
-                  {{ 'common.yes' | translate }}
+                  {{ 'create.outsideAccessYes' | translate }}
                 </button>
 
                 <button
@@ -668,7 +683,7 @@
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
-                  {{ 'common.no' | translate }}
+                  {{ 'create.outsideAccessNo' | translate }}
                 </button>
               </div>
             </div>
@@ -676,7 +691,12 @@
 
           <!-- 12. STEP: storage_space -->
           @if (currentStepId() === 'storage_space') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+               <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i aria-hidden="true" class="fa-solid fa-table-cells-large text-2xl"></i>
+                </div>
+              </div>
               <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                 {{ 'create.storageTitle' | translate }}
               </h3>
@@ -685,45 +705,61 @@
                 <button
                   type="button"
                   (click)="setStorageSpace('none')"
-                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all"
+                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all flex items-center justify-between"
                   [ngClass]="storageSpace() === 'none'
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
-                  {{ 'create.storageNone' | translate }}
+                  <div class="flex items-center gap-2">
+                    <i aria-hidden="true" class="fa-solid fa-ban"></i>
+                    {{ 'create.storageNone' | translate }}
+                  </div>
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
                 </button>
 
                 <button
                   type="button"
                   (click)="setStorageSpace('little')"
-                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all"
+                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all flex items-center justify-between"
                   [ngClass]="storageSpace() === 'little'
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
-                  {{ 'create.storageLittle' | translate }}
+                  <div class="flex items-center gap-2">
+                    <i aria-hidden="true" class="fa-solid fa-tent-arrows-down"></i>
+                    {{ 'create.storageLittle' | translate }}
+                  </div>
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
                 </button>
 
                 <button
                   type="button"
                   (click)="setStorageSpace('much')"
-                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all"
+                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all flex items-center justify-between"
                   [ngClass]="storageSpace() === 'much'
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
-                  {{ 'create.storageMuch' | translate }}
+                  <div class="flex items-center gap-2">
+                    <i aria-hidden="true" class="fa-solid fa-suitcase-rolling"></i>
+                    {{ 'create.storageMuch' | translate }}
+                  </div>
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
                 </button>
 
                 <button
                   type="button"
                   (click)="setStorageSpace(null)"
-                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all"
+                  class="p-3.5 rounded-xl border text-left font-bold text-sm transition-all flex items-center justify-between"
                   [ngClass]="storageSpace() === null
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
-                  {{ 'create.storageUnspecified' | translate }}
+                  <div class="flex items-center gap-2">
+                    <i aria-hidden="true" class="fa-regular fa-circle-question"></i>
+                    {{ 'create.storageUnspecified' | translate }}
+                  </div>
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
                 </button>
               </div>
             </div>
@@ -878,7 +914,7 @@
           <!-- Modal Header -->
           <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
             <div class="flex items-center gap-2 text-purple-700 dark:text-purple-400 font-bold text-lg">
-              <i class="fa-regular fa-building"></i>
+              <i aria-hidden="true" class="fa-regular fa-building"></i>
               <span>{{ 'create.municipalityTitle' | translate }}</span>
             </div>
 
