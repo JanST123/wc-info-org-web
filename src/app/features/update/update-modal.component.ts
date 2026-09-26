@@ -14,12 +14,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GooglePlacesPeriod, Toilet, UpdateToiletPayload } from '../../core/models/toilet.model';
+import * as exifr from 'exifr';
+import { GooglePlacesPeriod, Toilet, ToiletPhoto, UpdateToiletPayload } from '../../core/models/toilet.model';
 import { WcInfoApiService } from '../../core/services/wc-info-api.service';
 import { GoogleMapsLoaderService } from '../../core/services/google-maps-loader.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { EuroKeyModalComponent } from '../../shared/components/euro-key-modal/euro-key-modal.component';
+import { PhotoLegalModalComponent } from '../photo-upload/photo-legal-modal.component';
 
 export interface OpeningHoursPeriodModel {
   days: number[];
@@ -39,7 +41,7 @@ export interface NearbyPlaceOption {
 @Component({
   selector: 'app-update-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, EuroKeyModalComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, EuroKeyModalComponent, PhotoLegalModalComponent],
   templateUrl: './update-modal.component.html',
 })
 export class UpdateModalComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -52,6 +54,12 @@ export class UpdateModalComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() onUpdated = new EventEmitter<Toilet>();
 
   @ViewChild('updateMapContainer') mapContainerRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('directPhotoInput') directPhotoInputRef?: ElementRef<HTMLInputElement>;
+
+  // Photos state
+  readonly photos = signal<ToiletPhoto[]>([]);
+  readonly isUploadingPhoto = signal<boolean>(false);
+  readonly showPhotoModal = signal<boolean>(false);
 
   // Venue state
   belongsToVenue = false;
@@ -121,6 +129,8 @@ export class UpdateModalComponent implements OnInit, AfterViewInit, OnDestroy {
     this.name = this.toilet.name || '';
     this.lat.set(this.toilet.lat || 52.520008);
     this.lon.set(this.toilet.lon || 13.404954);
+
+    this.photos.set(this.toilet.photos ? [...this.toilet.photos] : []);
 
     this.belongsToVenue = Boolean(this.toilet.placeId || this.toilet.owner);
     this.selectedPlaceId = this.toilet.placeId || null;
@@ -423,6 +433,92 @@ export class UpdateModalComponent implements OnInit, AfterViewInit, OnDestroy {
     return result;
   }
 
+  triggerPhotoUpload(): void {
+    const isConfirmed = typeof window !== 'undefined' && localStorage.getItem('wc_photo_legal_confirmed') === 'true';
+    if (isConfirmed) {
+      this.directPhotoInputRef?.nativeElement?.click();
+    } else {
+      this.showPhotoModal.set(true);
+    }
+  }
+
+  async onDirectPhotoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.isUploadingPhoto.set(true);
+
+    let exifDataString: string | undefined;
+    let fixedGeo: { lat: number; lon: number } | undefined;
+
+    try {
+      const parsed = await exifr.parse(file, { gps: true });
+      if (parsed) {
+        exifDataString = JSON.stringify(parsed);
+        if (parsed.latitude && parsed.longitude) {
+          fixedGeo = { lat: parsed.latitude, lon: parsed.longitude };
+        }
+      }
+    } catch {
+      // Ignore exif parse error
+    }
+
+    this.api.uploadPhoto(file, this.toilet.id, exifDataString, fixedGeo).subscribe({
+      next: (res) => {
+        this.isUploadingPhoto.set(false);
+        input.value = '';
+        const newPhoto: ToiletPhoto = {
+          id: Date.now(),
+          toiletId: this.toilet.id,
+          url: res.imageUrl || '',
+          urlThumb: res.thumbUrl || res.imageUrl || '',
+          filename: res.filename
+        };
+        this.photos.update((list) => [...list, newPhoto]);
+        if (this.toilet.photos) {
+          this.toilet.photos = [...this.toilet.photos, newPhoto];
+        } else {
+          this.toilet.photos = [newPhoto];
+        }
+      },
+      error: (err) => {
+        this.isUploadingPhoto.set(false);
+        input.value = '';
+        this.errorMessage.set(err?.message || 'Photo upload failed');
+      }
+    });
+  }
+
+  onPhotoUploaded(data: { url: string; thumbUrl?: string; filename: string }): void {
+    this.showPhotoModal.set(false);
+    const newPhoto: ToiletPhoto = {
+      id: Date.now(),
+      toiletId: this.toilet.id,
+      url: data.url,
+      urlThumb: data.thumbUrl || data.url,
+      filename: data.filename
+    };
+    this.photos.update((list) => [...list, newPhoto]);
+    if (this.toilet.photos) {
+      this.toilet.photos = [...this.toilet.photos, newPhoto];
+    } else {
+      this.toilet.photos = [newPhoto];
+    }
+  }
+
+  deletePhoto(photo: ToiletPhoto, index: number, event: Event): void {
+    event.stopPropagation();
+    if (photo.filename) {
+      this.api.deletePhoto(this.toilet.id, photo.filename).subscribe({
+        error: (err) => console.error('Failed to delete photo:', err)
+      });
+    }
+    this.photos.update((list) => list.filter((_, i) => i !== index));
+    if (this.toilet.photos) {
+      this.toilet.photos = this.toilet.photos.filter((_, i) => i !== index);
+    }
+  }
+
   submitUpdate(): void {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
@@ -471,6 +567,7 @@ export class UpdateModalComponent implements OnInit, AfterViewInit, OnDestroy {
         const updated: Toilet = {
           ...this.toilet,
           ...payload,
+          photos: this.photos(),
           name: this.name.trim() || this.toilet.name
         };
         this.onUpdated.emit(updated);
