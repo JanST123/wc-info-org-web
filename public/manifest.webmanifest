@@ -1,7 +1,7 @@
 {
   "name": "wc-info.org - Öffentliche Toiletten finden",
   "short_name": "wc-info.org",
-  "description": "Finde saubere und barrierefreie öffentliche Toiletten in deiner Nähe auf wc-info.org",
+  "description": "Finde barrierefreie öffentliche Toiletten in deiner Nähe auf wc-info.org",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#030712",
