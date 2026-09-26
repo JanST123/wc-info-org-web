@@ -14,7 +14,7 @@
               }
               @if (toilet.isQualified) {
                 <span class="inline-flex items-center text-green-600 dark:text-green-500" [title]="'attr.verified' | translate">
-                  <i class="fa-solid fa-circle-check text-base text-green-600 dark:text-green-500"></i>
+                  <i aria-hidden="true" class="fa-solid fa-circle-check text-base text-green-600 dark:text-green-500"></i>
                 </span>
               }
             </div>
@@ -133,7 +133,7 @@
               <!-- Wheelchair -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.hasWheelchairAccess ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
-                  <i class="fa-solid fa-wheelchair text-sm"></i>
+                  <i aria-hidden="true" class="fa-solid fa-wheelchair text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.wheelchair' | translate }}</span>
@@ -146,7 +146,7 @@
               <!-- Changing Table -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.hasChangingTable ? 'bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
-                  <i class="fa-solid fa-baby text-sm"></i>
+                  <i aria-hidden="true" class="fa-solid fa-baby text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.changingTable' | translate }}</span>
@@ -159,7 +159,7 @@
               <!-- Euro Key -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="isEuroKeyRequired ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
-                  <i class="fa-solid fa-key text-xs"></i>
+                  <i aria-hidden="true" class="fa-solid fa-key text-xs"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.euroKey' | translate }}</span>
@@ -173,9 +173,9 @@
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
                   @if (toilet.isGenderSeparated) {
-                    <i class="fa-solid fa-restroom text-sm"></i>
+                    <i aria-hidden="true" class="fa-solid fa-restroom text-sm"></i>
                   } @else {
-                    <i class="fa-solid fa-toilet-paper text-sm"></i>
+                    <i aria-hidden="true" class="fa-solid fa-toilet-paper text-sm"></i>
                   }
                 </div>
                 <div class="flex flex-col min-w-0">
@@ -206,7 +206,7 @@
               <!-- Public Access -->
               <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="toilet.publicAccessible !== false ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300' : 'bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300'">
-                  <i class="fa-solid fa-circle-check text-sm"></i>
+                  <i aria-hidden="true" class="fa-solid fa-circle-check text-sm"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'create.step5.title' | translate }}</span>
@@ -326,7 +326,7 @@
           class="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/30 active:scale-95 p-3 rounded-full transition-all cursor-pointer z-10 flex items-center justify-center shadow-lg"
           aria-label="Close photo"
         >
-          <i class="fa-solid fa-xmark text-2xl text-white"></i>
+          <i aria-hidden="true" class="fa-solid fa-xmark text-2xl text-white"></i>
         </button>
 
         <img

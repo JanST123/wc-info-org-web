@@ -203,7 +203,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'create.outsideAccessSub': 'Is the toilet accessible outside regular building hours (e.g. outside entrance)?',
   'create.outsideAccessYes': 'Yes, always accessible',
   'create.outsideAccessNo': 'No, or not sure',
-  'create.storageTitle': 'Are there storage surfaces in the toilet?',
+  'create.storageTitle': 'Are there storage surfaces, coat hooks etc. in the toilet?',
   'create.storageNone': 'None',
   'create.storageLittle': 'A little',
   'create.storageMuch': 'A lot',

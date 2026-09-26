@@ -15,7 +15,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
           class="inline-flex items-center text-purple-600 dark:text-purple-400"
           [title]="'attr.wheelchair' | translate"
         >
-          <i class="fa-solid fa-wheelchair text-sm sm:text-base"></i>
+          <i aria-hidden="true" class="fa-solid fa-wheelchair text-sm sm:text-base"></i>
         </span>
       }
 
@@ -25,7 +25,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
           class="inline-flex items-center text-purple-600 dark:text-purple-400"
           [title]="'attr.genderSeparated' | translate"
         >
-          <i class="fa-solid fa-restroom text-sm sm:text-base"></i>
+          <i aria-hidden="true" class="fa-solid fa-restroom text-sm sm:text-base"></i>
         </span>
       }
 
@@ -35,7 +35,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
           class="inline-flex items-center text-purple-600 dark:text-purple-400"
           [title]="'attr.changingTable' | translate"
         >
-          <i class="fa-solid fa-baby text-sm sm:text-base"></i>
+          <i aria-hidden="true" class="fa-solid fa-baby text-sm sm:text-base"></i>
         </span>
       }
 
@@ -45,7 +45,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
           class="inline-flex items-center text-purple-600 dark:text-purple-400"
           [title]="'attr.euroKey' | translate"
         >
-          <i class="fa-solid fa-key text-xs sm:text-sm"></i>
+          <i aria-hidden="true" class="fa-solid fa-key text-xs sm:text-sm"></i>
         </span>
       }
 
@@ -55,7 +55,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
           class="inline-flex items-center text-purple-600 dark:text-purple-400"
           [title]="(toilet.isUnisex ? 'attr.unisex' : 'attr.public') | translate"
         >
-          <i class="fa-solid fa-toilet-paper text-sm sm:text-base"></i>
+          <i aria-hidden="true" class="fa-solid fa-toilet-paper text-sm sm:text-base"></i>
         </span>
       }
     </div>

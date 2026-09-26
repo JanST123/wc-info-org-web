@@ -203,7 +203,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'create.outsideAccessSub': 'Ist das WC auch außerhalb regulärer Gebäude-Öffnungszeiten erreichbar (z.B. Außenzugang)?',
   'create.outsideAccessYes': 'Ja, immer zugänglich',
   'create.outsideAccessNo': 'Nein, oder nicht sicher',
-  'create.storageTitle': 'Gibt es Ablageflächen in der Toilette?',
+  'create.storageTitle': 'Gibt es Ablageflächen, Kleiderhaken etc. in der Toilette?',
   'create.storageNone': 'Keine',
   'create.storageLittle': 'Wenig',
   'create.storageMuch': 'Viel',
