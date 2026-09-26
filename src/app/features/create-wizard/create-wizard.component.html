@@ -667,23 +667,25 @@
                 <button
                   type="button"
                   (click)="setOutsideAccess(true)"
-                  class="p-4 rounded-xl border text-center font-bold text-sm transition-all"
+                  class="p-4 rounded-xl border text-center font-bold text-sm transition-all flex items-center justify-between"
                   [ngClass]="accessibleOutsideOpeningTimes() === true
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'bg-purple-50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
                   {{ 'create.outsideAccessYes' | translate }}
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
                 </button>
 
                 <button
                   type="button"
                   (click)="setOutsideAccess(false)"
-                  class="p-4 rounded-xl border text-center font-bold text-sm transition-all"
+                  class="p-4 rounded-xl border text-center font-bold text-sm transition-all flex items-center justify-between"
                   [ngClass]="accessibleOutsideOpeningTimes() === false
                     ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
                     : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
                 >
                   {{ 'create.outsideAccessNo' | translate }}
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
                 </button>
               </div>
             </div>
@@ -767,7 +769,12 @@
 
           <!-- 13. STEP: photo -->
           @if (currentStepId() === 'photo') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+               <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i class="fa-solid fa-camera text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.photoTitle' | translate }}
@@ -809,7 +816,12 @@
 
           <!-- 14. STEP: comment -->
           @if (currentStepId() === 'comment') {
-            <div class="space-y-4">
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i aria-hidden="true" class="fa-regular fa-comments text-2xl"></i>
+                </div>
+              </div>
               <div class="space-y-1">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
                   {{ 'create.commentTitle' | translate }}
