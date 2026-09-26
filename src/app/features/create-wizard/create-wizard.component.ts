@@ -79,6 +79,7 @@ export class CreateWizardComponent implements OnInit {
   readonly showEuroKeyModal = signal<boolean>(false);
 
   @Input() initialCoords: Coordinates | null = null;
+  @Input() explicitCoords: boolean | null = null;
 
   @Output() onCancel = new EventEmitter<void>();
   @Output() onCreated = new EventEmitter<Toilet>();
@@ -167,7 +168,11 @@ export class CreateWizardComponent implements OnInit {
 
   // Dynamic step engine
   readonly activeSteps = computed<WizardStepId[]>(() => {
-    const steps: WizardStepId[] = ['place_id', 'name', 'sensor_location'];
+    const steps: WizardStepId[] = ['place_id', 'name'];
+
+    if (!this.explicitCoords) {
+      steps.push('sensor_location');
+    }
 
     // Map picker step: ONLY if NO place was selected in step 1 AND sensor was denied in step 3
     if (this.selectedPlace() === null && this.usedSensorLocation() === false) {

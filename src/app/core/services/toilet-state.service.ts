@@ -25,6 +25,7 @@ export class ToiletStateService {
   readonly mobileSheetState = signal<'peek' | 'half' | 'full'>('peek');
   readonly isCreateWizardOpen = signal<boolean>(false);
   readonly createInitialCoords = signal<Coordinates | null>(null);
+  readonly createExplicitCoords = signal<boolean>(false);
   readonly isFeedbackOpen = signal<boolean>(false);
   readonly isUpdateOpen = signal<boolean>(false);
 
@@ -199,6 +200,7 @@ export class ToiletStateService {
   }
 
   openCreateWizard(coords?: Coordinates): void {
+    this.createExplicitCoords.set(!!coords);
     this.createInitialCoords.set(coords || this.searchLocation() || this.userLocation() || this.mapCenter());
     this.isCreateWizardOpen.set(true);
   }
