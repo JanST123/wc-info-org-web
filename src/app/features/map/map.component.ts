@@ -321,19 +321,29 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       });
       this.isMapReady.set(true);
 
-      // Deselect toilet when user starts dragging the map
+      // Close info window and deselect toilet when user starts dragging the map
       this.dragStartListener = this.googleMap.addListener('dragstart', () => {
+        this.infoWindow?.close();
         if (this.selectedToilet) {
-          this.infoWindow?.close();
           this.toiletSelect.emit(null);
         }
       });
 
-      // Deselect toilet when user clicks on empty map space
-      this.mapClickListener = this.googleMap.addListener('click', () => {
+      // On click/tap on empty map space: deselect toilet and open tooltip to add a toilet
+      this.mapClickListener = this.googleMap.addListener('click', (e: google.maps.MapMouseEvent) => {
         if (this.selectedToilet) {
-          this.infoWindow?.close();
           this.toiletSelect.emit(null);
+        }
+        if (e.latLng && this.infoWindow) {
+          const lat = e.latLng.lat();
+          const lon = e.latLng.lng();
+          const content = this.createAddHereInfoWindowContent({ lat, lon });
+          this.infoWindow.setContent(content);
+          this.infoWindow.setOptions({ disableAutoPan: true });
+          this.infoWindow.setPosition(e.latLng);
+          this.infoWindow.open({
+            map: this.googleMap
+          });
         }
       });
 
@@ -348,6 +358,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       // Right-click / contextmenu event
       this.clickListener = this.googleMap.addListener('rightclick', (e: google.maps.MapMouseEvent) => {
         if (e.latLng) {
+          this.infoWindow?.close();
           this.mapCreate.emit({ lat: e.latLng.lat(), lon: e.latLng.lng() });
         }
       });
@@ -566,6 +577,33 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     });
     container.appendChild(linkEl);
 
+    return container;
+  }
+
+  private createAddHereInfoWindowContent(coords: Coordinates): HTMLElement {
+    const container = document.createElement('div');
+    container.className = 'p-1 text-center font-sans';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className =
+      'inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer select-none';
+    btn.innerHTML = `
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      <span>${this.translationService.t('map.addToiletHere')}</span>
+    `;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.infoWindow?.close();
+      this.mapCreate.emit(coords);
+    });
+
+    container.appendChild(btn);
     return container;
   }
 

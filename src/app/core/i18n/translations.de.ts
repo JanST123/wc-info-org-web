@@ -10,6 +10,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'nav.missingToiletSub': 'Hier klicken, um eine Toilette hinzuzufügen – wir freuen uns darüber!',
   'nav.urgent': 'Notfall-WC',
   'nav.currentLocation': 'Aktueller Standort',
+  'map.addToiletHere': 'Hier Toilette hinzufügen',
   'common.loading': 'Wird geladen...',
   'common.error': 'Ein Fehler ist aufgetreten',
   'common.retry': 'Erneut versuchen',
