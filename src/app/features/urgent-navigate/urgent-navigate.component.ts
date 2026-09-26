@@ -251,10 +251,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.seoService.updateSeo({
-      title: 'Notfall-Navigation - wc-info.org',
-      description: 'Schnellste Notfall-Navigation zur nächsten barrierefreien öffentlichen Toilette.'
-    });
+    this.seoService.setUrgentSeo();
     this.route.queryParams.subscribe((params) => {
       const toiletId = params['toilet'] ? parseInt(params['toilet'], 10) : null;
       const targetFromState = this.toiletState.navigationTargetToilet();

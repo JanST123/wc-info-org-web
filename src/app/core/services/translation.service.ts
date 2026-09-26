@@ -19,7 +19,15 @@ export class TranslationService {
     en: TRANSLATIONS_EN
   };
 
-  constructor() {}
+  constructor() {
+    this.updateHtmlLang(this.currentLang());
+  }
+
+  private updateHtmlLang(lang: string): void {
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.lang = lang;
+    }
+  }
 
   private detectInitialLanguage(): SupportedLanguage {
     try {
@@ -48,6 +56,7 @@ export class TranslationService {
 
   setLanguage(lang: SupportedLanguage): void {
     this.currentLang.set(lang);
+    this.updateHtmlLang(lang);
     try {
       localStorage.setItem(this.STORAGE_KEY, lang);
     } catch {

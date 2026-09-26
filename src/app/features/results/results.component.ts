@@ -64,24 +64,13 @@ export class ResultsComponent implements OnInit {
     effect(() => {
       const detailToilet = this.activeDetailToilet();
       if (detailToilet) {
-        const titlePart = (detailToilet.owner && detailToilet.owner.trim().length > 0)
-          ? detailToilet.owner.trim()
-          : (detailToilet.name && detailToilet.name.trim().length > 0 ? detailToilet.name.trim() : 'Toilette');
-        const title = `${titlePart} - wc-info.org`;
-        const address = detailToilet.address ? `${detailToilet.address} · ` : '';
-        const desc = `${address}${detailToilet.name || titlePart} - Öffentliche Toilette auf wc-info.org`;
-        const image = detailToilet.photos && detailToilet.photos.length > 0 ? detailToilet.photos[0].url : undefined;
-        this.seoService.updateSeo({ title, description: desc, image });
+        this.seoService.setToiletSeo(detailToilet);
         return;
       }
 
       const searchLoc = this.toiletState.searchLocation();
       if (searchLoc?.name && searchLoc.name.trim().length > 0) {
-        const placeName = searchLoc.name.trim();
-        this.seoService.updateSeo({
-          title: `${placeName} - wc-info.org`,
-          description: `Öffentliche Toiletten und barrierefreie WCs in ${placeName} finden auf wc-info.org.`
-        });
+        this.seoService.setPlacesSeo(searchLoc.name.trim());
         return;
       }
 
@@ -89,19 +78,12 @@ export class ResultsComponent implements OnInit {
       if (placeSlug) {
         const parsed = parsePlaceSlug(placeSlug);
         if (parsed.name && parsed.name.trim().length > 0) {
-          const placeName = parsed.name.trim();
-          this.seoService.updateSeo({
-            title: `${placeName} - wc-info.org`,
-            description: `Öffentliche Toiletten und barrierefreie WCs in ${placeName} finden auf wc-info.org.`
-          });
+          this.seoService.setPlacesSeo(parsed.name.trim());
           return;
         }
       }
 
-      this.seoService.updateSeo({
-        title: 'Öffentliche Toiletten - wc-info.org',
-        description: 'Öffentliche Toiletten und barrierefreie WCs in deiner Nähe finden auf wc-info.org.'
-      });
+      this.seoService.setPlacesSeo('Öffentliche Toiletten');
     });
   }
 

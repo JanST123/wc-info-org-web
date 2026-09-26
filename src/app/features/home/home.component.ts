@@ -193,10 +193,7 @@ export class HomeComponent implements OnInit {
   private readonly searchSubject = new Subject<string>();
 
   ngOnInit(): void {
-    this.seoService.updateSeo({
-      title: 'WC-Info - wc-info.org',
-      description: 'Finde saubere und barrierefreie öffentliche Toiletten in deiner Nähe auf wc-info.org.'
-    });
+    this.seoService.setHomeSeo();
     this.loadRecentSearches();
 
     window.setInterval(() => {
