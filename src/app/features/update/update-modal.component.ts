@@ -328,6 +328,7 @@ export class UpdateModalComponent implements OnInit, AfterViewInit, OnDestroy {
       const mapOptions: google.maps.MapOptions = {
         center,
         zoom: 17,
+        mapId: 'updateMap',
         disableDefaultUI: true,
         zoomControl: true,
         gestureHandling: 'greedy'
