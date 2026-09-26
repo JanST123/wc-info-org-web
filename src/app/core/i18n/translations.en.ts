@@ -239,5 +239,15 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'feedback.sent': 'Thank you! Your feedback has been submitted.',
   'update.title': 'Suggest Changes',
   'update.send': 'Submit Changes',
-  'update.sent': 'Changes submitted successfully!'
+  'update.sent': 'Changes submitted successfully!',
+
+  // Euro Key Modal
+  'euroKeyModal.title': 'Euro Key',
+  'euroKeyModal.p1': 'The Euro key is a locking system introduced in 1986 by CBF Darmstadt – Club Behinderter und ihrer Freunde in Darmstadt und Umgebung e. V. – and now used across borders. It allows physically impaired individuals to gain independent access to disabled-accessible sanitary facilities and amenities with a universal key, e.g. at participating motorway and train station restrooms, but also for public toilets in pedestrian areas, museums, or public authorities.',
+  'euroKeyModal.p2': 'The key is issued exclusively to people who rely on disabled-accessible toilets.',
+  'euroKeyModal.p3': 'The German disability pass serves as authorization if',
+  'euroKeyModal.bullet1': 'the disability mark: aG, B, H, or BL',
+  'euroKeyModal.bullet2': 'or the disability mark G and a degree of disability (GdB) of 70 and above is included.',
+  'euroKeyModal.source': 'Source: {url}',
+  'euroKeyModal.orderButton': 'Information and ordering (from CBF Darmstadt)'
 };

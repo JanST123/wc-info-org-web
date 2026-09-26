@@ -239,5 +239,15 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'feedback.sent': 'Vielen Dank! Dein Feedback wurde übermittelt.',
   'update.title': 'Änderungen vorschlagen',
   'update.send': 'Änderungen einreichen',
-  'update.sent': 'Änderungsvorschlag erfolgreich gespeichert!'
+  'update.sent': 'Änderungsvorschlag erfolgreich gespeichert!',
+
+  // Euro Key Modal
+  'euroKeyModal.title': 'Euroschlüssel',
+  'euroKeyModal.p1': 'Der Euroschlüssel ist ein 1986 vom CBF Darmstadt – Club Behinderter und ihrer Freunde in Darmstadt und Umgebung e. V. – eingeführtes, inzwischen über die Landesgrenzen hinaus genutztes Schließsystem, das es körperlich beeinträchtigten Menschen ermöglicht, mit einem Einheitsschlüssel selbständig Zugang zu behindertengerechten sanitären Anlagen und Einrichtungen zu erhalten, z. B. an teilnehmenden Autobahn- und Bahnhofstoiletten, aber auch für öffentliche Toiletten in Fußgängerzonen, Museen oder Behörden.',
+  'euroKeyModal.p2': 'Der Schlüssel wird ausschließlich an Menschen ausgehändigt, die auf behindertengerechte Toiletten angewiesen sind.',
+  'euroKeyModal.p3': 'Der deutsche Schwerbehindertenausweis gilt als Berechtigung, wenn',
+  'euroKeyModal.bullet1': 'das Merkzeichen: aG, B, H, oder BL',
+  'euroKeyModal.bullet2': 'oder das Merkzeichen G und der GdB ab 70 und aufwärts enthalten ist.',
+  'euroKeyModal.source': 'Quelle: {url}',
+  'euroKeyModal.orderButton': 'Informationen und Bestellung (bei CBF Darmstadt)'
 };

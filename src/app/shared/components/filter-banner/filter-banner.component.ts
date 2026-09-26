@@ -5,10 +5,12 @@ import { TranslationService } from '../../../core/services/translation.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { ToiletFilterSettings } from '../../../core/models/filter-settings.model';
 
+import { EuroKeyModalComponent } from '../euro-key-modal/euro-key-modal.component';
+
 @Component({
   selector: 'app-filter-banner',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, EuroKeyModalComponent],
   templateUrl: './filter-banner.component.html',
 })
 export class FilterBannerComponent {

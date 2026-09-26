@@ -54,6 +54,8 @@ export interface NearbyPlaceOption {
   openingHours?: GooglePlacesPeriod[];
 }
 
+import { EuroKeyModalComponent } from '../../shared/components/euro-key-modal/euro-key-modal.component';
+
 export interface OpeningHoursPeriodModel {
   days: number[];
   is247: boolean;
@@ -64,7 +66,7 @@ export interface OpeningHoursPeriodModel {
 @Component({
   selector: 'app-create-wizard',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, PhotoLegalModalComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, PhotoLegalModalComponent, EuroKeyModalComponent],
   templateUrl: './create-wizard.component.html'
 })
 export class CreateWizardComponent implements OnInit {
@@ -72,6 +74,8 @@ export class CreateWizardComponent implements OnInit {
   private readonly locationService = inject(LocationService);
   private readonly mapsLoader = inject(GoogleMapsLoaderService);
   private readonly translationService = inject(TranslationService);
+
+  readonly showEuroKeyModal = signal<boolean>(false);
 
   @Input() initialCoords: Coordinates | null = null;
 

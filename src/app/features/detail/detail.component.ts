@@ -8,10 +8,12 @@ import { OpeningHoursService } from '../../core/services/opening-hours.service';
 import { LocationService } from '../../core/services/location.service';
 import { TranslationService } from '../../core/services/translation.service';
 
+import { EuroKeyModalComponent } from '../../shared/components/euro-key-modal/euro-key-modal.component';
+
 @Component({
   selector: 'app-detail',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, OpeningTimeBadgeComponent],
+  imports: [CommonModule, TranslatePipe, OpeningTimeBadgeComponent, EuroKeyModalComponent],
   templateUrl: './detail.component.html',
 })
 export class DetailComponent {
@@ -28,6 +30,7 @@ export class DetailComponent {
   @Output() onAddPhoto = new EventEmitter<Toilet>();
 
   readonly activeLightboxPhoto = signal<ToiletPhoto | null>(null);
+  readonly showEuroKeyModal = signal<boolean>(false);
 
   get formattedDistance(): string | null {
     if (this.toilet.distanceMeters !== undefined && this.toilet.distanceMeters !== null) {

@@ -157,12 +157,19 @@
               </div>
 
               <!-- Euro Key -->
-              <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3">
+              <div
+                (click)="showEuroKeyModal.set(true)"
+                class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/60 flex items-center gap-3 cursor-pointer hover:bg-purple-50/50 dark:hover:bg-purple-950/20 transition-colors"
+                [title]="'euroKeyModal.title' | translate"
+              >
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" [ngClass]="isEuroKeyRequired ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'">
                   <i aria-hidden="true" class="fa-solid fa-key text-xs"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.euroKey' | translate }}</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ 'attr.euroKey' | translate }}</span>
+                    <i class="fa-solid fa-circle-info text-[10px] text-purple-600 dark:text-purple-400"></i>
+                  </div>
                   <span class="text-xs font-bold truncate text-gray-900 dark:text-gray-100">
                     {{ (isEuroKeyRequired ? 'attr.euroKeyRequired' : 'attr.noEuroKeyRequired') | translate }}
                   </span>
@@ -336,4 +343,9 @@
           (click)="$event.stopPropagation()"
         />
       </div>
+    }
+
+    <!-- Euro Key Info Modal -->
+    @if (showEuroKeyModal()) {
+      <app-euro-key-modal (onClose)="showEuroKeyModal.set(false)" />
     }

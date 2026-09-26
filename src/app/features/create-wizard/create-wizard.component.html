@@ -359,6 +359,14 @@
                 </h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ 'create.euroKeySub' | translate }}
+                  <button
+                    type="button"
+                    (click)="showEuroKeyModal.set(true)"
+                    class="text-purple-600 dark:text-purple-400 hover:underline font-semibold ml-1 inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <i class="fa-solid fa-circle-info text-[11px]"></i>
+                    <span>{{ 'euroKeyModal.title' | translate }}</span>
+                  </button>
                 </p>
               </div>
 
@@ -974,4 +982,9 @@
           </div>
         </div>
       </div>
+    }
+
+    <!-- Euro Key Info Modal -->
+    @if (showEuroKeyModal()) {
+      <app-euro-key-modal (onClose)="showEuroKeyModal.set(false)" />
     }

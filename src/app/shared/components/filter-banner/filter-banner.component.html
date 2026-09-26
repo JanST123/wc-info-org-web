@@ -163,7 +163,7 @@
             </span>
             <button
               type="button"
-              (click)="showEuroKeyInfo.set(!showEuroKeyInfo())"
+              (click)="showEuroKeyInfo.set(true)"
               class="text-purple-600 dark:text-purple-400 hover:opacity-80 transition-opacity cursor-pointer p-0.5"
               [title]="'filter.euroKeyNotice' | translate"
             >
@@ -188,9 +188,7 @@
           </button>
         </div>
         @if (showEuroKeyInfo()) {
-          <div class="mt-1.5 p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-100 dark:border-purple-900/60 text-xs text-purple-900 dark:text-purple-200 leading-relaxed">
-            {{ 'filter.euroKeyNotice' | translate }}
-          </div>
+          <app-euro-key-modal (onClose)="showEuroKeyInfo.set(false)" />
         }
       </div>
 
