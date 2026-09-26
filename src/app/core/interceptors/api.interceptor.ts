@@ -2,6 +2,7 @@ import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { ToastService } from '../services/toast.service';
 
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;
@@ -9,7 +10,49 @@ function getCookie(name: string): string | null {
   return match ? decodeURIComponent(match[3]) : null;
 }
 
+function extractErrorMessage(error: HttpErrorResponse): string {
+  if (error.error) {
+    if (typeof error.error === 'object') {
+      if (typeof error.error.message === 'string' && error.error.message.trim().length > 0) {
+        return error.error.message;
+      }
+      if (error.error.errors && typeof error.error.errors === 'object') {
+        const firstKey = Object.keys(error.error.errors)[0];
+        const firstVal = error.error.errors[firstKey];
+        if (Array.isArray(firstVal) && firstVal.length > 0) {
+          return firstVal[0];
+        } else if (typeof firstVal === 'string' && firstVal.trim().length > 0) {
+          return firstVal;
+        }
+      }
+      if (typeof error.error.error === 'string' && error.error.error.trim().length > 0) {
+        return error.error.error;
+      }
+    } else if (typeof error.error === 'string' && error.error.trim().length > 0) {
+      try {
+        const parsed = JSON.parse(error.error);
+        if (parsed?.message && typeof parsed.message === 'string') {
+          return parsed.message;
+        }
+      } catch {
+        return error.error;
+      }
+    }
+  }
+
+  if (error.status === 0) {
+    return 'Server nicht erreichbar oder Netzwerkfehler.';
+  }
+
+  if (error.status === 413) {
+    return 'Die Datei ist zu groß für den Upload.';
+  }
+
+  return error.statusText || error.message || 'Ein Fehler ist aufgetreten.';
+}
+
 export const apiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+  const toastService = inject(ToastService);
   let headers = req.headers.set('Accept', 'application/json');
 
   if (environment.apiKey) {
@@ -45,10 +88,21 @@ export const apiInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, nex
             }
             return next(modifiedReq.clone({ headers: retryHeaders }));
           }),
-          catchError(() => throwError(() => error))
+          catchError((retryErr: unknown) => {
+            if (retryErr instanceof HttpErrorResponse && !req.headers.has('X-Skip-Toast')) {
+              toastService.error(extractErrorMessage(retryErr));
+            }
+            return throwError(() => retryErr);
+          })
         );
       }
+
+      if (error instanceof HttpErrorResponse && !req.headers.has('X-Skip-Toast')) {
+        toastService.error(extractErrorMessage(error));
+      }
+
       return throwError(() => error);
     })
   );
 };
+
