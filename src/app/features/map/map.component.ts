@@ -433,7 +433,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         map: this.googleMap,
         position,
         content: el,
-        title: toilet.name,
+        title: toilet.owner || toilet.name,
         zIndex: this.selectedToilet?.id === toilet.id ? 100 : 1
       });
 
@@ -545,11 +545,25 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     const container = document.createElement('div');
     container.className = 'p-1.5 max-w-[260px] text-left font-sans select-text';
 
-    // 1. Toilet name (first line, bold)
-    const nameEl = document.createElement('div');
-    nameEl.className = 'font-bold text-sm text-gray-900 dark:text-white leading-tight mb-1';
-    nameEl.textContent = toilet.name || this.translationService.t('app.title');
-    container.appendChild(nameEl);
+    const hasOwner = Boolean(toilet.owner && toilet.owner.trim().length > 0);
+    const headline = hasOwner ? toilet.owner! : (toilet.name || this.translationService.t('app.title'));
+    const subheadline = hasOwner && toilet.name && toilet.name.trim().length > 0 && toilet.name !== toilet.owner
+      ? toilet.name
+      : null;
+
+    // 1. Headline (owner or fallback toilet name)
+    const headlineEl = document.createElement('div');
+    headlineEl.className = 'font-bold text-sm text-gray-900 dark:text-white leading-tight mb-0.5';
+    headlineEl.textContent = headline;
+    container.appendChild(headlineEl);
+
+    // 1b. Sub-headline (toilet name if owner is headline)
+    if (subheadline) {
+      const subEl = document.createElement('div');
+      subEl.className = 'text-xs text-gray-500 dark:text-gray-400 font-medium leading-snug mb-1';
+      subEl.textContent = subheadline;
+      container.appendChild(subEl);
+    }
 
     // 2. Text representation of toilet type
     const typeEl = document.createElement('div');
