@@ -136,24 +136,24 @@ export interface AddToiletPayload {
   owner?: string | null;
   lat: number;
   lon: number;
-  placeId?: string | null;
-  isUnisex?: boolean;
-  isGenderSeparated?: boolean;
-  hasWheelchairAccess?: boolean;
-  hasChangingTable?: boolean;
-  accessibleOutsideOpeningTimes?: boolean;
-  publicAccessible?: boolean;
-  placeOpeningHours?: GooglePlacesPeriod[] | null;
+  place_id?: string | null;
+  is_unisex?: boolean;
+  is_gender_separated?: boolean;
+  has_wheelchair_access?: boolean;
+  has_changing_table?: boolean;
+  accessible_outside_opening_times?: boolean;
+  public_accessible?: boolean;
+  place_opening_hours?: GooglePlacesPeriod[] | null;
   address?: string | null;
   website?: string | null;
   comment?: string | null;
-  euroKey?: string | null;
-  storageSpace?: string | null;
+  euro_key?: string | null;
+  storage_space?: string | null;
   status?: string;
 }
 
 export interface UpdateToiletPayload extends AddToiletPayload {
-  isQualified?: boolean | null;
+  is_qualified?: boolean | null;
 }
 
 export interface AddToiletResponse {

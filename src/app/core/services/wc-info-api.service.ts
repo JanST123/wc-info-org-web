@@ -54,12 +54,25 @@ export class WcInfoApiService {
     );
   }
 
+  private toSnakeCasePayload(payload: any): any {
+    if (!payload || typeof payload !== 'object') return payload;
+    const result: any = {};
+    for (const [key, val] of Object.entries(payload)) {
+      if (val === undefined) continue;
+      const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      result[snakeKey] = val;
+    }
+    return result;
+  }
+
   addToilet(payload: AddToiletPayload): Observable<AddToiletResponse> {
-    return this.http.post<AddToiletResponse>(`${this.baseUrl}/toilet/add`, payload);
+    const body = this.toSnakeCasePayload(payload);
+    return this.http.post<AddToiletResponse>(`${this.baseUrl}/toilet/add`, body);
   }
 
   updateToilet(id: number, payload: UpdateToiletPayload): Observable<UpdateToiletResponse> {
-    return this.http.patch<UpdateToiletResponse>(`${this.baseUrl}/toilet/${id}/update`, payload);
+    const body = this.toSnakeCasePayload(payload);
+    return this.http.patch<UpdateToiletResponse>(`${this.baseUrl}/toilet/${id}/update`, body);
   }
 
   sendToiletFeedback(toiletId: number, payload: SendToiletFeedbackRequest): Observable<SendToiletFeedbackResponse> {

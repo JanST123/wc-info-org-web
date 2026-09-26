@@ -484,15 +484,15 @@ export class CreateWizardComponent implements OnInit {
       lat: this.lat(),
       lon: this.lon(),
       owner: this.selectedPlace()?.name || null,
-      placeId: this.selectedPlace()?.placeId || null,
+      place_id: this.selectedPlace()?.placeId || null,
       name: this.name.trim() || null,
-      publicAccessible: this.publicAccessible() ?? true,
-      hasWheelchairAccess: this.hasWheelchairAccess() ?? false,
-      isGenderSeparated: this.isGenderSeparated() ?? false,
-      isUnisex: this.isUnisex() ?? true,
-      euroKey: this.euroKey() || null,
+      public_accessible: this.publicAccessible() ?? true,
+      has_wheelchair_access: this.hasWheelchairAccess() ?? false,
+      is_gender_separated: this.isGenderSeparated() ?? false,
+      is_unisex: this.isUnisex() ?? true,
+      euro_key: this.euroKey() || null,
       address: this.selectedPlace()?.formattedAddress || null,
-      placeOpeningHours: this.selectedPlace()?.openingHours || null
+      place_opening_hours: this.selectedPlace()?.openingHours || null
     };
 
     this.api.addToilet(payload).subscribe({
@@ -745,15 +745,15 @@ export class CreateWizardComponent implements OnInit {
         lon: this.lon(),
         name: this.name.trim() || null,
         owner: this.selectedPlace()?.name || null,
-        euroKey: this.euroKey() || null,
-        isGenderSeparated: this.isGenderSeparated() ?? false,
-        isUnisex: this.isUnisex() ?? true,
-        hasWheelchairAccess: this.hasWheelchairAccess() ?? false,
-        publicAccessible: this.publicAccessible() ?? true,
-        accessibleOutsideOpeningTimes: this.accessibleOutsideOpeningTimes() ?? false,
-        storageSpace: this.storageSpace(),
+        euro_key: this.euroKey() || null,
+        is_gender_separated: this.isGenderSeparated() ?? false,
+        is_unisex: this.isUnisex() ?? true,
+        has_wheelchair_access: this.hasWheelchairAccess() ?? false,
+        public_accessible: this.publicAccessible() ?? true,
+        accessible_outside_opening_times: this.accessibleOutsideOpeningTimes() ?? false,
+        storage_space: this.storageSpace(),
         address: this.address.trim() || this.selectedPlace()?.formattedAddress || null,
-        placeOpeningHours: this.configuredOpeningHours() || this.selectedPlace()?.openingHours || null,
+        place_opening_hours: this.configuredOpeningHours() || this.selectedPlace()?.openingHours || null,
         comment: this.comment.trim() || null
       };
 
