@@ -36,9 +36,34 @@ import * as exifr from 'exifr';
         </div>
 
         <!-- Modal Content -->
-        <div class="p-6 space-y-4 text-sm text-gray-600 dark:text-gray-300">
-          <p class="whitespace-pre-line leading-relaxed">
-            {{ 'photo.legalText' | translate }}
+        <div class="p-6 space-y-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed overflow-y-auto max-h-[60vh]">
+          <p>
+            {{ 'photo.legalIntro' | translate }}
+          </p>
+
+          <ul class="list-disc pl-5 space-y-1.5 text-xs text-gray-700 dark:text-gray-200">
+            <li>{{ 'photo.legalBullet1' | translate }}</li>
+            <li>{{ 'photo.legalBullet2' | translate }}</li>
+            <li>{{ 'photo.legalBullet3' | translate }}</li>
+            <li>{{ 'photo.legalBullet4' | translate }}</li>
+            <li>{{ 'photo.legalBullet5' | translate }}</li>
+          </ul>
+
+          <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">
+            {{ 'photo.legalFooter' | translate }}
+            <a
+              href="https://wc-info.de/Law/Privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-purple-600 dark:text-purple-400 font-semibold hover:underline inline-flex items-center gap-0.5"
+            >
+              <span>{{ 'photo.privacyPolicy' | translate }}</span>
+              <svg class="w-3 h-3 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>.
           </p>
 
           <label class="flex items-start gap-3 p-3.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/50 cursor-pointer">
