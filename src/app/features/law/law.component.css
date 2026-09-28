@@ -1,0 +1,19 @@
+@layer base {
+    /* revert some tailwind resets we don't want here */
+    :host ::ng-deep h1 {
+      font-size: var(--text-2xl);
+      padding: 1em 0;
+    }
+    :host ::ng-deep h2 {
+      font-size: var(--text-xl);
+      padding: 1em 0 .5em;
+    }
+    :host ::ng-deep h3 {
+      font-size: var(--text-lg);
+      padding: 1em 0 .5em;
+    }
+    :host ::ng-deep  a {
+      color: var(--color-blue-600);
+      text-decoration-line: underline;
+    }
+  }
