@@ -1,0 +1,49 @@
+name: Build and Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build & FTP Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: ⚙️ Configure environment variables
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const envPath = "src/environments/environment.ts";
+            let content = fs.readFileSync(envPath, "utf8");
+            content = content.replace(/apiKey:\s*["\x27][^"\x27]*["\x27]/, `apiKey: "${process.env.API_KEY || ""}"`);
+            content = content.replace(/googleMapsApiKey:\s*["\x27][^"\x27]*["\x27]/, `googleMapsApiKey: "${process.env.GOOGLE_MAPS_API_KEY || ""}"`);
+            fs.writeFileSync(envPath, content, "utf8");
+          '
+
+      - name: 🏗️ Build production bundle
+        run: npm run build
+
+      - name: 🚀 Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ vars.FTP_HOST }}
+          username: ${{ vars.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          local-dir: ./dist/wc-info-org-web/browser/
