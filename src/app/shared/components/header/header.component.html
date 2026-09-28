@@ -58,6 +58,17 @@
           }
         </button>
 
+        <!-- help button-->
+        <button
+          type="button"
+          (click)="toggleHelp()"
+          class="p-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors active:scale-95 flex items-center justify-center"
+          title="{{ 'common.help' | translate }}"
+          aria-label="Show help"
+        >
+          <i aria-hidden="true" class="fa-regular fa-circle-question"></i>
+        </button>
+
         <!-- Language Selector Button -->
         <div class="flex items-center border border-gray-200 dark:border-gray-700 rounded-full p-0.5 bg-gray-50 dark:bg-gray-800 text-xs font-semibold">
           <button
@@ -77,3 +88,7 @@
         </div>
       </div>
     </header>
+
+    @if(helpModal()) {
+      <app-help-modal (onClose)="helpModal.set(false)"></app-help-modal>
+    }

@@ -32,6 +32,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'common.share': 'Share',
   'common.copied': 'Link copied to clipboard',
   'common.send_email': 'Send Email',
+  'common.help': 'Help',
 
   // Filters
   'filter.title': 'Filters',
@@ -294,5 +295,7 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   // Footer
   'footer.privacy': 'Privacy',
   'footer.disclaimer': 'Disclaimer',
-  'footer.imprint': 'Imprint'
+  'footer.imprint': 'Imprint',
+
+  'helpModal.title': 'Instructions'
 };

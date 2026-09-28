@@ -1,0 +1,126 @@
+<div class="p-4 pb-30 h-screen overflow-scroll">
+    @if(!modal) {
+        <h1>{{ 'helpModal.title' | translate }}</h1>
+    }
+
+    @if(currentLang() === 'de') {
+        <h2>Warum?</h2>
+        <p>
+            wc-info.org möchte helfen, schnell eine Toilette in der Umgebung oder an einem Reiseziel zu finden. Anders als andere Anbieter fokussieren wir uns auf die speziellen Bedürfnisse von Menschen mit Behinderung.
+            Dazu bieten wir weiterführende Informationen (sofern verfügbar), z.B. ob die Toilette mit einem <a (click)="onShowEuroKey()" href="javascript:void(0)">Euro-Key des CBF</a> zugänglich ist, bzw. es überhaupt eine behindertengerechte Toilette gibt.
+        </p>
+        <p>
+            Da diese zusätzlichen Informationen schwer zu bekommen sind bzw. in unterschiedlichen Formaten und Orten vorliegen, sind wir auf die Mithilfe unserer Benutzer angewiesen; daher versuchen wir es so einfach wie möglich zu gestalten,
+            zusätzliche Toiletten oder Informationen zu bereits eingetragenen Toiletten hinzuzufügen. Ausserdem haben wir ein offenes Ohr für Verbesserungswünsche und helfen auch gerne bei Fragen aller Art. Einfach eine E-Mail an
+        </p>
+        <div class="text-2xl font-bold text-center p-2">
+            <i class="fa-regular fa-hand-point-right"></i>
+            hi{{ "@" }}wc-info.org
+        </div>
+        <p>
+            senden - wir antworten so bald wie möglich.
+        </p>
+
+        <h2>Wie?</h2>
+        <h3>Du suchst eine Toilette in deiner Nähe?</h3>
+        <p>
+            Klicke auf "In der Nähe" und wc-info.org zeigt dir eine Liste der Toiletten in deiner näheren Umgebung an. Du musst ggf. die entsprechende Berechtigung in deinem Browser erteilen. Zusätzlich erhälst du auch eine Kartenansicht deiner Umgebung. Toiletten sind auf der Karte mit unserem violetten Logo gekennzeichnet. Das Logo zeigt dir auch auf einen Blick ob ein barrierefreies WC zur Verfügung steht.
+        </p>
+        <p>
+            Klicke oder tippe auf eine Toilette um mehr Informationen anzuzeigen. Mit dem <strong>Navigieren</strong> Button kannst du mithilfe einer Art Kompass oder deiner Karten-App direkt zur Toilette navigieren.
+        </p>
+
+        <h3>Du planst einen Ausflug und möchtest dich über Toilettenbegebenheiten vor Ort informieren?</h3>
+        <p>
+            Tippe in das Suchfeld eine Adresse oder den Namen des Reiseziels ein (z.B. <i>Zoo Dresden</i>). Wähle das richtige Ziel aus der Liste der Vorschläge aus. Anschließend wird dir eine Liste der Toiletten in der Umgebung des Reiseziels angezeigt. Zusätzlich erhälst du auch eine Kartenansicht der Umgebung. Toiletten sind auf der Karte mit unserem violetten Logo gekennzeichnet. Das Logo zeigt dir auch auf einen Blick ob ein barrierefreies WC zur Verfügung steht.
+        </p>
+        <p>
+            Klicke oder tippe auf eine Toilette um mehr Informationen anzuzeigen. Mit dem <strong>Navigieren</strong> Button kannst du mithilfe einer Art Kompass oder deiner Karten-App direkt zur Toilette navigieren.
+        </p>
+
+        <h3>Du hast eine Toilette gefunden, die noch nicht gelistet ist?</h3>
+        <p>
+            Wir wären dir super dankbar, wenn du diese Toilette hinzufügst!
+            Das geht einfach: Suche in der App den Ort der Toilette (Adresse oder Name des Ortes in das Suchfeld eingeben und das korrekte Ziel auswählen).
+            Wenn du gerade vor der Toilette stehst oder darauf sitzt kannst du dir wieder die Toiletten in der Nähe anzeigen.
+        </p>
+        <p>In der Liste klickst du auf die violette <strong>Toilette fehlt</strong> Fläche und beantwortest anschließend die Fragen. Natürlich füllst du nur aus was du kannst - jede Info hilft uns. Nachdem du ausgewählt hast ob es eine barrierefreie Toilette ist wird die Toilette bereits abgespeichert, und den Rest beantwortest du nur noch aus wenn du Lust und Zeit hast.</p>
+        <p>Alternativ kannst du in der Karte auf einen beliebigen Ort klicken und dort eine neue Toilette hinzufügen.</p>
+        <p>Die Toilette ist nach den Hinzufügen sofort sichtbar, wird aber im Nachhinein noch von uns geprüft und ggf. um Informationen erweitert.</p>
+
+        <h3>Eine Toilette ist nicht (mehr) da, geschlossen oder es stimmt etwas nicht?</h3>
+        <p>
+            Auch hier sind wir auf deine Hilfe angewiesen, da wir uns meist auf Angaben Anderer verlassen und nicht jede Toilette eigenhändig und ständig prüfen können.
+            <br />In den Details der Toilette klicke auf "Feedback" oder "Änderung vorschlagen". Du kannst uns einfach eine Nachricht zu dieser Toilette senden - z.B. wenn diese nicht mehr verfügbar ist. Oder du mit "Änderung vorschlagen" kannst du die Änderungen direkt selbst vornehmen. Deine Änderung ist direkt für Andere sichtbar, wir checken diese aber baldmöglichst nochmal.
+        </p>
+
+        <div class="text-2xl font-bold text-center p-2">
+            <i class="fa-solid fa-heart"></i>
+            Danke
+            <i class="fa-solid fa-heart"></i>
+        </div>
+
+    } @else {
+
+        <h2>Why?</h2>
+        <p>
+            wc-info.org wants to help finding a toilet nearby or at a travel target. Unlike other providers, we focus on the special needs of people with disabilities.
+            In addition, we offer further information (if available), e.g. whether the toilet is accessible with an <a (click)="onShowEuroKey()" href="javascript:void(0)">Euro-Key</a>, or whether there is a bareer free toilet at all..
+        </p>
+        <p>
+            Since this additional information is difficult to obtain or is available in different formats and locations, we rely on the assistance of our users; therefore, we try to make it as easy as possible,
+            to add additional toilets or information about already registered toilets. We are also open to suggestions for improvements and are happy to help with questions of any kind. Just send an e-mail to
+        </p>
+        <div class="text-2xl font-bold text-center p-2">
+            <i class="fa-regular fa-hand-point-right"></i>
+            hi{{"@"}}wc-info.org
+        </div>
+        <p>
+            - we will answer as quick as possible.
+        </p>
+
+        <h2>How?</h2>
+        <h3>Looking for a toilet near you?</h3>
+        <p>
+            Click on "Nearby" and wc-info.org shows you a list of toilets in your vicinity. You may have to grant permissions in your browser or your smartphone. In addition, you will also get a map view of your surroundings. Toilets are marked on the map with our purple logo. The logo also shows you at a glance whether a barrier-free toilet is available.
+        </p>
+        <p>
+            Click or tap on the toilet to show additional information. Via the <strong>Navigate</strong> button you are able to navigate to the toilet via a compass or your maps application.
+        </p>
+
+        <h3>You are planning a trip and want to know about toilet conditions on site?</h3>
+        <p>
+            Type an address or the name of the destination into the search field (e.g. <i>Zoo Dresden</i>). Select the correct destination from the list of suggestions. You will then be shown a list of toilets in the vicinity of the destination. In addition, you will also get a map view of the area. Toilets are marked on the map with our purple logo. The logo also shows you at a glance whether a barrier-free toilet is available.
+        </p>
+        <p>
+            Click or tap on the toilet to show additional information. Via the <strong>Navigate</strong> button you are able to navigate to the toilet via a compass or your maps application.
+        </p>
+
+        <h3>You have found a toilet that is not listed yet?</h3>
+        <p>
+            We would be super grateful if you add this toilet!
+            It's easy: search the location of the toilet in the app (enter the address or name of the place in the search box and select the correct destination).
+            If you are currently standing in front of the toilet, or even sitting on it you can again search for nearby toilets.
+        </p>
+        <p>In the list you click on the purple <strong>toilet missing</strong> area and then answer the questions. Of course, you only fill in what you can - any info helps us. After you answered whether there is a barreer free toilet, the toilet is already saved and you continue answering further questions only if you have time and mood.</p>
+        <p>Alternatively, you can click on any location in the map and add a new toilet there.</p>
+        <p>The toilet will be visible immediately after adding, but we will check it afterwards and add information if necessary.</p>
+
+        <h3>A toilet is not there (anymore), closed or something is wrong?</h3>
+        <p>
+            Here we also need you help - we mostly rely on someone elses information - as we can not check or observe each toilet by ourselfes.
+            <br />In the details of a toilet click on "Feedback" or "suggest changes". You can simply send us a message about a toilet - for example if it is not available anymode. Or with "suggest changes" you can fix it on your own. Your change is then immediately visible to others, but we will check them again as soon as possible.
+        </p>
+
+        <div class="text-2xl font-bold text-center p-2">
+            <i class="fa-solid fa-heart"></i>
+            Thank you
+            <i class="fa-solid fa-heart"></i>
+        </div>
+    }
+</div>
+
+
+@if(showEuroKey()) {
+    <app-euro-key-modal (onClose)="showEuroKey.set(false)"></app-euro-key-modal>
+}

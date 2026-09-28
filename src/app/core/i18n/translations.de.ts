@@ -32,6 +32,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'common.share': 'Teilen',
   'common.copied': 'Link in die Zwischenablage kopiert',
   'common.send_email': 'E-Mail senden',
+  'common.help': 'Hilfe',
 
   // Filters
   'filter.title': 'Filter',
@@ -295,5 +296,7 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   // Footer
   'footer.privacy': 'Datenschutz',
   'footer.disclaimer': 'Haftungsausschluss',
-  'footer.imprint': 'Impressum'
+  'footer.imprint': 'Impressum',
+
+  'helpModal.title': 'Hinweise zur Benutzung'
 };

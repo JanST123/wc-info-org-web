@@ -3,6 +3,7 @@ import { HomeComponent } from './features/home/home.component';
 import { ResultsComponent } from './features/results/results.component';
 import { UrgentNavigateComponent } from './features/urgent-navigate/urgent-navigate.component';
 import { LawComponent } from './features/law/law.component';
+import { HelpComponent } from './features/help/help.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'toilet', component: ResultsComponent },
   { path: 'results', component: ResultsComponent },
   { path: 'Urgent', component: UrgentNavigateComponent },
+  { path: 'Help', component: HelpComponent },
   {
     path: 'Law',
     component: LawComponent,
