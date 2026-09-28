@@ -289,5 +289,10 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'euroKeyModal.bullet1': 'the disability mark: aG, B, H, or BL',
   'euroKeyModal.bullet2': 'or the disability mark G and a degree of disability (GdB) of 70 and above is included.',
   'euroKeyModal.source': 'Source: {url}',
-  'euroKeyModal.orderButton': 'Information and ordering (from CBF Darmstadt)'
+  'euroKeyModal.orderButton': 'Information and ordering (from CBF Darmstadt)',
+
+  // Footer
+  'footer.privacy': 'Privacy',
+  'footer.disclaimer': 'Disclaimer',
+  'footer.imprint': 'Imprint'
 };

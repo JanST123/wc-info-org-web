@@ -1,2 +1,26 @@
-<router-outlet></router-outlet>
+
+<div class="relative h-screen h-dvh flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-100 overflow-hidden">
+
+    <!-- App Header -->
+    @if (showHeader()) {
+    <app-header class="relative z-20 shrink-0" />
+    }
+    
+
+    <router-outlet></router-outlet>
+
+    <!-- Footer -->
+     @if(showFooter()) {
+    <footer class="fixed bottom-0 w-full z-10 p-2 text-center text-xs bg-purple-900 text-purple-300/70 border-t border-white/10 flex items-center justify-between">
+        <div>
+            <a [routerLink]="['/Law', 'Privacy']" routerLinkActive="font-bold" class="underline">{{ 'footer.privacy' | translate }}</a>
+            <span class="mx-1">|</span>
+            <a [routerLink]="['/Law', 'Disclaimer']" routerLinkActive="font-bold" class="underline">{{ 'footer.disclaimer' | translate }}</a>
+            <span class="mx-1">|</span>
+            <a [routerLink]="['/Law', 'Imprint']" routerLinkActive="font-bold" class="underline">{{ 'footer.imprint' | translate }}</a>
+        </div>
+        <p>{{ funnyFooter() }}</p>
+    </footer>
+    }
+</div>
 <app-toast-container></app-toast-container>

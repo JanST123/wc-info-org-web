@@ -2,7 +2,6 @@ import { Component, ElementRef, OnInit, ViewChild, effect, inject, signal } from
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import * as exifr from 'exifr';
-import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FilterBannerComponent } from '../../shared/components/filter-banner/filter-banner.component';
 import { ToiletCardComponent } from '../../shared/components/toilet-card/toilet-card.component';
 import { MapComponent } from '../map/map.component';
@@ -27,7 +26,6 @@ import { parsePlaceSlug, parseToiletSlug, createToiletSlug, createPlaceSlug } fr
   imports: [
     CommonModule,
     RouterModule,
-    HeaderComponent,
     FilterBannerComponent,
     ToiletCardComponent,
     MapComponent,
@@ -276,7 +274,7 @@ export class ResultsComponent implements OnInit {
 
   onStartNavigation(toilet: Toilet): void {
     this.toiletState.setNavigationTarget(toilet);
-    this.router.navigate(['/urgent'], { queryParams: { toilet: toilet.id } });
+    this.router.navigate(['/Urgent'], { queryParams: { toilet: toilet.id } });
   }
 
   onOpenSuggestEdit(toilet: Toilet): void {

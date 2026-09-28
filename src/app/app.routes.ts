@@ -12,6 +12,9 @@ export const routes: Routes = [
   { path: 'Toilet/:placeSlug', component: ResultsComponent },
   { path: 'Toilet', component: ResultsComponent },
   { path: 'results', component: ResultsComponent },
-  { path: 'urgent', component: UrgentNavigateComponent },
+  { path: 'Urgent', component: UrgentNavigateComponent },
+  { path: 'Law/Privacy', loadComponent: () => import('./features/law/privacy/privacy.component').then(m => m.PrivacyComponent) },
+  { path: 'Law/Disclaimer', loadComponent: () => import('./features/law/disclaimer/disclaimer.component').then(m => m.DisclaimerComponent) },
+  { path: 'Law/Imprint', loadComponent: () => import('./features/law/imprint/imprint.component').then(m => m.ImprintComponent) },
   { path: '**', redirectTo: '' }
 ];

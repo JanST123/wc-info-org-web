@@ -289,5 +289,11 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'euroKeyModal.bullet1': 'das Merkzeichen: aG, B, H, oder BL',
   'euroKeyModal.bullet2': 'oder das Merkzeichen G und der GdB ab 70 und aufwärts enthalten ist.',
   'euroKeyModal.source': 'Quelle: {url}',
-  'euroKeyModal.orderButton': 'Informationen und Bestellung (bei CBF Darmstadt)'
+  'euroKeyModal.orderButton': 'Informationen und Bestellung (bei CBF Darmstadt)',
+
+
+  // Footer
+  'footer.privacy': 'Datenschutz',
+  'footer.disclaimer': 'Haftungsausschluss',
+  'footer.imprint': 'Impressum'
 };

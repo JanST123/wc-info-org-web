@@ -201,7 +201,7 @@ export class SeoService {
   setUrgentSeo(): void {
     const title = 'Notfall-Navigation - wc-info.org';
     const description = 'Schnellste Notfall-Navigation zur nächsten barrierefreien öffentlichen Toilette auf wc-info.org.';
-    const url = typeof window !== 'undefined' ? window.location.href : `${this.baseUrl}/urgent`;
+    const url = typeof window !== 'undefined' ? window.location.href : `${this.baseUrl}/Urgent`;
 
     this.updateSeo({
       title,

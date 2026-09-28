@@ -2,12 +2,9 @@ import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HeaderComponent } from '../../shared/components/header/header.component';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
-import { TranslationService } from '../../core/services/translation.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { PlacesService, PlaceSuggestion } from '../../core/services/places.service';
-import { LocationService } from '../../core/services/location.service';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { SeoService } from '../../core/services/seo.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
@@ -23,9 +20,8 @@ export interface RecentSearchItem {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe],
   template: `
-    <div class="relative min-h-screen flex flex-col bg-gray-900 text-white overflow-hidden">
       <!-- Background Image with Overlay -->
       <div class="absolute inset-0 z-0">
         <img
@@ -35,8 +31,7 @@ export interface RecentSearchItem {
         />
       </div>
 
-      <!-- App Header -->
-      <app-header class="relative z-20" />
+      
 
       <!-- Main Hero Content -->
       <main class="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-4xl mx-auto w-full text-center">
@@ -161,12 +156,10 @@ export interface RecentSearchItem {
           </button>
         </div>
       </main>
+     
 
-      <!-- Footer -->
-      <footer class="relative z-10 py-4 text-center text-xs text-purple-300/70 border-t border-white/10">
-        <p>{{ funnyFooter() }}</p>
-      </footer>
-    </div>
+
+  
   `
 })
 export class HomeComponent implements OnInit {
@@ -181,14 +174,7 @@ export class HomeComponent implements OnInit {
   readonly suggestions = signal<PlaceSuggestion[]>([]);
   readonly recentSearches = signal<RecentSearchItem[]>([]);
 
-  private funnyFooters = [
-    "Made of stardust 💫",
-    "Powered by coffee ☕",
-    "Made in Germany 🥔",
-    "Made with love ❤️",
-    "Toilets are our passion 🚽",
-  ];
-  funnyFooter = signal<string>(this.funnyFooters[Math.floor(Math.random() * this.funnyFooters.length)]);
+ 
 
   private readonly searchSubject = new Subject<string>();
 
@@ -196,9 +182,7 @@ export class HomeComponent implements OnInit {
     this.seoService.setHomeSeo();
     this.loadRecentSearches();
 
-    window.setInterval(() => {
-      this.funnyFooter.set(this.funnyFooters[Math.floor(Math.random() * this.funnyFooters.length)]);
-    }, 60000);
+
 
     this.searchSubject.pipe(
       debounceTime(300),
@@ -252,7 +236,7 @@ export class HomeComponent implements OnInit {
 
   openUrgent(): void {
     this.toiletState.setNavigationTarget(null);
-    this.router.navigate(['/urgent'], { queryParams: {} });
+    this.router.navigate(['/Urgent'], { queryParams: {} });
   }
 
   onSelectRecent(item: RecentSearchItem): void {
