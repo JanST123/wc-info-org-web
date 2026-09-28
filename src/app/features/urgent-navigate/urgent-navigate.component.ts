@@ -69,9 +69,16 @@ import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-
 
             <div class="flex items-start justify-between flex-col gap-2">
               <div>
-                <h3 class="text-lg font-extrabold text-white line-clamp-1">
-                  {{ targetToilet()!.name || ('app.title' | translate) }}
-                </h3>
+                @if(targetToilet()!.owner) {
+                  <h3 class="text-lg font-extrabold text-white line-clamp-1">
+                    {{ targetToilet()!.owner || ('app.title' | translate) }}
+                  </h3>
+                  <p>{{ targetToilet()!.name }}</p>
+                } @else {
+                  <h3 class="text-lg font-extrabold text-white line-clamp-1">
+                    {{ targetToilet()!.name || ('app.title' | translate) }}
+                  </h3>
+                }
                 @if (targetToilet()!.address) {
                   <p class="text-xs text-purple-200 truncate">{{ targetToilet()!.address }}</p>
                 }
@@ -251,7 +258,10 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.seoService.setUrgentSeo();
+    this.seoService.updateSeo({
+      title: 'Notfall-Navigation - wc-info.org',
+      description: 'Schnellste Notfall-Navigation zur nächsten barrierefreien öffentlichen Toilette.'
+    });
     this.route.queryParams.subscribe((params) => {
       const toiletId = params['toilet'] ? parseInt(params['toilet'], 10) : null;
       const targetFromState = this.toiletState.navigationTargetToilet();
