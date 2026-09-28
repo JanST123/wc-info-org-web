@@ -1,4 +1,4 @@
-<div class="absolute pt-[55px] top-0 h-screen w-screen h-dvh flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-100 overflow-hidden">
+<div class="absolute inset-x-0 top-0 pt-[55px] h-screen h-dvh w-full max-w-full flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-800 dark:text-gray-100 overflow-hidden">
 
       <!-- Main Responsive Shell -->
       <div class="flex-1 min-h-0 flex relative overflow-hidden">
@@ -42,10 +42,10 @@
         }
 
           <!-- Scrollable Restroom Cards List -->
-          <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+          <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain">
             @for (toilet of toilets(); track toilet.id; let idx = $index) {
                 @if(idx > 0) {
-                    <div class="w-[95vw] ml-2 h-1 border-t border-purple-200 dark:border-purple-800/60"></div>
+                    <div class="mx-3 border-t border-purple-200 dark:border-purple-800/60"></div>
                 }
               <app-toilet-card
                 [toilet]="toilet"
@@ -132,10 +132,10 @@
             }
 
             <!-- Scrollable Toilet Cards List (flex-1 min-h-0 overflow-y-auto) -->
-            <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+            <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain">
               @for (toilet of toilets(); track toilet.id; let idx = $index) {
                 @if(idx > 0) {
-                    <div class="w-[95vw] ml-2 h-1 border-t border-purple-200 dark:border-purple-800/60"></div>
+                    <div class="mx-3 border-t border-purple-200 dark:border-purple-800/60"></div>
                 }
                 <app-toilet-card
                   [toilet]="toilet"
