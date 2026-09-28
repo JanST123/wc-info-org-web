@@ -46,7 +46,7 @@ test.describe('Toilet Cards & Detail View Properties Display', () => {
 
     // Click on the first card and open detail view
     const firstCard = page.locator('aside app-toilet-card').first();
-    await firstCard.click();
+    await firstCard.locator('h3').click();
     await firstCard.locator('button:has-text("Details anzeigen")').click();
 
     const detailModal = page.locator('app-detail > div').first();

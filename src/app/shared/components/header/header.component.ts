@@ -7,6 +7,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { ToiletStateService } from '../../../core/services/toilet-state.service';
 import { LocationService } from '../../../core/services/location.service';
 import { HelpModalComponent } from '../../../features/help/help-modal/help-modal.component';
+import { MatomoService } from '../../../core/services/matomo.service';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,7 @@ export class HeaderComponent {
   private readonly toiletState = inject(ToiletStateService);
   private readonly locationService = inject(LocationService);
   private readonly router = inject(Router);
+  private readonly matomoService = inject(MatomoService);
 
   setLang(lang: 'de' | 'en'): void {
     this.translationService.setLanguage(lang);
@@ -31,10 +33,15 @@ export class HeaderComponent {
   }
 
   toggleHelp() {
-    this.helpModal.set(!this.helpModal());
+    const nextState = !this.helpModal();
+    this.helpModal.set(nextState);
+    if (nextState) {
+      this.matomoService.trackHelpUsed();
+    }
   }
 
   openUrgent(): void {
+    this.matomoService.trackUrgentUsed();
     this.toiletState.setNavigationTarget(null);
     this.router.navigate(['/Urgent'], { queryParams: {} });
   }

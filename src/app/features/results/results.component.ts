@@ -18,6 +18,7 @@ import { SeoService } from '../../core/services/seo.service';
 import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { parsePlaceSlug, parseToiletSlug, createToiletSlug, createPlaceSlug } from '../../core/utils/slug.utils';
+import { MatomoService } from '../../core/services/matomo.service';
 
 @Component({
   selector: 'app-results',
@@ -46,6 +47,7 @@ export class ResultsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly seoService = inject(SeoService);
+  private readonly matomoService = inject(MatomoService);
 
   readonly toilets = this.toiletState.enrichedToilets;
   readonly selectedToilet = this.toiletState.selectedToilet;
@@ -121,12 +123,14 @@ export class ResultsComponent implements OnInit {
         const lon = parseFloat(params['lon']);
         const name = params['name'] || undefined;
         if (!isNaN(lat) && !isNaN(lon)) {
+          this.matomoService.trackResultsOpened(name ? 'place' : 'nearby', name);
           this.toiletState.setSearchLocation({ lat, lon, name });
           this.toiletState.loadToiletsNearby(lat, lon, 10, name);
         }
       } else if (params['q']) {
         const query = (params['q'] as string).trim();
         if (query) {
+          this.matomoService.trackResultsOpened('place', query);
           this.placesService.searchAndResolveFirst(query)
             .then((result) => {
               this.toiletState.setSearchLocation({ lat: result.lat, lon: result.lon, name: result.name });
@@ -151,6 +155,7 @@ export class ResultsComponent implements OnInit {
     const parsed = parsePlaceSlug(placeSlug);
 
     if (parsed.type === 'nearby') {
+      this.matomoService.trackResultsOpened('nearby');
       this.locationService.getCurrentPosition()
         .then((coords) => {
           this.toiletState.setSearchLocation({ lat: coords.lat, lon: coords.lon, name: parsed.name });
@@ -164,6 +169,7 @@ export class ResultsComponent implements OnInit {
     }
 
     if (parsed.type === 'place_id' && parsed.placeId) {
+      this.matomoService.trackResultsOpened('place', parsed.name);
       this.placesService.getPlaceDetailsByPlaceId(parsed.placeId, parsed.rawName)
         .then((coords) => {
           const resolvedName = coords.name || parsed.name;
@@ -189,6 +195,7 @@ export class ResultsComponent implements OnInit {
     }
 
     if (parsed.type === 'query') {
+      this.matomoService.trackResultsOpened('place', parsed.name);
       this.placesService.searchAndResolveFirst(parsed.name)
         .then((coords) => {
           const resolvedName = coords.name || parsed.name;
@@ -229,6 +236,7 @@ export class ResultsComponent implements OnInit {
   private loadAndOpenToiletDetail(id: number): void {
     const existing = this.toilets().find((t) => t.id === id);
     if (existing) {
+      this.matomoService.trackDetailOpened(existing.id, 'direct', existing.name || existing.owner);
       this.activeDetailToilet.set(existing);
       this.toiletState.setSelectedToilet(existing);
       return;
@@ -237,6 +245,7 @@ export class ResultsComponent implements OnInit {
     this.api.fetchToiletById(id).subscribe({
       next: (toilet) => {
         if (toilet) {
+          this.matomoService.trackDetailOpened(toilet.id, 'direct', toilet.name || toilet.owner);
           this.toiletState.addToiletToState(toilet);
           this.activeDetailToilet.set(toilet);
           this.toiletState.setSelectedToilet(toilet);
@@ -256,7 +265,8 @@ export class ResultsComponent implements OnInit {
     this.toiletState.setSelectedToilet(toilet);
   }
 
-  onOpenDetails(toilet: Toilet): void {
+  onOpenDetails(toilet: Toilet, source: 'card' | 'map' | 'direct' = 'card'): void {
+    this.matomoService.trackDetailOpened(toilet.id, source, toilet.name || toilet.owner);
     this.activeDetailToilet.set(toilet);
     this.toiletState.setSelectedToilet(toilet);
     const placeSlug = this.currentPlaceSlug() || 'Aktueller-Standort---NEARBY';
@@ -271,6 +281,7 @@ export class ResultsComponent implements OnInit {
   }
 
   onStartNavigation(toilet: Toilet): void {
+    this.matomoService.trackUrgentUsed(toilet.id, toilet.name || toilet.owner);
     this.toiletState.setNavigationTarget(toilet);
     this.router.navigate(['/Urgent'], { queryParams: { toilet: toilet.id } });
   }

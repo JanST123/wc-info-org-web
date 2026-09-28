@@ -51,7 +51,7 @@
                 [toilet]="toilet"
                 [isSelected]="selectedToilet()?.id === toilet.id"
                 (onSelect)="onSelectToilet($event)"
-                (onOpenDetails)="onOpenDetails($event)"
+                (onOpenDetails)="onOpenDetails($event, 'card')"
                 (onNavigate)="onStartNavigation($event)"
                 (onOpenPhoto)="onOpenPhoto($event, toilet)"
               />
@@ -80,7 +80,7 @@
             [userLocation]="userLocation()"
             (boundsChange)="onBoundsChange($event)"
             (toiletSelect)="onSelectToilet($event)"
-            (openDetails)="onOpenDetails($event)"
+            (openDetails)="onOpenDetails($event, 'map')"
             (mapCreate)="onMapCreate($event)"
           />
         </main>
@@ -141,7 +141,7 @@
                   [toilet]="toilet"
                   [isSelected]="selectedToilet()?.id === toilet.id"
                   (onSelect)="onSelectToilet($event)"
-                  (onOpenDetails)="onOpenDetails($event)"
+                  (onOpenDetails)="onOpenDetails($event, 'card')"
                   (onNavigate)="onStartNavigation($event)"
                   (onOpenPhoto)="onOpenPhoto($event, toilet)"
                 />
@@ -178,7 +178,7 @@
               [userLocation]="userLocation()"
               (boundsChange)="onBoundsChange($event)"
               (toiletSelect)="onSelectToilet($event)"
-              (openDetails)="onOpenDetails($event)"
+              (openDetails)="onOpenDetails($event, 'map')"
               (mapCreate)="onMapCreate($event)"
             />
           </div>

@@ -1,6 +1,7 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { TRANSLATIONS_DE } from '../i18n/translations.de';
 import { TRANSLATIONS_EN } from '../i18n/translations.en';
+import { MatomoService } from './matomo.service';
 
 export type SupportedLanguage = 'de' | 'en';
 
@@ -9,6 +10,7 @@ export type SupportedLanguage = 'de' | 'en';
 })
 export class TranslationService {
   private readonly STORAGE_KEY = 'wc_info_lang';
+  private readonly matomoService = inject(MatomoService);
   
   // Dynamic signal for active language
   readonly currentLang = signal<SupportedLanguage>(this.detectInitialLanguage());
@@ -20,7 +22,9 @@ export class TranslationService {
   };
 
   constructor() {
-    this.updateHtmlLang(this.currentLang());
+    const lang = this.currentLang();
+    this.updateHtmlLang(lang);
+    this.matomoService.trackLanguageSwitched(lang);
   }
 
   private updateHtmlLang(lang: string): void {
@@ -62,6 +66,7 @@ export class TranslationService {
     } catch {
       // Ignore localStorage errors
     }
+    this.matomoService.trackLanguageSwitched(lang);
   }
 
   toggleLanguage(): void {

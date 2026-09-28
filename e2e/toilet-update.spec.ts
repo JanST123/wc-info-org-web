@@ -28,7 +28,7 @@ test.describe('Toilet Update Modal API & Payload Conformance', () => {
 
     // Click on the first toilet card in desktop sidebar to select it and click "Details anzeigen"
     const firstCard = page.locator('aside app-toilet-card').first();
-    await firstCard.click();
+    await firstCard.locator('h3').click();
 
     const viewDetailsBtn = firstCard.locator('button:has-text("Details anzeigen")');
     await viewDetailsBtn.click();

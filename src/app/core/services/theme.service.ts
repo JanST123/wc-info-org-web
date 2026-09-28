@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { MatomoService } from './matomo.service';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -7,6 +8,7 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 })
 export class ThemeService {
   private readonly STORAGE_KEY = 'wc_info_theme';
+  private readonly matomoService = inject(MatomoService);
 
   readonly themeMode = signal<ThemeMode>('system');
   readonly isDark = signal<boolean>(false);
@@ -59,14 +61,19 @@ export class ThemeService {
       // ignore storage write errors
     }
 
+    let isDark = false;
     if (mode === 'system') {
       const systemPrefersDark = typeof window !== 'undefined'
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : false;
+      isDark = systemPrefersDark;
       this.applyThemeClass(systemPrefersDark);
     } else {
-      this.applyThemeClass(mode === 'dark');
+      isDark = mode === 'dark';
+      this.applyThemeClass(isDark);
     }
+
+    this.matomoService.trackDarkModeToggled(isDark);
   }
 
   toggleTheme(): void {

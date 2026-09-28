@@ -10,6 +10,7 @@ import { SeoService } from '../../core/services/seo.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { createPlaceSlug } from '../../core/utils/slug.utils';
+import { MatomoService } from '../../core/services/matomo.service';
 
 export interface RecentSearchItem {
   name: string;
@@ -168,6 +169,7 @@ export class HomeComponent implements OnInit {
   private readonly placesService = inject(PlacesService);
   private readonly toiletState = inject(ToiletStateService);
   readonly router = inject(Router);
+  private readonly matomoService = inject(MatomoService);
 
   searchQuery = '';
   readonly isFocused = signal<boolean>(false);
@@ -235,6 +237,7 @@ export class HomeComponent implements OnInit {
   }
 
   openUrgent(): void {
+    this.matomoService.trackUrgentUsed();
     this.toiletState.setNavigationTarget(null);
     this.router.navigate(['/Urgent'], { queryParams: {} });
   }

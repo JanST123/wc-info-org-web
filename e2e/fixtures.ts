@@ -135,6 +135,15 @@ export async function setupApiMocks(page: Page, customToilets: any[] = MOCK_TOIL
     });
   });
 
+  // Mock Matomo analytics requests
+  await page.route('**/piwik.jan8.de/**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: 'window._paq = window._paq || [];'
+    });
+  });
+
   // Mock Google Maps / Places JS API loader to avoid network failures
   await page.route('https://maps.googleapis.com/**', async (route) => {
     const reqUrl = route.request().url();
@@ -152,6 +161,15 @@ export async function setupApiMocks(page: Page, customToilets: any[] = MOCK_TOIL
       body: `
         window.google = window.google || {};
         window.google.maps = window.google.maps || {
+          MapTypeId: { ROADMAP: 'roadmap', SATELLITE: 'satellite', HYBRID: 'hybrid', TERRAIN: 'terrain' },
+          Animation: { DROP: 1, BOUNCE: 2 },
+          ControlPosition: {
+            TOP_LEFT: 1, TOP_CENTER: 2, TOP_RIGHT: 3,
+            LEFT_TOP: 4, LEFT_CENTER: 5, LEFT_BOTTOM: 6,
+            RIGHT_TOP: 7, RIGHT_CENTER: 8, RIGHT_BOTTOM: 9,
+            BOTTOM_LEFT: 10, BOTTOM_CENTER: 11, BOTTOM_RIGHT: 12
+          },
+          LatLng: function(lat, lng) { return { lat: () => lat, lng: () => lng }; },
           importLibrary: function(lib) {
             if (lib === 'places') {
               return Promise.resolve({
@@ -163,10 +181,24 @@ export async function setupApiMocks(page: Page, customToilets: any[] = MOCK_TOIL
             }
             return Promise.resolve({});
           },
+          InfoWindow: function() {
+            return {
+              setContent: function() {},
+              setOptions: function() {},
+              getPosition: function() { return null; },
+              open: function() {},
+              close: function() {},
+              setPosition: function() {},
+              addListener: function() {}
+            };
+          },
           Map: function() {
             return {
+              controls: Array.from({ length: 15 }, () => ({ push: () => {} })),
               setCenter: function() {},
+              panTo: function() {},
               setZoom: function() {},
+              setOptions: function() {},
               addListener: function() {},
               getBounds: function() { return null; }
             };
@@ -174,7 +206,11 @@ export async function setupApiMocks(page: Page, customToilets: any[] = MOCK_TOIL
           Marker: function() {
             return {
               setMap: function() {},
-              setPosition: function() {}
+              setPosition: function() {},
+              addListener: function() {},
+              setIcon: function() {},
+              setVisible: function() {},
+              getTitle: function() { return ''; }
             };
           },
           Geocoder: function() {

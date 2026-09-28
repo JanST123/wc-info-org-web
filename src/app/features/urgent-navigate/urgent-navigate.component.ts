@@ -10,6 +10,7 @@ import { Toilet } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
 import { OpeningTimeBadgeComponent } from '../../shared/components/opening-time-badge/opening-time-badge.component';
+import { MatomoService } from '../../core/services/matomo.service';
 
 @Component({
   selector: 'app-urgent-navigate',
@@ -208,6 +209,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   private readonly translationService = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly matomoService = inject(MatomoService);
 
   readonly isLoading = signal<boolean>(true);
   readonly statusMessage = signal<string>('');
@@ -283,6 +285,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   }
 
   startDirectNavigation(toilet: Toilet): void {
+    this.matomoService.trackUrgentUsed(toilet.id, toilet.name || toilet.owner);
     this.isEmergency.set(false);
     this.isFallback.set(false);
     this.targetToilet.set(toilet);
@@ -317,6 +320,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   }
 
   startEmergencySearch(): void {
+    this.matomoService.trackUrgentUsed();
     this.isLoading.set(true);
     this.statusMessage.set(this.translationService.t('urgent.locating'));
 
