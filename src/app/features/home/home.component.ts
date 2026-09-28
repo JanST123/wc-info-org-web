@@ -62,7 +62,7 @@ export interface RecentSearchItem {
                 (ngModelChange)="onSearchInput($event)"
                 (focus)="isFocused.set(true)"
                 [placeholder]="'common.searchPlaceholder' | translate"
-                class="w-full pl-8 pr-4 py-3.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-sm md:text-base font-medium shadow-inner focus:outline-hidden focus:ring-2 focus:ring-purple-500 border border-transparent dark:border-gray-700"
+                class="w-full pl-8 pr-4 py-3.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-xl text-base font-medium shadow-inner focus:outline-hidden focus:ring-2 focus:ring-purple-500 border border-transparent dark:border-gray-700"
               />
 
               @if (searchQuery) {
