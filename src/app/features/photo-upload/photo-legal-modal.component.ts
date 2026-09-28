@@ -52,7 +52,7 @@ import * as exifr from 'exifr';
           <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">
             {{ 'photo.legalFooter' | translate }}
             <a
-              href="https://wc-info.de/Law/Privacy"
+              href="https://wc-info.org/Law/Privacy"
               target="_blank"
               rel="noopener noreferrer"
               class="text-purple-600 dark:text-purple-400 font-semibold hover:underline inline-flex items-center gap-0.5"
