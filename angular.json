@@ -65,7 +65,7 @@
                   "inlineCritical": true,
                   "removeSpecialComments": false
                 },
-                "fonts": true
+                "fonts": false
               },
               "budgets": [
                 {
