@@ -205,6 +205,7 @@
       @if (toiletState.isCreateWizardOpen()) {
         <app-create-wizard
           [initialCoords]="toiletState.createInitialCoords()"
+          [explicitCoords]="toiletState.createExplicitCoords()"
           (onCancel)="toiletState.closeCreateWizard()"
           (onCreated)="onToiletCreated($event)"
         />
