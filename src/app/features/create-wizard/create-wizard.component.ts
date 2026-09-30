@@ -367,8 +367,11 @@ export class CreateWizardComponent implements OnInit {
     this.selectedPlaceNoChoice.set(false);
 
     if (place.lat !== undefined && place.lon !== undefined) {
-      this.lat.set(place.lat);
-      this.lon.set(place.lon);
+      // for explicit initial coords do not overwrite with place coords
+      if (!this.explicitCoords) {
+        this.lat.set(place.lat);
+        this.lon.set(place.lon);
+      }
     }
 
     if (place.formattedAddress) {
