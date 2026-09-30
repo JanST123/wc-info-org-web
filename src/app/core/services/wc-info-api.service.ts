@@ -54,6 +54,17 @@ export class WcInfoApiService {
     );
   }
 
+  fetchNearestPlaces(lat: number, lon: number, limit = 3, radius?: number): Observable<{ status: string; places: any[] }> {
+    let params = new HttpParams();
+    if (limit !== undefined) {
+      params = params.set('limit', limit.toString());
+    }
+    if (radius !== undefined) {
+      params = params.set('radius', radius.toString());
+    }
+    return this.http.get<{ status: string; places: any[] }>(`${this.baseUrl}/places/nearest/${lat}/${lon}`, { params });
+  }
+
   private toSnakeCasePayload(payload: any): any {
     if (!payload || typeof payload !== 'object') return payload;
     const result: any = {};

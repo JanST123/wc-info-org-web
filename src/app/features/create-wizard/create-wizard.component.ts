@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 import { Coordinates, LocationService } from '../../core/services/location.service';
 import {
   AddToiletPayload,
@@ -235,90 +236,130 @@ export class CreateWizardComponent implements OnInit {
     this.loadingNearbyPlaces.set(true);
 
     try {
-      await this.mapsLoader.load();
+      const response = await firstValueFrom(
+        this.api.fetchNearestPlaces(this.lat(), this.lon(), 3)
+      );
 
-      if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
-        const center = new (window as any).google.maps.LatLng(this.lat(), this.lon());
+      const places = response?.places;
+      if (Array.isArray(places) && places.length > 0) {
+        const mapped: NearbyPlaceOption[] = places.slice(0, 3).map((r: any) => {
+          let placeLat: number | undefined = undefined;
+          if (typeof r.lat === 'number') {
+            placeLat = r.lat;
+          } else if (typeof r.lat === 'string' && !isNaN(parseFloat(r.lat))) {
+            placeLat = parseFloat(r.lat);
+          } else if (typeof r.location?.latitude === 'number') {
+            placeLat = r.location.latitude;
+          } else if (typeof r.location?.lat === 'number') {
+            placeLat = r.location.lat;
+          } else if (typeof r.location?.lat === 'function') {
+            placeLat = r.location.lat();
+          } else if (typeof r.geometry?.location?.lat === 'number') {
+            placeLat = r.geometry.location.lat;
+          } else if (typeof r.geometry?.location?.lat === 'function') {
+            placeLat = r.geometry.location.lat();
+          }
 
+          let placeLon: number | undefined = undefined;
+          if (typeof r.lon === 'number') {
+            placeLon = r.lon;
+          } else if (typeof r.lng === 'number') {
+            placeLon = r.lng;
+          } else if (typeof r.lon === 'string' && !isNaN(parseFloat(r.lon))) {
+            placeLon = parseFloat(r.lon);
+          } else if (typeof r.lng === 'string' && !isNaN(parseFloat(r.lng))) {
+            placeLon = parseFloat(r.lng);
+          } else if (typeof r.location?.longitude === 'number') {
+            placeLon = r.location.longitude;
+          } else if (typeof r.location?.lng === 'number') {
+            placeLon = r.location.lng;
+          } else if (typeof r.location?.lng === 'function') {
+            placeLon = r.location.lng();
+          } else if (typeof r.geometry?.location?.lng === 'number') {
+            placeLon = r.geometry.location.lng;
+          } else if (typeof r.geometry?.location?.lng === 'function') {
+            placeLon = r.geometry.location.lng();
+          }
 
+          let dist: number | undefined = undefined;
+          if (typeof r.distanceMeters === 'number') {
+            dist = Math.round(r.distanceMeters);
+          } else if (typeof r.distance_m === 'number') {
+            dist = Math.round(r.distance_m);
+          } else if (typeof r.distance_m === 'string' && !isNaN(parseFloat(r.distance_m))) {
+            dist = Math.round(parseFloat(r.distance_m));
+          } else if (placeLat !== undefined && placeLon !== undefined) {
+            dist = Math.round(
+              this.locationService.calculateDistance(this.lat(), this.lon(), placeLat, placeLon)
+            );
+          }
 
-        const [
-            { Place, SearchNearbyRankPreference },
-        ] = await Promise.all([
-            google.maps.importLibrary('places'),
-        ]);
+          const rawPeriods =
+            r.regularOpeningHours?.periods ||
+            r.regular_opening_hours?.periods ||
+            r.openingHours?.periods ||
+            r.opening_hours?.periods ||
+            r.place_opening_hours ||
+            r.periods;
 
-        const request = {
-            // required parameters
-            fields: [
-                'displayName',
-                'location',
-                'formattedAddress',
-                'regularOpeningHours',
-            ],
-            locationRestriction: {
-                center,
-                radius: 100,
-            },
-            // optional parameters
-            maxResultCount: 3,
-            rankPreference: SearchNearbyRankPreference.DISTANCE,
-        };
-
-        const { places } = await Place.searchNearby(request);
-
-     
-        this.loadingNearbyPlaces.set(false);
-        if (places && places.length > 0) {
-          const mapped = places
-            .slice(0, 3)
-            .map((r) => {
-              r.location?.lat
-              const placeLat = r.location?.lat?.() ?? this.lat();
-              const placeLng = r.location?.lng?.() ?? this.lon();
-              const dist = Math.round(
-                this.locationService.calculateDistance(this.lat(), this.lon(), placeLat, placeLng)
-              );
+          let openingHours: GooglePlacesPeriod[] | undefined = undefined;
+          if (Array.isArray(rawPeriods) && rawPeriods.length > 0) {
+            openingHours = rawPeriods.map((p: any) => {
+              const parsePoint = (pt: any) => {
+                if (!pt) return { day: 0, hour: 0, minute: 0 };
+                const day = pt.day ?? 0;
+                const hour =
+                  pt.hour ??
+                  pt.hours ??
+                  (typeof pt.time === 'string' ? parseInt(pt.time.slice(0, 2), 10) : 0);
+                const minute =
+                  pt.minute ??
+                  pt.minutes ??
+                  (typeof pt.time === 'string' ? parseInt(pt.time.slice(2, 4), 10) : 0);
+                return { day, hour, minute };
+              };
 
               return {
-                placeId: r.id,
-                name: r.displayName ?? '',
-                vicinity: r.formattedAddress ?? '',
-                distanceMeters: dist,
-                lat: placeLat,
-                lon: placeLng,
-                openingHours: r.regularOpeningHours?.periods?.map((p) => ({
-                  open: {
-                    day: p.open?.day ?? 0,
-                    hour: p.open?.hour ?? 0,
-                    minute: p.open?.minute ?? 0
-                  },
-                  close: p.close
-                    ? {
-                        day: p.close?.day ?? 0,
-                        hour: p.close?.hour ?? 0,
-                        minute: p.close?.minute ?? 0
-                      }
-                    : null
-                })) || undefined
+                open: parsePoint(p.open),
+                close: p.close ? parsePoint(p.close) : null
               };
             });
+          }
 
-          this.nearbyPlaces.set(mapped);
-        } else {
-          this.nearbyPlaces.set([]);
-        }
-        return;
-            
-        
+          const name =
+            typeof r.displayName === 'string'
+              ? r.displayName
+              : typeof r.displayName?.text === 'string'
+              ? r.displayName.text
+              : typeof r.name === 'string'
+              ? r.name
+              : '';
+
+          const formattedAddress =
+            r.formattedAddress || r.formatted_address || r.address || r.vicinity || '';
+
+          return {
+            placeId: r.place_id || r.placeId || r.id || '',
+            name,
+            vicinity: r.vicinity || formattedAddress,
+            formattedAddress: formattedAddress || undefined,
+            distanceMeters: dist,
+            lat: placeLat,
+            lon: placeLon,
+            openingHours
+          };
+        });
+
+        this.nearbyPlaces.set(mapped);
+      } else {
+        this.nearbyPlaces.set([]);
       }
-    } catch(e) {
-      console.error('Error loading Google Maps Places API', e);
-      // Fallback
+    } catch (e) {
+      console.error('Error loading nearest places from API', e);
+      this.nearbyPlaces.set([]);
+    } finally {
+      this.loadingNearbyPlaces.set(false);
     }
-
-    this.loadingNearbyPlaces.set(false);
-    this.nearbyPlaces.set([]);
   }
 
   selectPlace(place: NearbyPlaceOption): void {
@@ -330,50 +371,10 @@ export class CreateWizardComponent implements OnInit {
       this.lon.set(place.lon);
     }
 
-    // Fetch place details for address & opening hours if Google Places is available
-    if (typeof window !== 'undefined' && (window as any).google?.maps?.places && place.placeId) {
-      try {
-        const dummyDiv = document.createElement('div');
-        const service = new (window as any).google.maps.places.PlacesService(dummyDiv);
-        service.getDetails(
-          {
-            placeId: place.placeId,
-            fields: ['name', 'formatted_address', 'opening_hours', 'geometry']
-          },
-          (detail: any, status: any) => {
-            if (status === 'OK' && detail) {
-              const periods: GooglePlacesPeriod[] | undefined = detail.opening_hours?.periods?.map((p: any) => ({
-                open: {
-                  day: p.open?.day ?? 0,
-                  hour: p.open?.hours ?? p.open?.hour ?? 0,
-                  minute: p.open?.minutes ?? p.open?.minute ?? 0
-                },
-                close: p.close
-                  ? {
-                      day: p.close?.day ?? 0,
-                      hour: p.close?.hours ?? p.close?.hour ?? 0,
-                      minute: p.close?.minutes ?? p.close?.minute ?? 0
-                    }
-                  : null
-              }));
-
-              this.selectedPlace.set({
-                ...place,
-                formattedAddress: detail.formatted_address || place.vicinity,
-                openingHours: periods,
-                lat: detail.geometry?.location?.lat?.() ?? place.lat,
-                lon: detail.geometry?.location?.lng?.() ?? place.lon
-              });
-
-              if (detail.formatted_address) {
-                this.address = detail.formatted_address;
-              }
-            }
-          }
-        );
-      } catch {
-        // Ignore details fetch errors
-      }
+    if (place.formattedAddress) {
+      this.address = place.formattedAddress;
+    } else if (place.vicinity) {
+      this.address = place.vicinity;
     }
 
     this.advanceToNextStep();
