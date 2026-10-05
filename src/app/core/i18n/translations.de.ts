@@ -2,6 +2,9 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   // General & Navigation
   'app.title': 'WC-Info',
   'app.subtitle': 'Finde Toiletten in deiner Nähe.',
+  'app.downloadOn': 'Auch als App verfügbar',
+  'app.appStoreSub': 'Laden im',
+  'app.googlePlaySub': 'Jetzt bei',
   'nav.home': 'Start',
   'nav.search': 'Suchen',
   'nav.nearby': 'In der Nähe',

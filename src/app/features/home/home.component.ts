@@ -156,6 +156,46 @@ export interface RecentSearchItem {
             <span>{{ 'urgent.title' | translate }}</span>
           </button>
         </div>
+
+        <!-- App Store & Google Play Badges -->
+        <div class="mt-8 relative z-10 flex flex-col items-center gap-2.5">
+          <p class="text-xs sm:text-sm text-purple-200/80 font-medium">
+            {{ 'app.downloadOn' | translate }}
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <!-- Apple App Store Badge -->
+            <a
+              href="https://apps.apple.com/de/app/wc-info/id6471011164"
+              target="_blank"
+              rel="noopener noreferrer"
+              (click)="trackAppClick('ios')"
+              class="inline-flex items-center gap-2.5 px-4 py-2 bg-black/70 hover:bg-black/90 text-white rounded-xl border border-white/20 shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95 text-left group cursor-pointer"
+              aria-label="Laden im App Store"
+            >
+              <i aria-hidden="true" class="fa-brands fa-apple text-2xl text-white"></i>
+              <div class="flex flex-col leading-tight">
+                <span class="text-[10px] text-gray-300 uppercase tracking-wider font-normal">{{ 'app.appStoreSub' | translate }}</span>
+                <span class="text-xs sm:text-sm font-semibold text-white tracking-tight">App Store</span>
+              </div>
+            </a>
+
+            <!-- Google Play Badge -->
+            <a
+              href="https://play.google.com/store/apps/details?id=de.wcinfo.app&hl=de"
+              target="_blank"
+              rel="noopener noreferrer"
+              (click)="trackAppClick('android')"
+              class="inline-flex items-center gap-2.5 px-4 py-2 bg-black/70 hover:bg-black/90 text-white rounded-xl border border-white/20 shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95 text-left group cursor-pointer"
+              aria-label="Jetzt bei Google Play"
+            >
+              <i aria-hidden="true" class="fa-brands fa-google-play text-xl text-emerald-400"></i>
+              <div class="flex flex-col leading-tight">
+                <span class="text-[10px] text-gray-300 uppercase tracking-wider font-normal">{{ 'app.googlePlaySub' | translate }}</span>
+                <span class="text-xs sm:text-sm font-semibold text-white tracking-tight">Google Play</span>
+              </div>
+            </a>
+          </div>
+        </div>
       </main>
      
 
@@ -175,6 +215,13 @@ export class HomeComponent implements OnInit {
   readonly isFocused = signal<boolean>(false);
   readonly suggestions = signal<PlaceSuggestion[]>([]);
   readonly recentSearches = signal<RecentSearchItem[]>([]);
+
+  trackAppClick(platform: 'ios' | 'android'): void {
+    const targetUrl = platform === 'ios'
+      ? 'https://apps.apple.com/de/app/wc-info/id6471011164'
+      : 'https://play.google.com/store/apps/details?id=de.wcinfo.app&hl=de';
+    this.matomoService.trackEvent('App Download', `Click ${platform === 'ios' ? 'iOS' : 'Android'} Badge`, targetUrl);
+  }
 
  
 

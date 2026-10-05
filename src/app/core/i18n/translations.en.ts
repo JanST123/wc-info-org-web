@@ -2,6 +2,9 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   // General & Navigation
   'app.title': 'WC-Info',
   'app.subtitle': 'Find toilets near you.',
+  'app.downloadOn': 'Also available as mobile app',
+  'app.appStoreSub': 'Download on the',
+  'app.googlePlaySub': 'Get it on',
   'nav.home': 'Home',
   'nav.search': 'Search',
   'nav.nearby': 'Nearby',
