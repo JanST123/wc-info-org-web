@@ -50,7 +50,7 @@
               <app-toilet-card
                 [toilet]="toilet"
                 [isSelected]="selectedToilet()?.id === toilet.id"
-                (onSelect)="onSelectToilet($event)"
+                (onSelect)="onSelectToilet($event, true)"
                 (onOpenDetails)="onOpenDetails($event, 'card')"
                 (onNavigate)="onStartNavigation($event)"
                 (onOpenPhoto)="onOpenPhoto($event, toilet)"
@@ -141,7 +141,7 @@
                 <app-toilet-card
                   [toilet]="toilet"
                   [isSelected]="selectedToilet()?.id === toilet.id"
-                  (onSelect)="onSelectToilet($event)"
+                  (onSelect)="onSelectToilet($event, true)"
                   (onOpenDetails)="onOpenDetails($event, 'card')"
                   (onNavigate)="onStartNavigation($event)"
                   (onOpenPhoto)="onOpenPhoto($event, toilet)"

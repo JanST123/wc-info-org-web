@@ -262,8 +262,11 @@ export class ResultsComponent implements OnInit {
     this.toiletState.loadToiletsInBounds(bounds.south, bounds.west, bounds.north, bounds.east);
   }
 
-  onSelectToilet(toilet: Toilet | null): void {
+  onSelectToilet(toilet: Toilet | null, centerMap = false): void {
     this.toiletState.setSelectedToilet(toilet);
+    if (centerMap && toilet) {
+      this.toiletState.mapCenter.set({ lat: toilet.lat, lon: toilet.lon });
+    }
   }
 
   onOpenDetails(toilet: Toilet, source: 'card' | 'map' | 'direct' = 'card'): void {
