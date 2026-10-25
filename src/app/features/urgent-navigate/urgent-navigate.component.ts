@@ -260,10 +260,6 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.seoService.updateSeo({
-      title: 'Notfall-Navigation - wc-info.org',
-      description: 'Schnellste Notfall-Navigation zur nächsten barrierefreien öffentlichen Toilette.'
-    });
     this.route.queryParams.subscribe((params) => {
       const toiletId = params['toilet'] ? parseInt(params['toilet'], 10) : null;
       const targetFromState = this.toiletState.navigationTargetToilet();
@@ -275,7 +271,25 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
         if (found) {
           this.startDirectNavigation(found);
         } else {
-          this.startEmergencySearch();
+          this.isEmergency.set(false);
+          this.isFallback.set(false);
+          this.isLoading.set(true);
+          this.statusMessage.set(this.translationService.t('urgent.locating'));
+          this.seoService.updateSeo({
+            title: `${this.translationService.t('detail.navigate')} - wc-info.org`
+          });
+          this.api.fetchToiletById(toiletId).subscribe({
+            next: (toilet) => {
+              if (toilet) {
+                this.startDirectNavigation(toilet);
+              } else {
+                this.startEmergencySearch();
+              }
+            },
+            error: () => {
+              this.startEmergencySearch();
+            }
+          });
         }
       } else {
         this.startEmergencySearch();
@@ -291,6 +305,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
     this.targetToilet.set(toilet);
     this.isLoading.set(true);
     this.statusMessage.set(this.translationService.t('urgent.locating'));
+    this.seoService.setToiletSeo(toilet);
 
     this.locationService.getCurrentPosition()
       .then((coords) => {
@@ -320,6 +335,8 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   }
 
   startEmergencySearch(): void {
+    this.isEmergency.set(true);
+    this.seoService.setUrgentSeo();
     this.matomoService.trackUrgentUsed();
     this.isLoading.set(true);
     this.statusMessage.set(this.translationService.t('urgent.locating'));
