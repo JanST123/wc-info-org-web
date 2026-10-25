@@ -181,6 +181,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() center: Coordinates = { lat: 52.520008, lon: 13.404954 };
   @Input() zoom = 14;
   @Input() userLocation: Coordinates | null = null;
+  @Input() searchLocation: { lat: number; lon: number; name?: string } | null = null;
 
   @Output() boundsChange = new EventEmitter<{ south: number; west: number; north: number; east: number }>();
   @Output() toiletSelect = new EventEmitter<Toilet | null>();
@@ -194,6 +195,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private infoWindow?: any;
   private markersMap = new Map<number, google.maps.marker.AdvancedMarkerElement>();
   private userMarker?: google.maps.marker.AdvancedMarkerElement;
+  private searchPlaceMarker?: google.maps.marker.AdvancedMarkerElement;
   private idleListener?: google.maps.MapsEventListener;
   private zoomListener?: google.maps.MapsEventListener;
   private dragStartListener?: google.maps.MapsEventListener;
@@ -234,6 +236,10 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
     if (changes['userLocation'] && this.userLocation) {
       this.updateUserMarker();
+    }
+
+    if (changes['searchLocation']) {
+      this.updateSearchPlaceMarker();
     }
 
     if (changes['center'] && !changes['center'].firstChange && this.center) {
@@ -300,6 +306,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         zoom,
         mapTypeId,
         mapId: environment.googleMapsMapId || 'DEMO_MAP_ID',
+        internalUsageAttributionIds: ['gmp_git_agentskills_v1'],
         disableDefaultUI: true,
         zoomControl: true,
         zoomControlOptions: {
@@ -308,7 +315,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         gestureHandling: 'greedy',
         styles: isDark ? DARK_MAP_STYLE : null,
         ...(colorScheme ? { colorScheme: isDark ? colorScheme.DARK : colorScheme.LIGHT } : {})
-      };
+      } as google.maps.MapOptions;
 
       this.googleMap = new g.maps.Map(this.mapContainerElement.nativeElement, mapOptions);
       this.infoWindow = new google.maps.InfoWindow({
@@ -365,6 +372,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
       this.updateToiletMarkers();
       this.updateUserMarker();
+      this.updateSearchPlaceMarker();
     } catch (err) {
       console.error('Google Maps failed to initialize:', err);
     }
@@ -671,6 +679,35 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  private updateSearchPlaceMarker(): void {
+    if (!this.googleMap || typeof google === 'undefined' || !google.maps.marker?.AdvancedMarkerElement) return;
+
+    if (!this.searchLocation) {
+      if (this.searchPlaceMarker) {
+        this.searchPlaceMarker.map = null;
+        this.searchPlaceMarker = undefined;
+      }
+      return;
+    }
+
+    const position = { lat: this.searchLocation.lat, lng: this.searchLocation.lon };
+
+    if (!this.searchPlaceMarker) {
+      this.searchPlaceMarker = new google.maps.marker.AdvancedMarkerElement({
+        position,
+        map: this.googleMap,
+        title: this.searchLocation.name || '',
+        zIndex: 50
+      });
+    } else {
+      this.searchPlaceMarker.position = position;
+      this.searchPlaceMarker.title = this.searchLocation.name || '';
+      if (!this.searchPlaceMarker.map) {
+        this.searchPlaceMarker.map = this.googleMap;
+      }
+    }
+  }
+
   private clearAllMarkers(): void {
     this.markersMap.forEach((m) => {
       m.map = null;
@@ -680,6 +717,11 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     if (this.userMarker) {
       this.userMarker.map = null;
       this.userMarker = undefined;
+    }
+
+    if (this.searchPlaceMarker) {
+      this.searchPlaceMarker.map = null;
+      this.searchPlaceMarker = undefined;
     }
   }
 

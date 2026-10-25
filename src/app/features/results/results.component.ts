@@ -53,6 +53,7 @@ export class ResultsComponent implements OnInit {
   readonly selectedToilet = this.toiletState.selectedToilet;
   readonly mapCenter = this.toiletState.mapCenter;
   readonly userLocation = this.toiletState.userLocation;
+  readonly searchLocation = this.toiletState.searchLocation;
   readonly isLoading = this.toiletState.isLoading;
 
   readonly listHeightPercent = signal<number>(60);
