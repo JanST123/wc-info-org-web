@@ -124,6 +124,10 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'detail.photos': 'Photos',
   'detail.addPhoto': 'Add photo',
   'detail.noPhotos': 'No photos available yet',
+  'detail.shareTitle': '{name} on WC-Info',
+  'detail.shareText': 'Check out this restroom on WC-Info: {name}',
+  'detail.shareTextWithAddress': 'Check out this restroom on WC-Info: {name} ({address})',
+  'detail.shareTextGeneric': 'Check out this public restroom on WC-Info!',
 
   // Emergency Navigation
   'urgent.title': 'Emergency Navigation',

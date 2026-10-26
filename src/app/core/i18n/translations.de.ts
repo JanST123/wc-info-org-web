@@ -124,6 +124,10 @@ export const TRANSLATIONS_DE: Record<string, string> = {
   'detail.photos': 'Fotos',
   'detail.addPhoto': 'Foto hinzufügen',
   'detail.noPhotos': 'Noch keine Fotos vorhanden',
+  'detail.shareTitle': '{name} auf WC-Info',
+  'detail.shareText': 'Schau dir diese Toilette auf WC-Info an: {name}',
+  'detail.shareTextWithAddress': 'Schau dir diese Toilette auf WC-Info an: {name} ({address})',
+  'detail.shareTextGeneric': 'Schau dir diese öffentliche Toilette auf WC-Info an!',
 
   // Emergency Navigation
   'urgent.title': 'Notfall-Navigation',

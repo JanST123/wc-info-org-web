@@ -146,14 +146,41 @@ export class DetailComponent {
 
   shareToilet(): void {
     const shareUrl = window.location.href;
+    const owner = this.toilet.owner?.trim();
+    const name = this.toilet.name?.trim();
+    const displayName = owner && name && owner !== name
+      ? `${owner} – ${name}`
+      : (owner || name || '');
+    const address = this.toilet.address?.trim();
+
+    const shareTitle = displayName
+      ? this.translationService.t('detail.shareTitle', { name: displayName })
+      : this.translationService.t('app.title');
+
+    let shareText: string;
+    if (displayName && address) {
+      shareText = this.translationService.t('detail.shareTextWithAddress', { name: displayName, address });
+    } else if (displayName) {
+      shareText = this.translationService.t('detail.shareText', { name: displayName });
+    } else if (address) {
+      shareText = this.translationService.t('detail.shareText', { name: address });
+    } else {
+      shareText = this.translationService.t('detail.shareTextGeneric');
+    }
+
     if (navigator.share) {
+      console.log({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl
+      });
       navigator.share({
-        title: this.toilet.name || 'WC-Info',
-        text: this.toilet.address || 'WC-Info Restroom',
+        title: shareTitle,
+        text: shareText,
         url: shareUrl
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(shareUrl).then(() => {
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
         alert(this.translationService.t('common.copied'));
       });
     }

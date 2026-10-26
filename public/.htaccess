@@ -8,12 +8,12 @@
 	RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 	RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
-  # Redirection of requests to index.html
+  # Redirection of requests to index.php (for dynamic OpenGraph / SEO tags)
   RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
   RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
   RewriteRule ^.*$ - [NC,L]
-  # Redirect all non-file routes to index.html
-  RewriteRule ^(?!.*\.).*$ index.html [NC,L]
+  # Redirect all non-file routes to index.php
+  RewriteRule ^(?!.*\.).*$ index.php [NC,L]
 </IfModule>
 
 <IfModule mod_headers.c>
