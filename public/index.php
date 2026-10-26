@@ -100,6 +100,13 @@ function fetchToiletFromApi(int $id): ?array {
 $segments = array_values(array_filter(explode('/', trim($path, '/'))));
 $firstSeg = isset($segments[0]) ? strtolower($segments[0]) : '';
 
+$routeLang = 'de';
+if (in_array($firstSeg, ['de', 'en', 'nl'], true)) {
+  $routeLang = $firstSeg;
+  array_shift($segments);
+  $firstSeg = isset($segments[0]) ? strtolower($segments[0]) : '';
+}
+
 $toiletId = null;
 $placeSlug = null;
 $toiletSlug = null;
@@ -174,6 +181,13 @@ $escDesc = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 $escImage = htmlspecialchars($image, ENT_QUOTES, 'UTF-8');
 $escUrl = htmlspecialchars($cleanUrl, ENT_QUOTES, 'UTF-8');
 
+$localeMap = [
+  'de' => 'de_DE',
+  'en' => 'en_US',
+  'nl' => 'nl_NL'
+];
+$targetLocale = $localeMap[$routeLang] ?? 'de_DE';
+
 // Replace tags in index.html
 $replacements = [
   '/<title>.*?<\/title>/is' => '<title>' . $escTitle . '</title>',
@@ -181,6 +195,7 @@ $replacements = [
   '/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/i' => '<meta property="og:title" content="' . $escTitle . '">',
   '/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/i' => '<meta property="og:description" content="' . $escDesc . '">',
   '/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i' => '<meta property="og:image" content="' . $escImage . '">',
+  '/<meta\s+property="og:locale"\s+content="[^"]*"\s*\/?>/i' => '<meta property="og:locale" content="' . $targetLocale . '">',
   '/<meta\s+name="twitter:title"\s+content="[^"]*"\s*\/?>/i' => '<meta name="twitter:title" content="' . $escTitle . '">',
   '/<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/i' => '<meta name="twitter:description" content="' . $escDesc . '">',
   '/<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i' => '<meta name="twitter:image" content="' . $escImage . '">',

@@ -1,9 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { TRANSLATIONS_DE } from '../i18n/translations.de';
 import { TRANSLATIONS_EN } from '../i18n/translations.en';
+import { TRANSLATIONS_NL } from '../i18n/translations.nl';
 import { MatomoService } from './matomo.service';
 
-export type SupportedLanguage = 'de' | 'en';
+export type SupportedLanguage = 'de' | 'en' | 'nl';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,8 @@ export class TranslationService {
   // Dictionaries
   private readonly dictionaries: Record<SupportedLanguage, Record<string, string>> = {
     de: TRANSLATIONS_DE,
-    en: TRANSLATIONS_EN
+    en: TRANSLATIONS_EN,
+    nl: TRANSLATIONS_NL
   };
 
   constructor() {
@@ -34,16 +36,30 @@ export class TranslationService {
   }
 
   private detectInitialLanguage(): SupportedLanguage {
+    // 1. Check URL path prefix first (e.g. /nl/..., /en/..., /de/...)
+    if (typeof window !== 'undefined' && window.location.pathname) {
+      const firstSegment = window.location.pathname.split('/')[1]?.toLowerCase();
+      if (firstSegment === 'de' || firstSegment === 'en' || firstSegment === 'nl') {
+        try {
+          localStorage.setItem(this.STORAGE_KEY, firstSegment);
+        } catch {
+          // Ignore localStorage errors
+        }
+        return firstSegment;
+      }
+    }
+
+    // 2. Check saved preference in localStorage
     try {
       const saved = localStorage.getItem(this.STORAGE_KEY);
-      if (saved === 'de' || saved === 'en') {
+      if (saved === 'de' || saved === 'en' || saved === 'nl') {
         return saved;
       }
     } catch {
       // localStorage may fail in private mode
     }
 
-    // Check browser languages: if German (de, de-DE, de-AT, de-CH) -> de, else -> en
+    // 3. Check browser languages: if German -> de, Dutch -> nl, else -> en
     const browserLanguages = typeof navigator !== 'undefined'
       ? (navigator.languages || [navigator.language || ''])
       : [''];
@@ -53,8 +69,12 @@ export class TranslationService {
       if (normalized.startsWith('de')) {
         return 'de';
       }
+      if (normalized.startsWith('nl')) {
+        return 'nl';
+      }
     }
 
+    // 4. Default fallback
     return 'en';
   }
 
@@ -70,7 +90,8 @@ export class TranslationService {
   }
 
   toggleLanguage(): void {
-    const next = this.currentLang() === 'de' ? 'en' : 'de';
+    const current = this.currentLang();
+    const next: SupportedLanguage = current === 'de' ? 'en' : current === 'en' ? 'nl' : 'de';
     this.setLanguage(next);
   }
 

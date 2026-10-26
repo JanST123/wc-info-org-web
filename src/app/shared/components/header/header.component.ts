@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { TranslationService } from '../../../core/services/translation.service';
+import { SupportedLanguage, TranslationService } from '../../../core/services/translation.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { ToiletStateService } from '../../../core/services/toilet-state.service';
@@ -24,8 +24,21 @@ export class HeaderComponent {
   private readonly router = inject(Router);
   private readonly matomoService = inject(MatomoService);
 
-  setLang(lang: 'de' | 'en'): void {
+  setLang(lang: SupportedLanguage): void {
     this.translationService.setLanguage(lang);
+
+    const currentUrl = this.router.url;
+    const urlTree = this.router.parseUrl(currentUrl);
+    const rootGroup = urlTree.root.children['primary'];
+    if (rootGroup && rootGroup.segments.length > 0) {
+      const first = rootGroup.segments[0].path.toLowerCase();
+      if (['de', 'en', 'nl'].includes(first)) {
+        rootGroup.segments[0].path = lang;
+        this.router.navigateByUrl(urlTree);
+        return;
+      }
+    }
+    this.router.navigate(['/', lang]);
   }
 
   toggleTheme(): void {
@@ -43,11 +56,11 @@ export class HeaderComponent {
   openUrgent(): void {
     this.matomoService.trackUrgentUsed();
     this.toiletState.setNavigationTarget(null);
-    this.router.navigate(['/Urgent'], { queryParams: {} });
+    this.router.navigate(['/', this.translationService.currentLang(), 'Urgent'], { queryParams: {} });
   }
 
   triggerNearby(): void {
-    this.router.navigate(['/Toilets', 'Aktueller-Standort---NEARBY']);
+    this.router.navigate(['/', this.translationService.currentLang(), 'Toilets', 'Aktueller-Standort---NEARBY']);
   }
 
   openAddModal(): void {

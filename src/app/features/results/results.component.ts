@@ -15,6 +15,7 @@ import { Coordinates, LocationService } from '../../core/services/location.servi
 import { PlacesService } from '../../core/services/places.service';
 import { WcInfoApiService } from '../../core/services/wc-info-api.service';
 import { SeoService } from '../../core/services/seo.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { Toilet, ToiletPhoto } from '../../core/models/toilet.model';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { parsePlaceSlug, parseToiletSlug, createToiletSlug, createPlaceSlug } from '../../core/utils/slug.utils';
@@ -46,6 +47,7 @@ export class ResultsComponent implements OnInit {
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
   private readonly seoService = inject(SeoService);
   private readonly matomoService = inject(MatomoService);
 
@@ -275,19 +277,19 @@ export class ResultsComponent implements OnInit {
     this.toiletState.setSelectedToilet(toilet);
     const placeSlug = this.currentPlaceSlug() || 'Aktueller-Standort---NEARBY';
     const toiletSlug = createToiletSlug(toilet.name, toilet.id);
-    this.location.go(`/Toilets/${placeSlug}/${toiletSlug}`);
+    this.location.go(`/${this.translationService.currentLang()}/Toilets/${placeSlug}/${toiletSlug}`);
   }
 
   onCloseDetails(): void {
     this.activeDetailToilet.set(null);
     const placeSlug = this.currentPlaceSlug() || 'Aktueller-Standort---NEARBY';
-    this.location.go(`/Toilets/${placeSlug}`);
+    this.location.go(`/${this.translationService.currentLang()}/Toilets/${placeSlug}`);
   }
 
   onStartNavigation(toilet: Toilet): void {
     this.matomoService.trackUrgentUsed(toilet.id, toilet.name || toilet.owner);
     this.toiletState.setNavigationTarget(toilet);
-    this.router.navigate(['/Urgent'], { queryParams: { toilet: toilet.id } });
+    this.router.navigate(['/', this.translationService.currentLang(), 'Urgent'], { queryParams: { toilet: toilet.id } });
   }
 
   onOpenSuggestEdit(toilet: Toilet): void {

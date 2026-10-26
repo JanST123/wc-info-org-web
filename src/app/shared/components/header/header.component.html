@@ -1,6 +1,6 @@
 <header class="sticky top-0 z-30 bg-white/40 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 flex items-center justify-between shadow-xs transition-colors">
       <!-- Left: Logo & Brand -->
-      <a routerLink="/" class="flex items-center gap-2.5 group">
+      <a [routerLink]="['/', translationService.currentLang()]" class="flex items-center gap-2.5 group">
         <img src="/assets/logo320.png" alt="WC-Info Logo" class="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
         <div class="flex flex-col">
           <span class="text-lg font-bold bg-gradient-to-r from-purple-700 to-indigo-600 dark:from-purple-400 dark:to-indigo-300 bg-clip-text text-transparent portrait:hidden">
@@ -84,6 +84,13 @@
             class="px-2 py-1 rounded-full transition-colors"
           >
             EN
+          </button>
+          <button
+            (click)="setLang('nl')"
+            [ngClass]="translationService.currentLang() === 'nl' ? 'bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-xs' : 'text-gray-600 dark:text-gray-400'"
+            class="px-2 py-1 rounded-full transition-colors"
+          >
+            NL
           </button>
         </div>
       </div>

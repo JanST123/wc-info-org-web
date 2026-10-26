@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { Toilet } from '../models/toilet.model';
+import { SupportedLanguage, TranslationService } from './translation.service';
 
 export interface SeoData {
   title: string;
@@ -12,12 +13,19 @@ export interface SeoData {
   schema?: object;
 }
 
+const LOCALE_MAP: Record<SupportedLanguage, string> = {
+  de: 'de_DE',
+  en: 'en_US',
+  nl: 'nl_NL'
+};
+
 @Injectable({
   providedIn: 'root'
 })
 export class SeoService {
   private readonly titleService = inject(Title);
   private readonly metaService = inject(Meta);
+  private readonly translationService = inject(TranslationService);
 
   private readonly defaultDescription = 'Finde saubere und barrierefreie öffentliche Toiletten in deiner Nähe auf wc-info.org';
   private readonly defaultImage = '/assets/logo320.png';
@@ -45,7 +53,20 @@ export class SeoService {
     this.metaService.updateTag({ property: 'og:url', content: url });
     this.metaService.updateTag({ property: 'og:type', content: type });
     this.metaService.updateTag({ property: 'og:site_name', content: this.siteName });
-    this.metaService.updateTag({ property: 'og:locale', content: 'de_DE' });
+
+    const currentLang = this.translationService.currentLang();
+    const currentLocale = LOCALE_MAP[currentLang] || 'de_DE';
+    this.metaService.updateTag({ property: 'og:locale', content: currentLocale });
+
+    const alternateLocales = (Object.keys(LOCALE_MAP) as SupportedLanguage[])
+      .filter((lang) => lang !== currentLang)
+      .map((lang) => LOCALE_MAP[lang]);
+    
+    const existingAlternates = this.metaService.getTags('property="og:locale:alternate"');
+    existingAlternates.forEach(tag => this.metaService.removeTagElement(tag));
+    alternateLocales.forEach(loc => {
+      this.metaService.addTag({ property: 'og:locale:alternate', content: loc });
+    });
 
     // 4. Twitter Card
     this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
@@ -66,17 +87,20 @@ export class SeoService {
       this.metaService.removeTag('property="place:location:longitude"');
     }
 
-    // 6. Canonical Link
+    // 6. Canonical & Alternate Links
     this.updateCanonicalUrl(url);
+    this.updateAlternateLinks(url);
 
     // 7. Schema.org JSON-LD structured data
     this.updateJsonLd(data.schema);
   }
 
   setHomeSeo(): void {
+    const lang = this.translationService.currentLang();
     const title = 'WC-Info - wc-info.org';
     const description = this.defaultDescription;
-    const url = typeof window !== 'undefined' ? window.location.origin : this.baseUrl;
+    const origin = typeof window !== 'undefined' ? window.location.origin : this.baseUrl;
+    const url = `${origin}/${lang}`;
 
     const schema = {
       '@context': 'https://schema.org',
@@ -199,9 +223,10 @@ export class SeoService {
   }
 
   setUrgentSeo(): void {
+    const lang = this.translationService.currentLang();
     const title = 'Notfall-Navigation - wc-info.org';
     const description = 'Schnellste Notfall-Navigation zur nächsten barrierefreien öffentlichen Toilette auf wc-info.org.';
-    const url = typeof window !== 'undefined' ? window.location.href : `${this.baseUrl}/Urgent`;
+    const url = typeof window !== 'undefined' ? window.location.href : `${this.baseUrl}/${lang}/Urgent`;
 
     this.updateSeo({
       title,
@@ -219,6 +244,39 @@ export class SeoService {
       document.head.appendChild(link);
     }
     link.setAttribute('href', url);
+  }
+
+  private updateAlternateLinks(url: string): void {
+    if (typeof document === 'undefined') return;
+
+    let urlObj: URL;
+    try {
+      urlObj = new URL(url);
+    } catch {
+      urlObj = new URL(url, this.baseUrl);
+    }
+
+    const cleanPath = urlObj.pathname.replace(/^\/(?:de|en|nl)(?=\/|$)/i, '');
+    const origin = urlObj.origin || this.baseUrl;
+    const searchAndHash = `${urlObj.search}${urlObj.hash}`;
+
+    const languages: { hreflang: string; href: string }[] = [
+      { hreflang: 'de', href: `${origin}/de${cleanPath}${searchAndHash}` },
+      { hreflang: 'en', href: `${origin}/en${cleanPath}${searchAndHash}` },
+      { hreflang: 'nl', href: `${origin}/nl${cleanPath}${searchAndHash}` },
+      { hreflang: 'x-default', href: `${origin}/en${cleanPath}${searchAndHash}` }
+    ];
+
+    languages.forEach(({ hreflang, href }) => {
+      let link: HTMLLinkElement | null = document.querySelector(`link[rel="alternate"][hreflang="${hreflang}"]`);
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', 'alternate');
+        link.setAttribute('hreflang', hreflang);
+        document.head.appendChild(link);
+      }
+      link.setAttribute('href', href);
+    });
   }
 
   private updateJsonLd(schema?: object): void {

@@ -13,11 +13,11 @@
      @if(showFooter()) {
     <footer class="fixed bottom-0 w-full z-10 p-2 text-center text-xs bg-purple-900 text-purple-300/70 border-t border-white/10 flex items-center justify-between">
         <div>
-            <a [routerLink]="['/Law', 'Privacy']" routerLinkActive="font-bold" class="underline">{{ 'footer.privacy' | translate }}</a>
+            <a [routerLink]="['/', translationService.currentLang(), 'Law', 'Privacy']" routerLinkActive="font-bold" class="underline">{{ 'footer.privacy' | translate }}</a>
             <span class="mx-1">|</span>
-            <a [routerLink]="['/Law', 'Disclaimer']" routerLinkActive="font-bold" class="underline">{{ 'footer.disclaimer' | translate }}</a>
+            <a [routerLink]="['/', translationService.currentLang(), 'Law', 'Disclaimer']" routerLinkActive="font-bold" class="underline">{{ 'footer.disclaimer' | translate }}</a>
             <span class="mx-1">|</span>
-            <a [routerLink]="['/Law', 'Imprint']" routerLinkActive="font-bold" class="underline">{{ 'footer.imprint' | translate }}</a>
+            <a [routerLink]="['/', translationService.currentLang(), 'Law', 'Imprint']" routerLinkActive="font-bold" class="underline">{{ 'footer.imprint' | translate }}</a>
         </div>
         <p>{{ funnyFooter() }}</p>
     </footer>

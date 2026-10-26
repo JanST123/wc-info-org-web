@@ -4,6 +4,7 @@ import { ToastContainerComponent } from './shared/components/toast-container/toa
 import { HeaderComponent } from './shared/components/header/header.component';
 import { TranslatePipe } from './core/pipes/translate.pipe';
 import { MatomoService } from './core/services/matomo.service';
+import { TranslationService } from './core/services/translation.service';
 import { filter } from 'rxjs';
 
 @Component({
@@ -18,6 +19,7 @@ export class AppComponent implements OnInit {
 
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
+  readonly translationService = inject(TranslationService);
   private readonly matomoService = inject(MatomoService);
   
 
@@ -44,11 +46,13 @@ export class AppComponent implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
     ).subscribe(event => {
-      if (event.url.indexOf('/Toilets') === 0) {
+      const url = event.urlAfterRedirects || event.url;
+      const cleanUrl = url.replace(/^\/(?:de|en|nl)(?=\/|$)/i, '') || '/';
+      if (cleanUrl.startsWith('/Toilets') || cleanUrl.startsWith('/toiletten') || cleanUrl.startsWith('/Toilet') || cleanUrl.startsWith('/toilet')) {
         this.showHeader.set(true);
         this.showFooter.set(false);
 
-      } else if (event.url.indexOf('/Urgent') === 0) {
+      } else if (cleanUrl.startsWith('/Urgent')) {
         this.showHeader.set(false);
         this.showFooter.set(false);
 

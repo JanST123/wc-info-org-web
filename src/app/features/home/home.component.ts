@@ -7,6 +7,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { PlacesService, PlaceSuggestion } from '../../core/services/places.service';
 import { ToiletStateService } from '../../core/services/toilet-state.service';
 import { SeoService } from '../../core/services/seo.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { createPlaceSlug } from '../../core/utils/slug.utils';
@@ -31,6 +32,7 @@ export class HomeComponent implements OnInit {
   private readonly placesService = inject(PlacesService);
   private readonly toiletState = inject(ToiletStateService);
   readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
   private readonly matomoService = inject(MatomoService);
 
   searchQuery = '';
@@ -87,7 +89,7 @@ export class HomeComponent implements OnInit {
       this.toiletState.loadToiletsNearby(place.lat, place.lon, 10, place.primaryText);
     }
     const slug = createPlaceSlug(place.primaryText, place.placeId);
-    this.router.navigate(['/Toilets', slug]);
+    this.router.navigate(['/', this.translationService.currentLang(), 'Toilets', slug]);
   }
 
   onSearchSubmit(): void {
@@ -95,25 +97,25 @@ export class HomeComponent implements OnInit {
       const term = this.searchQuery.trim();
       this.saveRecentSearch(term);
       const slug = createPlaceSlug(term);
-      this.router.navigate(['/Toilets', slug]);
+      this.router.navigate(['/', this.translationService.currentLang(), 'Toilets', slug]);
     } else {
-      this.router.navigate(['/Toilets']);
+      this.router.navigate(['/', this.translationService.currentLang(), 'Toilets']);
     }
   }
 
   onNearbyClick(): void {
-    this.router.navigate(['/Toilets', 'Aktueller-Standort---NEARBY']);
+    this.router.navigate(['/', this.translationService.currentLang(), 'Toilets', 'Aktueller-Standort---NEARBY']);
   }
 
   openUrgent(): void {
     this.matomoService.trackUrgentUsed();
     this.toiletState.setNavigationTarget(null);
-    this.router.navigate(['/Urgent'], { queryParams: {} });
+    this.router.navigate(['/', this.translationService.currentLang(), 'Urgent'], { queryParams: {} });
   }
 
   onSelectRecent(item: RecentSearchItem): void {
     this.searchQuery = item.name;
-    this.router.navigate(['/Toilets', item.slug]);
+    this.router.navigate(['/', this.translationService.currentLang(), 'Toilets', item.slug]);
   }
 
   @HostListener('document:click', ['$event'])

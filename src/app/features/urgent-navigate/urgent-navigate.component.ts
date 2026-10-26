@@ -327,7 +327,7 @@ export class UrgentNavigateComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/Toilets/Nearby---Nearby']);
+    this.router.navigate(['/', this.translationService.currentLang(), 'Toilets', 'Nearby---Nearby']);
   }
 
   enableCompass(): void {
