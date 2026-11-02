@@ -36,6 +36,7 @@ export type WizardStepId =
   | 'gender_separated'
   | 'wheelchair'
   | 'euro_key'
+  | 'changing_table'
   | 'address'
   | 'opening_hours'
   | 'public_accessible'
@@ -122,6 +123,9 @@ export class CreateWizardComponent implements OnInit {
   // Euro Key (Step 7)
   readonly euroKey = signal<string | null>(null);
 
+  // Changing Table
+  readonly hasChangingTable = signal<boolean | null>(null);
+
   // Address (Step 8)
   address = '';
 
@@ -186,6 +190,9 @@ export class CreateWizardComponent implements OnInit {
     if (this.hasWheelchairAccess() === true) {
       steps.push('euro_key');
     }
+
+    // Changing table step: (after euro key question)
+    steps.push('changing_table');
 
     // Address step: ONLY if NO place was selected in step 1
     if (this.selectedPlace() === null) {
@@ -466,19 +473,21 @@ export class CreateWizardComponent implements OnInit {
   // --- Step 6: Wheelchair Access ---
   setWheelchair(hasAccess: boolean): void {
     this.hasWheelchairAccess.set(hasAccess);
-
-    if (hasAccess) {
-      // Moves to Step 7 (euro_key)
-      this.advanceToNextStep();
-    } else {
-      // Persist baseline creation right away!
-      this.persistBaselineAndAdvance();
+    if (!hasAccess) {
+      this.euroKey.set(null);
     }
+    this.advanceToNextStep();
   }
 
   // --- Step 7: Euro Key ---
   setEuroKey(value: string): void {
     this.euroKey.set(value);
+    this.advanceToNextStep();
+  }
+
+  // --- Step 8: Changing Table ---
+  setChangingTable(hasTable: boolean): void {
+    this.hasChangingTable.set(hasTable);
     this.persistBaselineAndAdvance();
   }
 
@@ -497,6 +506,7 @@ export class CreateWizardComponent implements OnInit {
       name: this.name.trim() || null,
       public_accessible: this.publicAccessible() ?? true,
       has_wheelchair_access: this.hasWheelchairAccess() ?? false,
+      has_changing_table: this.hasChangingTable() ?? false,
       is_gender_separated: this.isGenderSeparated() ?? false,
       is_unisex: this.isUnisex() ?? true,
       euro_key: this.euroKey() || null,
@@ -758,6 +768,7 @@ export class CreateWizardComponent implements OnInit {
         is_gender_separated: this.isGenderSeparated() ?? false,
         is_unisex: this.isUnisex() ?? true,
         has_wheelchair_access: this.hasWheelchairAccess() ?? false,
+        has_changing_table: this.hasChangingTable() ?? false,
         public_accessible: this.publicAccessible() ?? true,
         accessible_outside_opening_times: this.accessibleOutsideOpeningTimes() ?? false,
         storage_space: this.storageSpace(),
@@ -807,6 +818,7 @@ export class CreateWizardComponent implements OnInit {
       placeId: this.selectedPlace()?.placeId || null,
       publicAccessible: this.publicAccessible() ?? true,
       hasWheelchairAccess: this.hasWheelchairAccess() ?? false,
+      hasChangingTable: this.hasChangingTable() ?? false,
       euroKey: this.euroKey() || null,
       isUnisex: this.isUnisex() ?? true,
       isGenderSeparated: this.isGenderSeparated() ?? false,

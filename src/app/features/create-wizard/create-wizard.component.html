@@ -410,6 +410,51 @@
             </div>
           }
 
+          <!-- STEP: changing_table -->
+          @if (currentStepId() === 'changing_table') {
+            <div class="space-y-4 text-center">
+              <div class="flex align-center justify-center">
+                <div class="h-10 w-10 center rounded-full text-purple-500 text-center pt-2">
+                  <i aria-hidden="true" class="fa-solid fa-baby text-2xl"></i>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+                  {{ 'create.changingTableTitle' | translate }}
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ 'create.changingTableSub' | translate }}
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3">
+                <button
+                  type="button"
+                  (click)="setChangingTable(true)"
+                  class="p-4 rounded-xl border text-left flex items-center justify-between transition-all"
+                  [ngClass]="hasChangingTable() === true
+                    ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
+                    : 'bg-purple-50 dark:bg-purple-950/30 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
+                >
+                  <span class="font-bold text-sm">{{ 'create.changingTableYes' | translate }}</span>
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
+                </button>
+
+                <button
+                  type="button"
+                  (click)="setChangingTable(false)"
+                  class="p-4 rounded-xl border text-left flex items-center justify-between transition-all"
+                  [ngClass]="hasChangingTable() === false
+                    ? 'border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/40 text-purple-950 dark:text-purple-100 shadow-xs'
+                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 text-gray-900 dark:text-white'"
+                >
+                  <span class="font-bold text-sm">{{ 'create.changingTableNo' | translate }}</span>
+                  <span class="text-purple-600 dark:text-purple-400 font-bold">&rarr;</span>
+                </button>
+              </div>
+            </div>
+          }
+
           <!-- 8. CONDITIONAL STEP: address (Only if no place selected) -->
           @if (currentStepId() === 'address') {
             <div class="space-y-4 text-center">
