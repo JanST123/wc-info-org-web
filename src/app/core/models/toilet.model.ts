@@ -24,6 +24,13 @@ export interface ToiletPropertyItem {
   value: string;
 }
 
+export interface SummaryBounds {
+  south: number;
+  west: number;
+  north: number;
+  east: number;
+}
+
 export interface Toilet {
   id: number;
   name: string;
@@ -34,6 +41,12 @@ export interface Toilet {
   status?: 'active' | 'temporary_closed' | 'inactive' | string;
   temporaryClosed?: boolean;
   
+  // Summary mode fields
+  isSummary?: boolean;
+  summaryCount?: number;
+  summaryBounds?: SummaryBounds | null;
+  summaryLocationName?: string | null;
+
   // Accessibility & Features
   isQualified?: boolean | null;
   isUnisex?: boolean;
@@ -68,6 +81,33 @@ function toFlexibleBool(val: any): boolean {
   return false;
 }
 
+export function parseSummaryBounds(rawBounds: any): SummaryBounds | null {
+  if (!rawBounds) return null;
+  if (typeof rawBounds === 'object' && 'south' in rawBounds && 'north' in rawBounds) {
+    const south = parseFloat(rawBounds.south);
+    const west = parseFloat(rawBounds.west);
+    const north = parseFloat(rawBounds.north);
+    const east = parseFloat(rawBounds.east);
+    if (!isNaN(south) && !isNaN(west) && !isNaN(north) && !isNaN(east)) {
+      return { south, west, north, east };
+    }
+  }
+  if (typeof rawBounds === 'string') {
+    try {
+      const parsed = JSON.parse(rawBounds);
+      if (parsed && typeof parsed === 'object') {
+        return parseSummaryBounds(parsed);
+      }
+    } catch {
+      const parts = rawBounds.split(',').map((p) => parseFloat(p.trim()));
+      if (parts.length === 4 && !parts.some(isNaN)) {
+        return { south: parts[0], west: parts[1], north: parts[2], east: parts[3] };
+      }
+    }
+  }
+  return null;
+}
+
 export function normalizeToilet(raw: any): Toilet {
   if (!raw) {
     return {
@@ -83,15 +123,34 @@ export function normalizeToilet(raw: any): Toilet {
   const lon = typeof raw.lon === 'number' ? raw.lon : (parseFloat(raw.lon) || 0);
   const isClosed = toFlexibleBool(raw.temporary_closed ?? raw.temporaryClosed);
 
+  const isSummary = toFlexibleBool(raw.is_summary ?? raw.isSummary);
+  const summaryCount = typeof raw.summary_count === 'number'
+    ? raw.summary_count
+    : (typeof raw.summarize_count === 'number'
+      ? raw.summarize_count
+      : (parseInt(raw.summary_count ?? raw.summarize_count, 10) || (isSummary ? 1 : 0)));
+  const summaryLocationName = raw.summary_location_name ?? raw.summary_location ?? raw.summarize_location ?? null;
+  const summaryBounds = parseSummaryBounds(raw.summary_bounds ?? raw.summaryBounds ?? raw.summarize_bounds);
+
+  let name = raw.name || '';
+  if (isSummary) {
+    const loc = summaryLocationName || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+    name = `${summaryCount} Toilets around ${loc}`;
+  }
+
   return {
     id,
-    name: raw.name || '',
+    name,
     owner: raw.owner || null,
     lat,
     lon,
     placeId: raw.place_id ?? raw.placeId ?? null,
     status: raw.status || (isClosed ? 'temporary_closed' : 'active'),
     temporaryClosed: isClosed,
+    isSummary,
+    summaryCount: isSummary ? summaryCount : undefined,
+    summaryBounds,
+    summaryLocationName,
     isQualified: raw.is_qualified !== undefined ? toFlexibleBool(raw.is_qualified) : (raw.isQualified !== undefined ? toFlexibleBool(raw.isQualified) : null),
     isUnisex: toFlexibleBool(raw.is_unisex ?? raw.isUnisex),
     isGenderSeparated: toFlexibleBool(raw.is_gender_separated ?? raw.isGenderSeparated),

@@ -29,6 +29,12 @@ export class ToiletStateService {
   readonly isFeedbackOpen = signal<boolean>(false);
   readonly isUpdateOpen = signal<boolean>(false);
 
+  // Computed: Summary mode active when first item has isSummary
+  readonly isSummaryMode = computed(() => {
+    const list = this.toilets();
+    return list.length > 0 && !!list[0].isSummary;
+  });
+
   // Computed: Toilets with live distances relative to searched location (or userLocation / mapCenter)
   readonly enrichedToilets = computed(() => {
     const list = this.toilets();

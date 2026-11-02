@@ -37,6 +37,13 @@ export const TRANSLATIONS_EN: Record<string, string> = {
   'common.send_email': 'Send Email',
   'common.help': 'Help',
 
+  // Summary Mode
+  'summary.toiletsAround': '{count} Toilets around {location}',
+  'summary.toiletsInArea': '{count} Toilets in this area',
+  'summary.zoomIn': 'Zoom in',
+  'summary.zoomHint': 'Zoom in to see individual toilets.',
+  'summary.badge': 'Summary',
+
   // Filters
   'filter.title': 'Filters',
   'filter.expand': 'Expand filters',

@@ -14,7 +14,7 @@ import {
   signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Toilet } from '../../core/models/toilet.model';
+import { Toilet, SummaryBounds } from '../../core/models/toilet.model';
 import { Coordinates } from '../../core/services/location.service';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
@@ -194,6 +194,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private googleMap?: google.maps.Map;
   private infoWindow?: any;
   private markersMap = new Map<number, google.maps.marker.AdvancedMarkerElement>();
+  private summaryRectangles = new Map<number, google.maps.Rectangle>();
   private userMarker?: google.maps.marker.AdvancedMarkerElement;
   private searchPlaceMarker?: google.maps.marker.AdvancedMarkerElement;
   private idleListener?: google.maps.MapsEventListener;
@@ -425,23 +426,63 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-    // Add new markers
+    // Remove summary rectangles that are no longer in the list
+    for (const [id, rect] of this.summaryRectangles.entries()) {
+      if (!currentToiletIds.has(id)) {
+        rect.setMap(null);
+        this.summaryRectangles.delete(id);
+      }
+    }
+
+    // Add or update markers and rectangles
     for (const toilet of this.toilets) {
+      if (toilet.isSummary && toilet.summaryBounds) {
+        if (!this.summaryRectangles.has(toilet.id)) {
+          const isSelected = this.selectedToilet?.id === toilet.id;
+          const rect = new google.maps.Rectangle({
+            bounds: {
+              south: toilet.summaryBounds.south,
+              west: toilet.summaryBounds.west,
+              north: toilet.summaryBounds.north,
+              east: toilet.summaryBounds.east
+            },
+            map: this.googleMap,
+            fillColor: '#9333ea',
+            fillOpacity: isSelected ? 0.28 : 0.12,
+            strokeColor: '#a855f7',
+            strokeOpacity: isSelected ? 0.85 : 0.45,
+            strokeWeight: isSelected ? 2.5 : 1.2,
+            clickable: true,
+            zIndex: isSelected ? 20 : 5
+          });
+
+          rect.addListener('click', () => {
+            this.toiletSelect.emit(toilet);
+          });
+
+          this.summaryRectangles.set(toilet.id, rect);
+        }
+      }
+
       if (this.markersMap.has(toilet.id)) continue;
 
       const position = { lat: toilet.lat, lng: toilet.lon };
-      const el = this.createPinElement(toilet);
+      const el = toilet.isSummary ? this.createSummaryPinElement(toilet) : this.createPinElement(toilet);
 
       el.addEventListener('click', (e) => {
         e.stopPropagation();
         this.toiletSelect.emit(toilet);
       });
 
+      const title = toilet.isSummary
+        ? this.getSummaryTitle(toilet)
+        : (toilet.owner || toilet.name);
+
       const advMarker = new google.maps.marker.AdvancedMarkerElement({
         map: this.googleMap,
         position,
         content: el,
-        title: toilet.owner || toilet.name,
+        title,
         zIndex: this.selectedToilet?.id === toilet.id ? 100 : 1
       });
 
@@ -449,6 +490,31 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.highlightSelectedMarkersOnly();
+  }
+
+  getSummaryTitle(toilet: Toilet): string {
+    const loc = toilet.summaryLocationName;
+    return loc
+      ? this.translationService.t('summary.toiletsAround', { count: toilet.summaryCount ?? 0, location: loc })
+      : this.translationService.t('summary.toiletsInArea', { count: toilet.summaryCount ?? 0 });
+  }
+
+  private createSummaryPinElement(toilet: Toilet): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'custom-summary-pin';
+    el.setAttribute('data-id', toilet.id.toString());
+
+    const countEl = document.createElement('span');
+    countEl.className = 'summary-count';
+    countEl.textContent = (toilet.summaryCount ?? 1).toString();
+    el.appendChild(countEl);
+
+    const subEl = document.createElement('span');
+    subEl.className = 'summary-sub';
+    subEl.textContent = 'WC';
+    el.appendChild(subEl);
+
+    return el;
   }
 
   private getMarkerIconName(toilet: Toilet): string {
@@ -498,6 +564,14 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
           marker.zIndex = 1;
         }
       });
+      this.summaryRectangles.forEach((rect) => {
+        rect.setOptions({
+          fillOpacity: 0.12,
+          strokeOpacity: 0.45,
+          strokeWeight: 1.2,
+          zIndex: 5
+        });
+      });
       return;
     }
 
@@ -512,6 +586,16 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
           marker.zIndex = 1;
         }
       }
+    });
+
+    this.summaryRectangles.forEach((rect, id) => {
+      const isSelected = id === this.selectedToilet!.id;
+      rect.setOptions({
+        fillOpacity: isSelected ? 0.28 : 0.12,
+        strokeOpacity: isSelected ? 0.85 : 0.45,
+        strokeWeight: isSelected ? 2.5 : 1.2,
+        zIndex: isSelected ? 20 : 5
+      });
     });
   }
 
@@ -552,6 +636,49 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   private createInfoWindowContent(toilet: Toilet): HTMLElement {
     const container = document.createElement('div');
     container.className = 'p-1.5 max-w-[260px] text-left font-sans select-text';
+
+    if (toilet.isSummary) {
+      const headlineEl = document.createElement('div');
+      headlineEl.className = 'font-bold text-sm text-gray-900 dark:text-white leading-tight mb-1';
+      headlineEl.textContent = this.getSummaryTitle(toilet);
+      container.appendChild(headlineEl);
+
+      const hintEl = document.createElement('div');
+      hintEl.className = 'text-xs text-gray-600 dark:text-gray-300 leading-snug mb-2';
+      hintEl.textContent = this.translationService.t('summary.zoomHint');
+      container.appendChild(hintEl);
+
+      const zoomBtn = document.createElement('button');
+      zoomBtn.type = 'button';
+      zoomBtn.className = 'inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer w-full';
+      zoomBtn.innerHTML = `
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <line x1="11" y1="8" x2="11" y2="14"/>
+          <line x1="8" y1="11" x2="14" y2="11"/>
+        </svg>
+        <span>${this.translationService.t('summary.zoomIn')}</span>
+      `;
+      zoomBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (toilet.summaryBounds && this.googleMap) {
+          this.googleMap.fitBounds({
+            south: toilet.summaryBounds.south,
+            west: toilet.summaryBounds.west,
+            north: toilet.summaryBounds.north,
+            east: toilet.summaryBounds.east
+          });
+        } else if (this.googleMap) {
+          this.googleMap.setCenter({ lat: toilet.lat, lng: toilet.lon });
+          this.googleMap.setZoom((this.googleMap.getZoom() ?? 12) + 2);
+        }
+      });
+      container.appendChild(zoomBtn);
+
+      return container;
+    }
 
     const hasOwner = Boolean(toilet.owner && toilet.owner.trim().length > 0);
     const headline = hasOwner ? toilet.owner! : (toilet.name || this.translationService.t('app.title'));
@@ -714,6 +841,11 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     });
     this.markersMap.clear();
 
+    this.summaryRectangles.forEach((rect) => {
+      rect.setMap(null);
+    });
+    this.summaryRectangles.clear();
+
     if (this.userMarker) {
       this.userMarker.map = null;
       this.userMarker = undefined;
@@ -723,6 +855,16 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
       this.searchPlaceMarker.map = null;
       this.searchPlaceMarker = undefined;
     }
+  }
+
+  fitSummaryBounds(bounds: SummaryBounds): void {
+    if (!this.googleMap) return;
+    this.googleMap.fitBounds({
+      south: bounds.south,
+      west: bounds.west,
+      north: bounds.north,
+      east: bounds.east
+    });
   }
 
   toggleMapType(): void {

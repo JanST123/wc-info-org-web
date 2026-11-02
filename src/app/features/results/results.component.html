@@ -54,6 +54,7 @@
                 (onOpenDetails)="onOpenDetails($event, 'card')"
                 (onNavigate)="onStartNavigation($event)"
                 (onOpenPhoto)="onOpenPhoto($event, toilet)"
+                (onZoomToSummary)="onZoomToSummary($event)"
               />
             } @empty {
               @if (!isLoading()) {
@@ -74,6 +75,7 @@
         <!-- ============================================== -->
         <main class="hidden md:block flex-1 min-h-0 relative h-full">
           <app-map
+            #desktopMap
             [toilets]="toilets()"
             [selectedToilet]="selectedToilet()"
             [center]="mapCenter()"
@@ -145,6 +147,7 @@
                   (onOpenDetails)="onOpenDetails($event, 'card')"
                   (onNavigate)="onStartNavigation($event)"
                   (onOpenPhoto)="onOpenPhoto($event, toilet)"
+                  (onZoomToSummary)="onZoomToSummary($event)"
                 />
               } @empty {
                 @if (!isLoading()) {
@@ -173,6 +176,7 @@
           <!-- Bottom Section: Map Component (flex-1 min-h-0) -->
           <div class="flex-1 min-h-0 relative w-full overflow-hidden">
             <app-map
+              #mobileMap
               [toilets]="toilets()"
               [selectedToilet]="selectedToilet()"
               [center]="mapCenter()"

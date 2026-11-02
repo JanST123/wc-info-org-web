@@ -37,6 +37,13 @@ export const TRANSLATIONS_NL: Record<string, string> = {
   'common.send_email': 'E-mail verzenden',
   'common.help': 'Help',
 
+  // Summary Mode
+  'summary.toiletsAround': '{count} Toiletten in de omgeving van {location}',
+  'summary.toiletsInArea': '{count} Toiletten in dit gebied',
+  'summary.zoomIn': 'Inzoomen',
+  'summary.zoomHint': 'Zoom in om individuele toiletten te zien.',
+  'summary.badge': 'Overzicht',
+
   // Filters
   'filter.title': 'Filters',
   'filter.expand': 'Filters uitklappen',

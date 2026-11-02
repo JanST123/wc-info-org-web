@@ -25,6 +25,7 @@ export class ToiletCardComponent {
   @Output() onOpenDetails = new EventEmitter<Toilet>();
   @Output() onNavigate = new EventEmitter<Toilet>();
   @Output() onOpenPhoto = new EventEmitter<ToiletPhoto>();
+  @Output() onZoomToSummary = new EventEmitter<Toilet>();
 
   readonly showNonPublicInfo = signal(false);
 
@@ -33,7 +34,18 @@ export class ToiletCardComponent {
     this.onOpenPhoto.emit(photo);
   }
 
+  zoomToSummary(event: MouseEvent): void {
+    event.stopPropagation();
+    this.onZoomToSummary.emit(this.toilet);
+  }
+
   get displayTitle(): string {
+    if (this.toilet.isSummary) {
+      const loc = this.toilet.summaryLocationName;
+      return loc
+        ? this.translationService.t('summary.toiletsAround', { count: this.toilet.summaryCount ?? 0, location: loc })
+        : this.translationService.t('summary.toiletsInArea', { count: this.toilet.summaryCount ?? 0 });
+    }
     if (this.toilet.owner && this.toilet.owner.trim().length > 0 && this.toilet.name && this.toilet.owner !== this.toilet.name) {
       return this.toilet.owner;
     }
@@ -41,6 +53,9 @@ export class ToiletCardComponent {
   }
 
   get displaySubtitle(): string | null {
+    if (this.toilet.isSummary) {
+      return null;
+    }
     if (this.toilet.owner && this.toilet.owner.trim().length > 0 && this.toilet.name && this.toilet.owner !== this.toilet.name) {
       return this.toilet.name;
     }
@@ -48,6 +63,7 @@ export class ToiletCardComponent {
   }
 
   get hasSymbols(): boolean {
+    if (this.toilet.isSummary) return false;
     return !!(
       this.toilet.hasWheelchairAccess ||
       this.toilet.hasChangingTable ||

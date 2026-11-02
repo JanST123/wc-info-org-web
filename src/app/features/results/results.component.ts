@@ -61,6 +61,9 @@ export class ResultsComponent implements OnInit {
   readonly listHeightPercent = signal<number>(60);
   readonly currentPlaceSlug = signal<string>('Aktueller-Standort---NEARBY');
 
+  @ViewChild('desktopMap') desktopMap?: MapComponent;
+  @ViewChild('mobileMap') mobileMap?: MapComponent;
+
   constructor() {
     effect(() => {
       const detailToilet = this.activeDetailToilet();
@@ -237,8 +240,13 @@ export class ResultsComponent implements OnInit {
   }
 
   private loadAndOpenToiletDetail(id: number): void {
+    if (id < 0) {
+      return; // Do not attempt to load summary placeholders
+    }
+
     const existing = this.toilets().find((t) => t.id === id);
     if (existing) {
+      if (existing.isSummary) return;
       this.matomoService.trackDetailOpened(existing.id, 'direct', existing.name || existing.owner);
       this.activeDetailToilet.set(existing);
       this.toiletState.setSelectedToilet(existing);
@@ -271,7 +279,19 @@ export class ResultsComponent implements OnInit {
     }
   }
 
+  onZoomToSummary(toilet: Toilet): void {
+    if (toilet.summaryBounds) {
+      this.desktopMap?.fitSummaryBounds(toilet.summaryBounds);
+      this.mobileMap?.fitSummaryBounds(toilet.summaryBounds);
+    } else {
+      this.toiletState.mapCenter.set({ lat: toilet.lat, lon: toilet.lon });
+    }
+  }
+
   onOpenDetails(toilet: Toilet, source: 'card' | 'map' | 'direct' = 'card'): void {
+    if (toilet.isSummary) {
+      return; // Opening detail view is prevented in summary mode
+    }
     this.matomoService.trackDetailOpened(toilet.id, source, toilet.name || toilet.owner);
     this.activeDetailToilet.set(toilet);
     this.toiletState.setSelectedToilet(toilet);
